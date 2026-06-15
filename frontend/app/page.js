@@ -9,13 +9,36 @@ import LabourSection from "@/components/ui/LabourSection";
 import HowItWorks from "@/components/ui/HowItWorks";
 import Testimonials from "@/components/ui/Testimonials";
 import VendorCTA from "@/components/ui/VendorCTA";
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomePage() {
+  const { openSubscriptionModal } = useAuth();
+
   return (
     <div className="bg-slate-50 min-h-screen">
       <HeroSection />
       <TrustStrip />
       
+      {/* Minimum Plan Highlight Section */}
+      <section className="max-w-6xl mx-auto px-5 md:px-10 mb-12">
+        <div className="bg-gradient-to-r from-indigo-50 to-teal-50 border border-indigo-100 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+          <div>
+            <h3 className="font-sora text-xl md:text-2xl font-bold text-slate-800">
+              Get started for just <span className="text-indigo-600">₹11/month</span>
+            </h3>
+            <p className="text-slate-600 mt-2">
+              Unlock all verified vendor contacts, exclusive local offers, and daily labour listings instantly.
+            </p>
+          </div>
+          <button 
+            onClick={openSubscriptionModal}
+            className="shrink-0 bg-indigo-600 text-white font-bold px-8 py-3.5 rounded-xl shadow-md hover:bg-indigo-700 hover:-translate-y-0.5 transition-all w-full md:w-auto"
+          >
+            Subscribe Now
+          </button>
+        </div>
+      </section>
+
       <section className="max-w-6xl mx-auto px-5 md:px-10 py-12">
         <div className="flex justify-between items-end mb-6">
           <div>

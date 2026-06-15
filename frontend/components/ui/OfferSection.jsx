@@ -1,3 +1,6 @@
+'use client';
+import { useAuth } from '@/contexts/AuthContext';
+
 const offers = [
   { title: "AC servicing & gas refill discount", vendor: "Sonu AC Repair · Gaya City", discount: "20% OFF", expiry: "30 Jun 2025", bg: "bg-indigo-50", color: "indigo" },
   { title: "Full bike service at flat ₹99 only", vendor: "Raja Motors · Bodh Gaya", discount: "₹99 FLAT", expiry: "15 Jul 2025", bg: "bg-teal-50", color: "teal" },
@@ -6,6 +9,8 @@ const offers = [
 ];
 
 export default function OfferSection() {
+  const { user, openSubscriptionModal } = useAuth();
+
   return (
     <div className="grid md:grid-cols-2 gap-4">
       {offers.map((offer, idx) => (
@@ -25,10 +30,22 @@ export default function OfferSection() {
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 Expires {offer.expiry}
               </div>
-              <div className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-[10px] font-semibold rounded-full px-2 py-0.5 mt-2">
-                <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" strokeWidth="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth="2"/></svg>
-                Subscribe to view full offer
-              </div>
+              {user?.isSubscribed ? (
+                <button 
+                  className="inline-flex items-center gap-1 bg-green-50 text-green-700 text-[10px] font-semibold rounded-full px-3 py-1 mt-2 hover:bg-green-100 transition"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>
+                  Reveal Offer Code
+                </button>
+              ) : (
+                <button 
+                  onClick={openSubscriptionModal}
+                  className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-[10px] font-semibold rounded-full px-2 py-0.5 mt-2 hover:bg-amber-100 transition"
+                >
+                  <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" strokeWidth="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth="2"/></svg>
+                  Subscribe to view full offer
+                </button>
+              )}
             </div>
           </div>
         </div>

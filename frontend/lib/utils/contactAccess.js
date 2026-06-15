@@ -113,6 +113,12 @@ export function hasActiveBannerPostAccess(user) {
   return Boolean(user.bannerPostExpiresAt && new Date(user.bannerPostExpiresAt).getTime() > Date.now())
 }
 
+export function isUserSubscribed(user) {
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+  return Boolean(user.subscriptionActive && user.subscriptionExpiry && new Date(user.subscriptionExpiry).getTime() > Date.now());
+}
+
 export function toAuthUser(user) {
   const hasContactAccess = hasActiveContactAccess(user)
   const hasOfferAccess = hasActiveOfferAccess(user)
@@ -139,6 +145,7 @@ export function toAuthUser(user) {
     subscriptionActive: user.subscriptionActive || false,
     subscriptionExpiry: user.subscriptionExpiry || null,
     subscriptionPlan: user.subscriptionPlan || 'none',
+    isSubscribed: isUserSubscribed(user),
   }
 }
 

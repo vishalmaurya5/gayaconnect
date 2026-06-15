@@ -3,7 +3,7 @@ import { connectDB } from '@/lib/db/mongodb'
 import User from '@/lib/db/models/User'
 import Vendor from '@/lib/db/models/Vendor'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import { createUserSession } from '@/lib/security/auth'
 
 export async function POST(request) {
   try {
@@ -36,13 +36,9 @@ export async function POST(request) {
       await vendor.save()
     }
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role, name: user.name },
-      process.env.JWT_SECRET,
-      { expiresIn: '30d' }
-    )
-
-    return NextResponse.json({ success: true, token, user })
+    const response = NextResponse.json({ success: true, user })
+    await createUserSession(response, user, false)
+    return response
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 })
   }

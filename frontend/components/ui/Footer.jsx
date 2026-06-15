@@ -1,6 +1,11 @@
+'use client';
+
 import Link from "next/link";
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Footer() {
+  const { openSubscriptionModal } = useAuth();
+
   return (
     <footer className="bg-slate-900 text-white/70 pt-12 pb-6">
       <div className="max-w-6xl mx-auto px-5 md:px-10">
@@ -13,7 +18,7 @@ export default function Footer() {
             <p className="text-sm text-white/40 leading-relaxed max-w-xs">
               Your trusted local discovery platform for Gaya &amp; Bodh Gaya district. Find services, vendors, deals, and daily workers — all in one place.
             </p>
-            <button className="mt-4 bg-indigo-600 text-white rounded-lg px-4 py-2 text-sm font-semibold flex items-center gap-2">
+            <button onClick={openSubscriptionModal} className="mt-4 bg-indigo-600 text-white rounded-lg px-4 py-2 text-sm font-semibold flex items-center gap-2 hover:bg-indigo-700 transition">
               Subscribe now
               <span className="bg-white/20 rounded px-1.5 py-0.5 text-xs">₹11 / month</span>
             </button>

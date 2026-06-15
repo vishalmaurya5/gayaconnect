@@ -7,7 +7,7 @@ import { UserIcon } from '@heroicons/react/24/outline'
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { user, logout } = useAuth()
+  const { user, logout, openSubscriptionModal } = useAuth()
 
   return (
     <>
@@ -15,9 +15,9 @@ export default function Navbar() {
       <div className="bg-indigo-700 text-white text-center py-1.5 text-xs">
         Limited time: Unlock all vendor contacts, offers & daily labour listings for just{" "}
         <strong className="text-amber-300">₹11/month</strong>
-        <Link href="/pricing" className="text-indigo-200 underline ml-1.5">
+        <button onClick={openSubscriptionModal} className="text-indigo-200 underline ml-1.5 hover:text-white transition">
           Subscribe now →
-        </Link>
+        </button>
       </div>
 
       {/* Main Navbar */}
@@ -88,13 +88,13 @@ export default function Navbar() {
               >
                 Login
               </Link>
-              <Link 
-                href="/register" 
+              <button 
+                onClick={openSubscriptionModal}
                 className="bg-indigo-600 text-white text-sm font-semibold rounded-lg px-5 py-1.5 flex items-center gap-1.5 hover:bg-indigo-700 transition"
               >
                 Subscribe
                 <span className="bg-white/20 rounded px-1.5 py-0.5 text-xs">₹11/mo</span>
-              </Link>
+              </button>
             </>
           )}
         </div>
@@ -153,13 +153,15 @@ export default function Navbar() {
                 >
                   Login
                 </Link>
-                <Link 
-                  href="/register" 
+                <button 
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    openSubscriptionModal();
+                  }}
                   className="block w-full text-center bg-indigo-600 text-white font-semibold rounded-lg py-2"
-                  onClick={() => setMobileMenuOpen(false)}
                 >
                   Subscribe ₹11/mo
-                </Link>
+                </button>
               </>
             )}
           </div>

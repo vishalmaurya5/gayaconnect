@@ -1,3 +1,6 @@
+'use client';
+import { useAuth } from '@/contexts/AuthContext';
+
 const workers = [
   { name: "Ramesh Kumar", role: "Raj Mistri (Mason)", rate: "₹600", available: true, avatar: "RK", bg: "bg-indigo-50", text: "indigo" },
   { name: "Suresh Paswan", role: "Painter", rate: "₹500", available: true, avatar: "SP", bg: "bg-teal-50", text: "teal" },
@@ -6,6 +9,8 @@ const workers = [
 ];
 
 export default function LabourSection() {
+  const { user, openSubscriptionModal } = useAuth();
+
   return (
     <div>
       <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -32,13 +37,27 @@ export default function LabourSection() {
           </div>
         ))}
       </div>
-      <div className="mt-5 bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-3">
-        <div className="flex items-center gap-3">
-          <svg className="w-5 h-5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4" strokeWidth="2"/></svg>
-          <p className="text-sm font-medium text-indigo-900">800+ daily workers registered. Subscribe to contact them directly. <span className="text-gray-600 ml-1">Rates, availability & numbers all unlocked.</span></p>
+      {user?.isSubscribed ? (
+        <div className="mt-5 bg-green-50 border border-green-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-3">
+          <div className="flex items-center gap-3">
+            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <p className="text-sm font-medium text-green-900">You have premium access. Contact daily workers directly.</p>
+          </div>
         </div>
-        <button className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Subscribe ₹11/month</button>
-      </div>
+      ) : (
+        <div className="mt-5 bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-3">
+          <div className="flex items-center gap-3">
+            <svg className="w-5 h-5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4" strokeWidth="2"/></svg>
+            <p className="text-sm font-medium text-indigo-900">800+ daily workers registered. Subscribe to contact them directly. <span className="text-gray-600 ml-1">Rates, availability & numbers all unlocked.</span></p>
+          </div>
+          <button 
+            onClick={openSubscriptionModal}
+            className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-semibold whitespace-nowrap hover:bg-indigo-700 transition"
+          >
+            Subscribe ₹11/month
+          </button>
+        </div>
+      )}
     </div>
   );
 }
