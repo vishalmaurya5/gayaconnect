@@ -1,0 +1,15 @@
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Gaya Connect",
+  "url": "https://example.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Street",
+    "addressLocality": "City",
+    "addressRegion": "State",
+    "postalCode": "00000",
+    "addressCountry": "IN"
+  }
+}
+
