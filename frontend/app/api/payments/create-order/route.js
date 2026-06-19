@@ -1,128 +1,89 @@
-import Razorpay from 'razorpay'
-import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/db/mongodb'
-import Payment from '@/lib/db/models/Payment'
-import { CONTACT_ACCESS_PLAN, PAYMENT_PLANS } from '@/lib/utils/contactAccess'
-import { createPhonePeCheckout, hasPhonePeConfig } from '@/lib/payments/phonepe'
-import { getAuthenticatedUser } from '@/lib/security/auth'
-import { enforceRateLimit } from '@/lib/security/rateLimit'
-import { paymentOrderSchema, validationError } from '@/lib/security/validation'
+// app/api/payments/create-order/route.js — Create Razorpay / dummy order
+import { NextResponse } from "next/server";
+import connectDB         from "@/lib/db/connect";
+import { getLoggedInUser } from "@/lib/checkSubscription";
 
-const razorpay = () => new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-})
-
-const hasRazorpayKeys = () => Boolean(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET)
-const shouldUseDummy = (request) =>
-  process.env.NODE_ENV !== 'production' && (
-    request.headers.get('x-use-dummy-razorpay') === 'true' ||
-    request.headers.get('x-use-dummy-phonepe') === 'true' ||
-    process.env.DUMMY_RAZORPAY === 'true' ||
-    process.env.DUMMY_PHONEPE === 'true'
-  )
+const PLAN_PRICES = {
+  user_monthly:  1100,  // ₹11 in paise
+  offer_7days:   3900,  // ₹39
+  offer_30days:  19900, // ₹199
+  offer_365days: 39900, // ₹399
+  banner:        99900, // ₹999
+};
 
 export async function POST(request) {
-  const limited = enforceRateLimit(request, 'payment-order', { limit: 20, windowMs: 15 * 60 * 1000 })
-  if (limited) return limited
-
   try {
-    await connectDB()
+    await connectDB();
 
-    const user = await getAuthenticatedUser(request)
+    const user = await getLoggedInUser(request);
     if (!user) {
-      return NextResponse.json({ success: false, message: 'Login required' }, { status: 401 })
+      return NextResponse.json({ error: "Please login to continue" }, { status: 401 });
     }
 
-    const parsed = paymentOrderSchema.safeParse(await request.json().catch(() => ({ planType: CONTACT_ACCESS_PLAN })))
-    if (!parsed.success) {
-      return NextResponse.json({ success: false, message: validationError(parsed.error) }, { status: 400 })
-    }
-    const { provider, planType } = parsed.data
+    const body     = await request.json();
+    const { plan, duration, offerData } = body;
 
-    const plan = PAYMENT_PLANS[planType]
-    if (!plan) {
-      return NextResponse.json({ success: false, message: 'Unsupported payment plan' }, { status: 400 })
-    }
+    // Determine plan key and amount
+    const planKey = plan === "offer_post"
+      ? `offer_${duration}`
+      : plan;
 
-    if (!plan.roles.includes(user.role)) {
-      return NextResponse.json(
-        { success: false, message: `${plan.description} is not available for this account type` },
-        { status: 403 }
-      )
+    const amountPaise = PLAN_PRICES[planKey];
+    if (!amountPaise) {
+      return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
     }
 
-    const amount = plan.amount
-    const providerConfigured = provider === 'razorpay' ? hasRazorpayKeys() : hasPhonePeConfig()
-    const useDummy = shouldUseDummy(request)
-    if (!providerConfigured && !useDummy) {
-      return NextResponse.json({ success: false, message: 'Payment provider is unavailable' }, { status: 503 })
+    // ── DUMMY MODE (dev / testing) ────────────────────────────────────────────
+    if (process.env.DUMMY_RAZORPAY === "true" || process.env.NEXT_PUBLIC_USE_REAL_RAZORPAY === "false") {
+      return NextResponse.json({
+        isDummy:  true,
+        orderId:  `dummy_order_${Date.now()}`,
+        amount:   amountPaise,
+        currency: "INR",
+        plan,
+        duration,
+        offerData,
+      });
     }
-    const merchantOrderId = provider === 'phonepe' ? `phonepe_order_${Date.now()}` : null
-    const phonePeOrder = provider === 'phonepe' && !useDummy
-      ? await createPhonePeCheckout({ user, amount, merchantOrderId, request })
-      : null
-    const order = provider === 'razorpay' && !useDummy
-      ? await razorpay().orders.create({
-          amount: amount * 100,
-          currency: 'INR',
-          receipt: `${plan.receiptPrefix}_${user._id}_${Date.now()}`.slice(0, 40),
-          notes: {
-            userId: String(user._id),
-            planType,
-          },
-        })
-      : provider === 'phonepe'
-        ? {
-          id: useDummy ? `dummy_phonepe_order_${Date.now()}` : merchantOrderId,
-          amount: amount * 100,
-          currency: 'INR',
-          status: 'created',
-          redirectUrl: useDummy
-            ? null
-            : phonePeOrder?.redirectUrl || null,
-          raw: phonePeOrder,
-        }
-        : {
-          id: `dummy_order_${Date.now()}`,
-          amount: amount * 100,
-          currency: 'INR',
-          receipt: `dummy_${plan.receiptPrefix}_${Date.now()}`,
-          status: 'created',
-        }
 
-    const payment = await Payment.create({
-      userId: user._id,
-      amount,
-      currency: 'INR',
-      planType,
-      paymentMethod: provider,
-      transactionId: `${provider}_${order.id}`,
-      status: 'pending',
-      razorpayOrderId: order.id,
-      metadata: {
-        description: plan.description,
-        accessDays: plan.days,
-        provider,
-        phonePeRedirectUrl: order.redirectUrl || undefined,
-        phonePeOrderId: phonePeOrder?.phonePeOrderId || undefined,
-        phonePeExpireAt: phonePeOrder?.expireAt || undefined,
-        phonePeState: phonePeOrder?.status || undefined,
+    // ── REAL RAZORPAY ORDER ───────────────────────────────────────────────────
+    const Razorpay = (await import("razorpay")).default;
+    const razorpay = new Razorpay({
+      key_id:     process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
+
+    const planLabels = {
+      user_monthly:  "GayaConnect — Monthly subscription",
+      offer_7days:   "GayaConnect — Offer post (7 days)",
+      offer_30days:  "GayaConnect — Offer post (30 days)",
+      offer_365days: "GayaConnect — Offer post (1 year)",
+      banner:        "GayaConnect — Banner advertisement",
+    };
+
+    const order = await razorpay.orders.create({
+      amount:   amountPaise,
+      currency: "INR",
+      receipt:  `gc_${planKey}_${user._id}_${Date.now()}`,
+      notes: {
+        userId:   user._id.toString(),
+        userEmail:user.email,
+        plan:     planKey,
+        duration: duration || "",
       },
-    })
+    });
 
     return NextResponse.json({
-      success: true,
-      provider,
-      keyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_dummy',
-      isDummy: useDummy,
-      order,
-      paymentId: payment._id,
-    }, { status: 201 })
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, message: error.message },
-      { status: 500 }
-    )
+      isDummy:  false,
+      orderId:  order.id,
+      amount:   order.amount,
+      currency: order.currency,
+      plan,
+      duration,
+      description: planLabels[planKey] || "GayaConnect payment",
+    });
+  } catch (err) {
+    console.error("create-order error:", err);
+    return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
   }
 }

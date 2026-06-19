@@ -1,76 +1,120 @@
-import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/db/mongodb'
-import Labourer from '@/lib/db/models/Labourer'
-import { validateImageDataUrl } from '@/lib/utils/imageUpload'
-import { enforceRateLimit } from '@/lib/security/rateLimit'
+// app/api/labour/route.js — Labour listing API
+import { NextResponse } from "next/server";
+import connectDB from "@/lib/db/connect";
+import Labour from "@/lib/db/models/Labour";
+import { checkSubscription } from "@/lib/checkSubscription";
 
+// ─── GET /api/labour — List approved workers ──────────────────────────────────
 export async function GET(request) {
   try {
-    await connectDB()
-    const { searchParams } = new URL(request.url)
-    
-    const query = { isApproved: true }
+    await connectDB();
 
-    const category = searchParams.get('category')
-    if (category) query.category = category
+    const { searchParams } = new URL(request.url);
+    const search     = searchParams.get("search")     || "";
+    const category   = searchParams.get("category")   || "";
+    const area       = searchParams.get("area")        || "";
+    const minRate    = Number(searchParams.get("minRate")) || 0;
+    const maxRate    = Number(searchParams.get("maxRate")) || 99999;
+    const available  = searchParams.get("available")   === "true";
+    const page       = Math.max(1, Number(searchParams.get("page"))  || 1);
+    const limit      = Math.min(50, Number(searchParams.get("limit")) || 12);
+    const skip       = (page - 1) * limit;
 
-    const area = searchParams.get('area')
-    if (area) query.area = { $regex: new RegExp(area, 'i') }
+    // Build query
+    const query = { isApproved: true };
 
-    const availability = searchParams.get('availability')
-    if (availability === 'today') query.availability = true
-
-    const minRate = searchParams.get('minRate')
-    const maxRate = searchParams.get('maxRate')
-    if (minRate || maxRate) {
-      query.dailyRate = {}
-      if (minRate) query.dailyRate.$gte = Number(minRate)
-      if (maxRate) query.dailyRate.$lte = Number(maxRate)
+    if (search) {
+      query.$or = [
+        { name:     { $regex: search, $options: "i" } },
+        { role:     { $regex: search, $options: "i" } },
+        { skills:   { $elemMatch: { $regex: search, $options: "i" } } },
+      ];
     }
+    if (category) query.role  = { $regex: category, $options: "i" };
+    if (area)     query.area  = { $regex: area,     $options: "i" };
+    if (available) query.availability = true;
 
-    const labourers = await Labourer.find(query).sort('-createdAt')
+    // Rate filter
+    query.dailyRate = { $gte: minRate, $lte: maxRate };
 
-    return NextResponse.json({ success: true, labourers })
-  } catch (error) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 })
+    const [workers, total] = await Promise.all([
+      Labour.find(query)
+        .select("-phone -whatsapp") // hide contact by default
+        .sort({ rating: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Labour.countDocuments(query),
+    ]);
+
+    // Check if requester is subscribed — reveal contact if yes
+    const { allowed } = await checkSubscription(request);
+
+    const sanitized = workers.map(w => ({
+      ...w,
+      phone:    allowed ? w.phone    : null,
+      whatsapp: allowed ? w.whatsapp : null,
+      dailyRate: allowed ? w.dailyRate : null, // optionally hide rate too
+    }));
+
+    return NextResponse.json({ workers: sanitized, total, page, isSubscribed: allowed });
+  } catch (err) {
+    console.error("GET /api/labour error:", err);
+    return NextResponse.json({ error: "Failed to fetch workers" }, { status: 500 });
   }
 }
 
+// ─── POST /api/labour — Register as a labour ─────────────────────────────────
 export async function POST(request) {
-  const limited = enforceRateLimit(request, 'labour-register', { limit: 5, windowMs: 60 * 60 * 1000 })
-  if (limited) return limited
-
   try {
-    await connectDB()
-    const body = await request.json()
+    await connectDB();
 
-    const { name, phone, category, area, dailyRate, skills, availability, photoStr } = body
+    const body = await request.json();
+    const {
+      name, phone, whatsapp, photo,
+      role, category, area,
+      dailyRate, skills, availability,
+    } = body;
 
-    if (!name || !phone || !category || !area) {
-      return NextResponse.json({ success: false, message: 'Missing required fields' }, { status: 400 })
+    // Basic validation
+    if (!name || !phone || !role || !area || !dailyRate) {
+      return NextResponse.json(
+        { error: "name, phone, role, area and dailyRate are required" },
+        { status: 400 }
+      );
     }
 
-    let photoUrl = ''
-    if (photoStr && photoStr.startsWith('data:image/')) {
-      photoUrl = validateImageDataUrl(photoStr, 'Labour photo')
+    // Prevent duplicate phone registrations
+    const existing = await Labour.findOne({ phone });
+    if (existing) {
+      return NextResponse.json(
+        { error: "A worker with this phone number is already registered" },
+        { status: 409 }
+      );
     }
 
-    const labourer = new Labourer({
+    const worker = await Labour.create({
       name,
       phone,
-      category,
+      whatsapp: whatsapp || phone,
+      photo:    photo || null,
+      role,
+      category: category || role,
       area,
-      dailyRate: dailyRate ? Number(dailyRate) : 0,
-      skills: skills || [],
-      availability: availability !== undefined ? availability : true,
-      photo: photoUrl,
-      isApproved: false // Admin must approve
-    })
+      dailyRate: Number(dailyRate),
+      skills:    Array.isArray(skills) ? skills : [],
+      availability: availability !== false,
+      isApproved: false, // admin must approve
+      rating:    0,
+      reviewCount: 0,
+    });
 
-    await labourer.save()
-
-    return NextResponse.json({ success: true, message: 'Registration submitted successfully. Waiting for admin approval.', labourer })
-  } catch (error) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 })
+    return NextResponse.json(
+      { message: "Registration submitted. You'll be listed after admin approval.", worker: { _id: worker._id, name: worker.name } },
+      { status: 201 }
+    );
+  } catch (err) {
+    console.error("POST /api/labour error:", err);
+    return NextResponse.json({ error: "Registration failed" }, { status: 500 });
   }
 }
