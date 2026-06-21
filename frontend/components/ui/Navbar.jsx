@@ -55,6 +55,7 @@ export default function Navbar() {
           <NavLink href="/offers">Offers <span className="ml-1 bg-teal-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">New</span></NavLink>
           <NavLink href="/services">Services</NavLink>
           <NavLink href="/labour">Daily Labour</NavLink>
+          <NavLink href="/vehicles">Rent Vehicles <span className="ml-1 bg-teal-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">New</span></NavLink>
           <NavLink href="/about">About</NavLink>
         </div>
 
@@ -122,6 +123,7 @@ export default function Navbar() {
           <MobileNavLink href="/offers" onClick={() => setMobileMenuOpen(false)}>Offers</MobileNavLink>
           <MobileNavLink href="/services" onClick={() => setMobileMenuOpen(false)}>Services</MobileNavLink>
           <MobileNavLink href="/labour" onClick={() => setMobileMenuOpen(false)}>Daily Labour</MobileNavLink>
+          <MobileNavLink href="/vehicles" onClick={() => setMobileMenuOpen(false)}>Rent Vehicles</MobileNavLink>
           <MobileNavLink href="/about" onClick={() => setMobileMenuOpen(false)}>About</MobileNavLink>
           <div className="pt-3 flex flex-col gap-2 border-t border-gray-100 mt-2">
             {user ? (

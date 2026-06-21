@@ -1,12 +1,22 @@
-import { NextResponse } from 'next/server'
-import { getAuthenticatedUser } from '@/lib/security/auth'
-import { toAuthUser } from '@/lib/utils/contactAccess'
+import { NextResponse } from "next/server";
+import { getAuthenticatedUser } from "@/lib/security/auth";
 
 export async function GET(request) {
-  const user = await getAuthenticatedUser(request)
-  if (!user) {
-    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
-  }
+  try {
+    const user = await getAuthenticatedUser(request);
+    
+    if (!user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
 
-  return NextResponse.json({ success: true, user: toAuthUser(user) })
+    // Remove password from response just in case
+    const userObj = user.toObject();
+    delete userObj.password;
+
+    return NextResponse.json({ success: true, user: userObj });
+
+  } catch (error) {
+    console.error("Auth Me Error:", error.message);
+    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  }
 }

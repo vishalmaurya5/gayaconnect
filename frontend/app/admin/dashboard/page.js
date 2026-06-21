@@ -16,9 +16,12 @@ import {
   FiShoppingBag,
   FiTag,
   FiTrash2,
-  FiTool,
   FiUpload,
   FiUsers,
+  FiTruck,
+  FiSettings,
+  FiDownload,
+  FiTool
 } from 'react-icons/fi'
 import { Bar } from 'react-chartjs-2'
 import {
@@ -41,7 +44,10 @@ const tabs = [
   { id: 'banners', label: 'Banners', icon: FiImage },
   { id: 'blogs', label: 'Blogs', icon: FiBookOpen },
   { id: 'labour', label: 'Labour', icon: FiTool },
+  { id: 'vehicles', label: 'Vehicles', icon: FiTruck },
   { id: 'payments', label: 'Payments', icon: FiDollarSign },
+  { id: 'deleted_accounts', label: 'Deleted', icon: FiTrash2 },
+  { id: 'settings', label: 'Settings', icon: FiSettings },
 ]
 
 const emptyBanner = {
@@ -72,6 +78,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false)
   const [bannerForm, setBannerForm] = useState(emptyBanner)
   const [blogForm, setBlogForm] = useState(emptyBlog)
+  const [vehicleForm, setVehicleForm] = useState({ vehicleName: '', vehicleModel: '', vehicleNumber: '', dlNumber: '', ownerName: '', phone: '' })
+  const [settings, setSettings] = useState(null)
 
   useEffect(() => {
     loadOverview()
@@ -101,15 +109,21 @@ export default function AdminDashboard() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/admin/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-      })
-      const json = await response.json()
+      const [res, settingsRes] = await Promise.all([
+        fetch('/api/admin/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(credentials),
+        }),
+        fetch('/api/admin/settings')
+      ])
+      const json = await res.json()
+      const settingsJson = await settingsRes.json()
+
       if (!json.success) throw new Error(json.message || 'Admin login failed')
 
       setAuthenticated(true)
+      if (settingsJson.success) setSettings(settingsJson.pricing)
       toast.success('Admin access granted')
       await loadOverview()
     } catch (error) {
@@ -129,9 +143,13 @@ export default function AdminDashboard() {
     setLoading(true)
 
     try {
-      const overview = await adminFetch('/api/admin/overview', { method: 'GET' })
+      const [overview, settingsRes] = await Promise.all([
+        adminFetch('/api/admin/overview', { method: 'GET' }),
+        fetch('/api/admin/settings').then(res => res.json())
+      ])
       setAuthenticated(true)
       setData(overview)
+      if (settingsRes.success) setSettings(settingsRes.pricing)
     } catch (error) {
       setAuthenticated(false)
     } finally {
@@ -248,14 +266,15 @@ export default function AdminDashboard() {
           <Metric label="Offers" value={stats.offers || 0} icon={FiTag} />
           <Metric label="Banners" value={stats.banners || 0} icon={FiImage} />
           <Metric label="Labour" value={stats.labourers || 0} icon={FiTool} />
+          <Metric label="Vehicles" value={stats.vehicles || 0} icon={FiTruck} />
           <Metric label="Revenue" value={`Rs. ${revenue}`} icon={FiDollarSign} />
           <Metric label="Paid Rate" value={`${conversionRate}%`} icon={FiCheckCircle} />
         </section>
 
         <section className="mt-5">
           {activeTab === 'market' && <MarketView data={data} recentPayments={recentPayments} />}
-          {activeTab === 'users' && <UsersView users={data?.users || []} onDelete={(id) => deleteResource('users', id)} />}
-          {activeTab === 'vendors' && <VendorsView vendors={data?.vendors || []} onUpdate={updateResource} onDelete={(id) => deleteResource('vendors', id)} />}
+          {activeTab === 'users' && <UsersView users={(data?.users || []).filter(u => !u.isDeleted)} onDelete={(id) => deleteResource('users', id)} onRefresh={loadOverview} />}
+          {activeTab === 'vendors' && <VendorsView vendors={(data?.vendors || []).filter(v => !v.isDeleted)} onUpdate={updateResource} onDelete={(id) => deleteResource('vendors', id)} onRefresh={loadOverview} />}
           {activeTab === 'offers' && <OffersView offers={data?.offers || []} onUpdate={updateResource} onDelete={(id) => deleteResource('offers', id)} />}
           {activeTab === 'banners' && (
             <BannersView
@@ -278,8 +297,52 @@ export default function AdminDashboard() {
               onDelete={(id) => deleteResource('blogs', id)}
             />
           )}
-          {activeTab === 'labour' && <LabourView labourers={data?.labourers || []} onUpdate={updateResource} onDelete={(id) => deleteResource('labourers', id)} />}
+          {activeTab === 'labour' && <LabourView labourers={(data?.labourers || []).filter(l => !l.isDeleted)} onUpdate={updateResource} onDelete={(id) => deleteResource('labourers', id)} onRefresh={loadOverview} />}
+          {activeTab === 'vehicles' && (
+            <VehiclesView
+              vehicles={data?.vehicles || []}
+              form={vehicleForm}
+              setForm={setVehicleForm}
+              onCreate={async () => {
+                await fetch('/api/admin/vehicles', { method: 'POST', body: JSON.stringify(vehicleForm) })
+                setVehicleForm({ vehicleName: '', vehicleModel: '', vehicleNumber: '', dlNumber: '', ownerName: '', phone: '' })
+                toast.success('Vehicle Posted')
+                loadOverview()
+              }}
+              onApprove={async (id, status) => {
+                await fetch(`/api/admin/vehicles/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) })
+                toast.success('Status Updated')
+                loadOverview()
+              }}
+              onDelete={async (id) => {
+                if (window.confirm('Delete this vehicle request?')) {
+                  await fetch(`/api/admin/vehicles/${id}`, { method: 'DELETE' })
+                  toast.success('Vehicle Deleted')
+                  loadOverview()
+                }
+              }}
+            />
+          )}
           {activeTab === 'payments' && <PaymentsView payments={data?.payments || []} onUpdate={updateResource} onDelete={(id) => deleteResource('payments', id)} />}
+          {activeTab === 'deleted_accounts' && (
+            <DeletedAccountsView 
+              users={(data?.users || []).filter(u => u.isDeleted)} 
+              vendors={(data?.vendors || []).filter(v => v.isDeleted)} 
+              labourers={(data?.labourers || []).filter(l => l.isDeleted)} 
+              onRestore={(resource, id) => updateResource(resource, id, { isDeleted: false })} 
+              onDelete={deleteResource} 
+            />
+          )}
+          {activeTab === 'settings' && (
+            <SettingsView 
+              settings={settings} 
+              onUpdate={async (newSettings) => {
+                await fetch('/api/admin/settings', { method: 'POST', body: JSON.stringify({ pricing: newSettings }) })
+                toast.success('Settings Updated')
+                loadOverview()
+              }} 
+            />
+          )}
         </section>
       </main>
     </div>
@@ -307,6 +370,33 @@ function Panel({ title, children, action }) {
       </div>
       {children}
     </section>
+  )
+}
+
+function ExportButton({ filename, headers, data }) {
+  const handleExport = () => {
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => row.map(cell => `"${String(cell || '').replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `${filename}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
+
+  return (
+    <button type="button" onClick={handleExport} className="flex items-center gap-2 rounded-lg bg-green-50 px-3 py-1.5 text-sm font-semibold text-green-700 transition hover:bg-green-100 border border-green-200">
+      <FiDownload size={14} /> Export CSV
+    </button>
   )
 }
 
@@ -399,49 +489,136 @@ function MiniList({ title, items }) {
   )
 }
 
-function UsersView({ users, onDelete }) {
+function UsersView({ users, onDelete, onRefresh }) {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' })
+  const [loading, setLoading] = useState(false)
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const res = await fetch('/api/admin/create-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'user', ...form })
+      })
+      const json = await res.json()
+      if (json.success) {
+        setForm({ name: '', email: '', phone: '', password: '' })
+        onRefresh()
+      } else {
+        alert(json.message)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <Panel title="Users">
-      <Table
-        headers={['Name', 'Email', 'Role', 'Phone', 'Access', 'Action']}
-        rows={users.map((user) => [
-          user.name,
-          user.email,
-          user.role,
-          user.phone,
-          user.offerAccessExpiresAt ? new Date(user.offerAccessExpiresAt).toLocaleDateString() : '-',
-          <IconButton key={user._id} icon={FiTrash2} label="Delete" onClick={() => onDelete(user._id)} danger />,
-        ])}
-      />
-    </Panel>
+    <div className="space-y-6">
+      <Panel title="Add New User">
+        <form onSubmit={handleCreate} className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+          <TextInput label="Name" value={form.name} onChange={v => setForm({...form, name: v})} required />
+          <TextInput label="Email" type="email" value={form.email} onChange={v => setForm({...form, email: v})} required />
+          <TextInput label="Phone" value={form.phone} onChange={v => setForm({...form, phone: v})} required />
+          <TextInput label="Temporary Password" value={form.password} onChange={v => setForm({...form, password: v})} required />
+          <button type="submit" disabled={loading} className="sm:col-span-2 md:col-span-4 mt-2 rounded-xl bg-indigo-600 py-2.5 font-bold text-white hover:bg-indigo-700 disabled:opacity-50">
+            {loading ? 'Creating...' : 'Create User'}
+          </button>
+        </form>
+      </Panel>
+      <Panel 
+        title="Users" 
+        action={<ExportButton filename="users_export" headers={['Name', 'Email', 'Phone', 'Role', 'Joined']} data={users.map(u => [u.name, u.email, u.phone, u.role, new Date(u.createdAt).toLocaleDateString()])} />}
+      >
+        <Table
+          headers={['Name', 'Email', 'Role', 'Phone', 'Action']}
+          rows={users.map((user) => [
+            user.name,
+            user.email,
+            user.role,
+            user.phone,
+            <IconButton key={user._id} icon={FiTrash2} label="Delete Permanently" onClick={() => onDelete(user._id)} danger />,
+          ])}
+        />
+      </Panel>
+    </div>
   )
 }
 
-function VendorsView({ vendors, onUpdate, onDelete }) {
+function VendorsView({ vendors, onUpdate, onDelete, onRefresh }) {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', businessName: '', category: '', address: '' })
+  const [loading, setLoading] = useState(false)
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const res = await fetch('/api/admin/create-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'vendor', ...form })
+      })
+      const json = await res.json()
+      if (json.success) {
+        setForm({ name: '', email: '', phone: '', password: '', businessName: '', category: '', address: '' })
+        onRefresh()
+      } else {
+        alert(json.message)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <Panel title="Vendors">
-      <Table
-        headers={['Business', 'Category', 'Subcategory', 'Approved', 'Premium', 'Actions']}
-        rows={vendors.map((vendor) => [
-          vendor.name,
-          vendor.category,
-          vendor.subCategory || '-',
-          vendor.isApproved ? 'Yes' : 'No',
-          vendor.isPremium ? 'Yes' : 'No',
-          <div key={vendor._id} className="flex gap-2">
-            <IconButton icon={FiCheckCircle} label={vendor.isApproved ? 'Unapprove' : 'Approve'} onClick={() => onUpdate('vendors', vendor._id, { isApproved: !vendor.isApproved })} />
-            <IconButton icon={FiEye} label={vendor.isPremium ? 'Normal' : 'Premium'} onClick={() => onUpdate('vendors', vendor._id, { isPremium: !vendor.isPremium })} />
-            <IconButton icon={FiTrash2} label="Delete" onClick={() => onDelete(vendor._id)} danger />
-          </div>,
-        ])}
-      />
-    </Panel>
+    <div className="space-y-6">
+      <Panel title="Add New Vendor">
+        <form onSubmit={handleCreate} className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+          <TextInput label="Owner Name" value={form.name} onChange={v => setForm({...form, name: v})} required />
+          <TextInput label="Email" type="email" value={form.email} onChange={v => setForm({...form, email: v})} required />
+          <TextInput label="Phone" value={form.phone} onChange={v => setForm({...form, phone: v})} required />
+          <TextInput label="Temporary Password" value={form.password} onChange={v => setForm({...form, password: v})} required />
+          <TextInput label="Business Name" value={form.businessName} onChange={v => setForm({...form, businessName: v})} required />
+          <TextInput label="Category" value={form.category} onChange={v => setForm({...form, category: v})} required />
+          <div className="sm:col-span-2">
+            <TextInput label="Business Address" value={form.address} onChange={v => setForm({...form, address: v})} required />
+          </div>
+          <button type="submit" disabled={loading} className="sm:col-span-2 md:col-span-4 mt-2 rounded-xl bg-indigo-600 py-2.5 font-bold text-white hover:bg-indigo-700 disabled:opacity-50">
+            {loading ? 'Creating...' : 'Create Vendor'}
+          </button>
+        </form>
+      </Panel>
+      <Panel 
+        title="Vendors"
+        action={<ExportButton filename="vendors_export" headers={['Business Name', 'Category', 'SubCategory', 'Approved', 'Premium', 'Joined']} data={vendors.map(v => [v.name, v.category, v.subCategory || '', v.isApproved ? 'Yes' : 'No', v.isPremium ? 'Yes' : 'No', new Date(v.createdAt).toLocaleDateString()])} />}
+      >
+        <Table
+          headers={['Business', 'Category', 'Subcategory', 'Approved', 'Premium', 'Actions']}
+          rows={vendors.map((vendor) => [
+            vendor.name,
+            vendor.category,
+            vendor.subCategory || '-',
+            vendor.isApproved ? 'Yes' : 'No',
+            vendor.isPremium ? 'Yes' : 'No',
+            <div key={vendor._id} className="flex gap-2">
+              <IconButton icon={FiCheckCircle} label={vendor.isApproved ? 'Unapprove' : 'Approve'} onClick={() => onUpdate('vendors', vendor._id, { isApproved: !vendor.isApproved })} />
+              <IconButton icon={FiEye} label={vendor.isPremium ? 'Normal' : 'Premium'} onClick={() => onUpdate('vendors', vendor._id, { isPremium: !vendor.isPremium })} />
+              <IconButton icon={FiTrash2} label="Delete" onClick={() => onDelete(vendor._id)} danger />
+            </div>,
+          ])}
+        />
+      </Panel>
+    </div>
   )
 }
 
 function OffersView({ offers, onUpdate, onDelete }) {
   return (
-    <Panel title="Offers">
+    <Panel 
+      title="Offers"
+      action={<ExportButton filename="offers_export" headers={['Title', 'Discount', 'Vendor', 'Active', 'Valid Until']} data={offers.map(o => [o.title, o.discountText, o.vendorId?.name || '', o.isActive ? 'Yes' : 'No', o.validUntil ? new Date(o.validUntil).toLocaleDateString() : ''])} />}
+    >
       <Table
         headers={['Title', 'Discount', 'Vendor', 'Active', 'Valid Until', 'Actions']}
         rows={offers.map((offer) => [
@@ -519,7 +696,10 @@ function BannersView({ banners, vendors, form, setForm, onCreate, onUpdate, onDe
           <button onClick={onCreate} className="w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700">Create Banner</button>
         </div>
       </Panel>
-      <Panel title="Banners">
+      <Panel 
+        title="Banners"
+        action={<ExportButton filename="banners_export" headers={['Title', 'Position', 'Active', 'End Date']} data={banners.map(b => [b.title, b.position, b.isActive ? 'Yes' : 'No', b.endDate ? new Date(b.endDate).toLocaleDateString() : ''])} />}
+      >
         <Table
           headers={['Title', 'Position', 'Active', 'End Date', 'Actions']}
           rows={banners.map((banner) => [
@@ -554,7 +734,10 @@ function BlogsView({ blogs, form, setForm, onCreate, onUpdate, onDelete }) {
           <button onClick={onCreate} className="w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700">Create Blog</button>
         </div>
       </Panel>
-      <Panel title="Blogs">
+      <Panel 
+        title="Blogs"
+        action={<ExportButton filename="blogs_export" headers={['Title', 'Slug', 'Status', 'Created']} data={blogs.map(b => [b.title, b.slug, b.status, b.createdAt ? new Date(b.createdAt).toLocaleDateString() : ''])} />}
+      >
         <Table
           headers={['Title', 'Slug', 'Status', 'Created', 'Actions']}
           rows={blogs.map((blog) => [
@@ -575,7 +758,10 @@ function BlogsView({ blogs, form, setForm, onCreate, onUpdate, onDelete }) {
 
 function PaymentsView({ payments, onUpdate, onDelete, compact = false }) {
   return (
-    <Panel title={compact ? 'Recent Payments' : 'Payments & Revenue'}>
+    <Panel 
+      title={compact ? 'Recent Payments' : 'Payments & Revenue'}
+      action={<ExportButton filename="payments_export" headers={['Plan', 'Amount', 'Method', 'Status', 'Date']} data={payments.map(p => [p.planType, p.amount, p.paymentMethod || '', p.status, p.createdAt ? new Date(p.createdAt).toLocaleDateString() : ''])} />}
+    >
       <Table
         headers={['Plan', 'Amount', 'Method', 'Status', 'Date', 'Actions']}
         rows={payments.map((payment) => [
@@ -641,23 +827,192 @@ function TextInput({ label, value, onChange, type = 'text' }) {
   )
 }
 
-function LabourView({ labourers, onUpdate, onDelete }) {
+function LabourView({ labourers, onUpdate, onDelete, onRefresh }) {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', skill: '', dailyRate: '', address: '' })
+  const [loading, setLoading] = useState(false)
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const res = await fetch('/api/admin/create-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'labourer', ...form })
+      })
+      const json = await res.json()
+      if (json.success) {
+        setForm({ name: '', email: '', phone: '', password: '', skill: '', dailyRate: '', address: '' })
+        onRefresh()
+      } else {
+        alert(json.message)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <Panel title="Labour Directory">
+    <div className="space-y-6">
+      <Panel title="Add New Labourer">
+        <form onSubmit={handleCreate} className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+          <TextInput label="Name" value={form.name} onChange={v => setForm({...form, name: v})} required />
+          <TextInput label="Email" type="email" value={form.email} onChange={v => setForm({...form, email: v})} required />
+          <TextInput label="Phone" value={form.phone} onChange={v => setForm({...form, phone: v})} required />
+          <TextInput label="Temporary Password" value={form.password} onChange={v => setForm({...form, password: v})} required />
+          <TextInput label="Skill (Category)" value={form.skill} onChange={v => setForm({...form, skill: v})} required />
+          <TextInput label="Daily Rate (₹)" type="number" value={form.dailyRate} onChange={v => setForm({...form, dailyRate: v})} />
+          <div className="sm:col-span-2">
+            <TextInput label="Area / Address" value={form.address} onChange={v => setForm({...form, address: v})} />
+          </div>
+          <button type="submit" disabled={loading} className="sm:col-span-2 md:col-span-4 mt-2 rounded-xl bg-indigo-600 py-2.5 font-bold text-white hover:bg-indigo-700 disabled:opacity-50">
+            {loading ? 'Creating...' : 'Create Labourer'}
+          </button>
+        </form>
+      </Panel>
+      <Panel 
+        title="Labour Directory"
+        action={<ExportButton filename="labourers_export" headers={['Name', 'Skill/Category', 'Area/Address', 'Rate', 'Approved', 'Joined']} data={labourers.map(l => [l.name, l.skill || l.category || '', l.address || l.area || '', l.dailyRate || '', l.isVerified || l.isApproved ? 'Yes' : 'No', l.createdAt ? new Date(l.createdAt).toLocaleDateString() : ''])} />}
+      >
+        <Table
+          headers={['Name', 'Skill', 'Area', 'Rate', 'Approved', 'Actions']}
+          rows={labourers.map((labour) => [
+            labour.name,
+            labour.skill || labour.category || '-',
+            labour.address || labour.area || '-',
+            labour.dailyRate ? `₹${labour.dailyRate}/day` : '-',
+            labour.isVerified || labour.isApproved ? 'Yes' : 'No',
+            <div key={labour._id} className="flex gap-2">
+              <IconButton icon={FiCheckCircle} label={labour.isVerified || labour.isApproved ? 'Unapprove' : 'Approve'} onClick={() => onUpdate('labourers', labour._id, { isVerified: !(labour.isVerified || labour.isApproved) })} />
+              <IconButton icon={FiTrash2} label="Delete Permanently" onClick={() => onDelete(labour._id)} danger />
+            </div>,
+          ])}
+        />
+      </Panel>
+    </div>
+  )
+}
+
+function VehiclesView({ vehicles, form, setForm, onCreate, onApprove, onDelete }) {
+  return (
+    <div className="grid gap-5 xl:grid-cols-[0.8fr_1.2fr]">
+      <Panel title="Admin Post Vehicle">
+        <div className="space-y-3">
+          <TextInput label="Vehicle Name" value={form.vehicleName} onChange={(value) => setForm((current) => ({ ...current, vehicleName: value }))} />
+          <TextInput label="Vehicle Model" value={form.vehicleModel} onChange={(value) => setForm((current) => ({ ...current, vehicleModel: value }))} />
+          <TextInput label="Vehicle Number" value={form.vehicleNumber} onChange={(value) => setForm((current) => ({ ...current, vehicleNumber: value }))} />
+          <TextInput label="DL Number" value={form.dlNumber} onChange={(value) => setForm((current) => ({ ...current, dlNumber: value }))} />
+          <TextInput label="Owner Name (Optional)" value={form.ownerName} onChange={(value) => setForm((current) => ({ ...current, ownerName: value }))} />
+          <TextInput label="Owner Phone (Optional)" value={form.phone} onChange={(value) => setForm((current) => ({ ...current, phone: value }))} />
+          <button onClick={onCreate} className="w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700">Add Vehicle Directly</button>
+        </div>
+      </Panel>
+      <Panel 
+        title="Vehicle Requests"
+        action={<ExportButton filename="vehicles_export" headers={['Owner', 'Phone', 'Vehicle', 'Number', 'Status', 'Paid']} data={vehicles.map(v => [v.ownerName, v.phone, `${v.vehicleName} - ${v.vehicleModel}`, v.vehicleNumber, v.status, v.paymentStatus === 'completed' ? 'Yes' : 'No'])} />}
+      >
+        <Table
+          headers={['Owner', 'Vehicle', 'Number', 'Status', 'Paid', 'Actions']}
+          rows={vehicles.map((v) => [
+            `${v.ownerName} (${v.phone})`,
+            `${v.vehicleName} - ${v.vehicleModel}`,
+            v.vehicleNumber,
+            v.status,
+            v.paymentStatus === 'completed' ? 'Yes' : 'No',
+            <div key={v._id} className="flex gap-2">
+              <IconButton icon={FiCheckCircle} label={v.status === 'approved' ? 'Reject' : 'Approve'} onClick={() => onApprove(v._id, v.status === 'approved' ? 'rejected' : 'approved')} />
+              <IconButton icon={FiTrash2} label="Delete Permanently" onClick={() => onDelete(v._id)} danger />
+            </div>,
+          ])}
+        />
+      </Panel>
+    </div>
+  )
+}
+
+function DeletedAccountsView({ users, vendors, labourers, onRestore, onDelete }) {
+  const deletedItems = [
+    ...users.map(u => ({ ...u, type: 'users', displayType: 'User' })),
+    ...vendors.map(v => ({ ...v, type: 'vendors', displayType: 'Vendor' })),
+    ...labourers.map(l => ({ ...l, type: 'labourers', displayType: 'Labourer' }))
+  ].sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
+
+  return (
+    <Panel title="Deleted Accounts (Soft Deleted)">
       <Table
-        headers={['Name', 'Category', 'Area', 'Rate', 'Approved', 'Actions']}
-        rows={labourers.map((labour) => [
-          labour.name,
-          labour.category || '-',
-          labour.area || '-',
-          labour.dailyRate ? `₹${labour.dailyRate}/day` : '-',
-          labour.isApproved ? 'Yes' : 'No',
-          <div key={labour._id} className="flex gap-2">
-            <IconButton icon={FiCheckCircle} label={labour.isApproved ? 'Unapprove' : 'Approve'} onClick={() => onUpdate('labourers', labour._id, { isApproved: !labour.isApproved })} />
-            <IconButton icon={FiTrash2} label="Delete" onClick={() => onDelete(labour._id)} danger />
+        headers={['Name/Business', 'Type', 'Email/Phone', 'Action']}
+        rows={deletedItems.map((item) => [
+          item.name || item.businessName || '-',
+          <span key={`type-${item._id}`} className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">{item.displayType}</span>,
+          item.email || item.phone || '-',
+          <div key={item._id} className="flex gap-2">
+            <IconButton icon={FiRefreshCw} label="Restore Account" onClick={() => onRestore(item.type, item._id)} />
+            <IconButton icon={FiTrash2} label="Delete Permanently" onClick={() => onDelete(item.type, item._id)} danger />
           </div>,
         ])}
       />
     </Panel>
+  )
+}
+
+function SettingsView({ settings, onUpdate }) {
+  const [form, setForm] = useState(settings || {
+    subscription: 11,
+    banner: 199,
+    vehicle: 200,
+    vendorRegistration: 49,
+    chargeVendorRegistration: false
+  })
+
+  useEffect(() => {
+    if (settings) setForm(settings)
+  }, [settings])
+
+  return (
+    <div className="grid gap-5 xl:grid-cols-2">
+      <Panel title="Platform Pricing (in INR)">
+        <div className="space-y-4">
+          <TextInput 
+            label="Monthly Subscription Price" 
+            type="number" 
+            value={form.subscription} 
+            onChange={(val) => setForm({ ...form, subscription: Number(val) })} 
+          />
+          <TextInput 
+            label="Banner Advertisement Price" 
+            type="number" 
+            value={form.banner} 
+            onChange={(val) => setForm({ ...form, banner: Number(val) })} 
+          />
+          <TextInput 
+            label="Vehicle Listing Price" 
+            type="number" 
+            value={form.vehicle} 
+            onChange={(val) => setForm({ ...form, vehicle: Number(val) })} 
+          />
+          <TextInput 
+            label="Vendor Registration Fee" 
+            type="number" 
+            value={form.vendorRegistration} 
+            onChange={(val) => setForm({ ...form, vendorRegistration: Number(val) })} 
+          />
+          
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-slate-800">Charge Vendor Registration Fee</p>
+              <p className="text-sm text-slate-500">If enabled, new vendors will have to pay the fee during registration via Razorpay.</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+              <input type="checkbox" className="sr-only peer" checked={form.chargeVendorRegistration} onChange={(e) => setForm({ ...form, chargeVendorRegistration: e.target.checked })} />
+              <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+            </label>
+          </div>
+
+          <button onClick={() => onUpdate(form)} className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/30">
+            Save Settings
+          </button>
+        </div>
+      </Panel>
+    </div>
   )
 }

@@ -17,6 +17,7 @@ const vendorSchema = new mongoose.Schema({
   rating: { type: Number, default: 4.5 },
   totalReviews: { type: Number, default: 0 },
   views: { type: Number, default: 0 },
+  isDeleted: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

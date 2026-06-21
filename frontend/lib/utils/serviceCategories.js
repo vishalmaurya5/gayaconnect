@@ -214,6 +214,26 @@ export const SERVICE_CATEGORIES = [
       'Visa Consultant',
     ],
   },
+  {
+    name: 'Tour & Travel',
+    subcategories: [
+      'Tourist Guide',
+      'Tour Operator',
+      'Cab Booking',
+      'Hotel Booking',
+    ],
+  },
+  {
+    name: 'Agent Services',
+    subcategories: [
+      'Loan Agent',
+      'Finance Agent',
+      'Real Estate Agent',
+      'Insurance Agent',
+      'RTO Agent',
+      'Passport Agent',
+    ],
+  },
 ]
 
 export const slugifyService = (value) =>

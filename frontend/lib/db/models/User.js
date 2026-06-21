@@ -1,39 +1,26 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  phone: { type: String, unique: true },
-  email: { type: String, unique: true, sparse: true },
-  password: { type: String, select: false },
+  phone: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, select: false, required: true },
   role: { type: String, enum: ['user', 'vendor', 'admin'], default: 'user' },
   avatar: { type: String },
   subscriptionActive: { type: Boolean, default: false },
   subscriptionExpiry: { type: Date },
   subscriptionPlan: { type: String },
-  failedLoginAttempts: { type: Number, default: 0, select: false },
-  lockedUntil: { type: Date, select: false },
+  // Vendor Fields
+  businessName: { type: String },
+  category: { type: String },
+  address: { type: String },
+  gstNumber: { type: String },
+  description: { type: String },
+  verified: { type: Boolean, default: false },
+  isDeleted: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
-
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) {
-    next();
-  }
-  if (this.password) {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-  }
-});
-
-userSchema.methods.comparePassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
-};
-
-userSchema.methods.isLoginLocked = function() {
-  return !!(this.lockedUntil && this.lockedUntil > new Date());
-};
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 export default User;

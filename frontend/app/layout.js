@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className} ${inter.variable} ${sora.variable}`}>
         <AuthProvider>
           <Navbar />
-          <main className="min-h-screen pt-16">
+          <main className="min-h-screen">
             {children}
           </main>
           <Footer />

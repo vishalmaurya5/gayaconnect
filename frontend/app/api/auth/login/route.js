@@ -1,65 +1,68 @@
-import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/db/mongodb'
-import User from '@/lib/db/models/User'
-import { createUserSession } from '@/lib/security/auth'
-import { enforceRateLimit } from '@/lib/security/rateLimit'
-import { loginSchema, validationError } from '@/lib/security/validation'
-import { toAuthUser } from '@/lib/utils/contactAccess'
-
-const MAX_FAILED_ATTEMPTS = 5
-const LOCK_DURATION_MS = 15 * 60 * 1000
+import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { connectDB } from "@/lib/db/mongodb";
+import User from "@/lib/db/models/User";
+import { createUserSession } from "@/lib/security/auth";
 
 export async function POST(request) {
-  const limited = enforceRateLimit(request, 'auth-login', { limit: 10, windowMs: 15 * 60 * 1000 })
-  if (limited) return limited
-
   try {
-    const parsed = loginSchema.safeParse(await request.json())
-    if (!parsed.success) {
-      return NextResponse.json({ success: false, message: validationError(parsed.error) }, { status: 400 })
+    await connectDB();
+    const body = await request.json();
+    const { email, identifier, password, role } = body;
+    const loginId = identifier || email;
+
+    if (!loginId || !password) {
+      return NextResponse.json({ error: "Email/Mobile and password are required" }, { status: 400 });
     }
 
-    await connectDB()
-    const { phone, password, rememberMe } = parsed.data
-    const user = await User.findOne({ phone }).select('+failedLoginAttempts +lockedUntil')
-
+    // Find user by email or phone and explicitly select password
+    const user = await User.findOne({
+      $or: [
+        { email: loginId.toLowerCase() },
+        { phone: loginId }
+      ]
+    }).select("+password");
     if (!user) {
-      return NextResponse.json({ success: false, message: 'Invalid credentials' }, { status: 401 })
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    if (user.isLoginLocked()) {
-      return NextResponse.json(
-        { success: false, message: 'Account temporarily locked. Try again after 15 minutes.' },
-        { status: 423 }
-      )
+    // Block deleted accounts
+    if (user.isDeleted) {
+      return NextResponse.json({ error: "Account has been deleted" }, { status: 403 });
     }
 
-    if (!(await user.comparePassword(password))) {
-      user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1
-      if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
-        user.lockedUntil = new Date(Date.now() + LOCK_DURATION_MS)
-        user.failedLoginAttempts = 0
-      }
-      await user.save()
-      return NextResponse.json({ success: false, message: 'Invalid credentials' }, { status: 401 })
+    // Role check (allow admin to login from anywhere)
+    if (role && user.role !== role && user.role !== "admin") {
+      return NextResponse.json({ error: `Account exists but not registered as a ${role}` }, { status: 403 });
     }
 
-    user.failedLoginAttempts = 0
-    user.lockedUntil = undefined
-
-    if (user.subscriptionActive && user.subscriptionExpiry && new Date(user.subscriptionExpiry).getTime() < Date.now()) {
-      user.subscriptionActive = false
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    const response = NextResponse.json({
-      success: true,
-      user: toAuthUser(user),
-      message: 'Login successful',
-    })
-    await createUserSession(response, user, rememberMe)
-    return response
+    // Generate JWT
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET || "fallback_secret_key",
+      { expiresIn: "7d" }
+    );
+
+    // Remove password from response
+    const userObj = user.toObject();
+    delete userObj.password;
+
+    const response = NextResponse.json({ success: true, user: userObj, token });
+    
+    // Set HTTP-only cookies for Server Components
+    await createUserSession(response, user, true);
+    
+    return response;
+
   } catch (error) {
-    console.error('Login error:', error)
-    return NextResponse.json({ success: false, message: 'Login failed' }, { status: 500 })
+    console.error("Login Error:", error);
+    return NextResponse.json({ error: "Server error during login" }, { status: 500 });
   }
 }

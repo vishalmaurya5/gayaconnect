@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
-import { FiBriefcase, FiLock, FiMapPin, FiPhone } from 'react-icons/fi'
+import { FiBriefcase } from 'react-icons/fi'
 import { SERVICE_CATEGORIES, mergeServiceCategories, slugifyService } from '@/lib/utils/serviceCategories'
+import VendorCard from '@/components/ui/VendorCard'
 
 export default function ServiceCategoryPage() {
   const params = useParams()
@@ -72,17 +73,17 @@ export default function ServiceCategoryPage() {
   }
 
   return (
-    <div className="bg-slate-50 py-8">
-      <div className="container-custom">
-        <Link href="/services" className="font-semibold text-blue-700">Back to all services</Link>
-        <div className="mt-5 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-600">Service Category</p>
-          <h1 className="mt-2 text-3xl font-bold text-slate-950">{category.name}</h1>
-          <div className="mt-5 flex flex-wrap gap-2">
+    <div className="bg-slate-50 py-8 min-h-screen">
+      <div className="container-custom max-w-[1440px] px-5 lg:px-10 mx-auto">
+        <Link href="/services" className="font-semibold text-indigo-700 hover:text-indigo-800 transition-colors">← Back to all services</Link>
+        <div className="mt-5 rounded-[24px] border border-slate-200 bg-white p-8 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 mb-2">Service Category</p>
+          <h1 className="text-3xl md:text-4xl font-sora font-bold text-slate-900">{category.name}</h1>
+          <div className="mt-6 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => setSelectedSubcategory('')}
-              className={`rounded-full px-3 py-2 text-sm font-medium ${!selectedSubcategory ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}
+              className={`rounded-full px-4 py-2 text-sm font-bold transition-all ${!selectedSubcategory ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
             >
               All
             </button>
@@ -91,7 +92,7 @@ export default function ServiceCategoryPage() {
                 key={subcategory}
                 type="button"
                 onClick={() => setSelectedSubcategory(subcategory)}
-                className={`rounded-full px-3 py-2 text-sm font-medium ${selectedSubcategory === subcategory ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                className={`rounded-full px-4 py-2 text-sm font-bold transition-all ${selectedSubcategory === subcategory ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
               >
                 {subcategory}
               </button>
@@ -99,54 +100,27 @@ export default function ServiceCategoryPage() {
           </div>
         </div>
 
-        <div className="mt-8 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-slate-950">{selectedSubcategory || category.name} Vendors</h2>
-          <span className="text-sm text-slate-500">{vendors.length} found</span>
+        <div className="mt-10 flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-sora font-bold text-slate-900">{selectedSubcategory || category.name} Providers</h2>
+          <span className="text-sm font-bold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">{vendors.length} found</span>
         </div>
 
         {loading ? (
-          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {[...Array(6)].map((_, index) => <div key={index} className="h-64 animate-pulse rounded-lg bg-white" />)}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[...Array(6)].map((_, index) => <div key={index} className="h-80 animate-pulse rounded-[24px] bg-slate-200" />)}
           </div>
         ) : vendors.length ? (
-          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {vendors.map((vendor) => <ServiceVendorCard key={vendor._id} vendor={vendor} />)}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {vendors.map((vendor) => <VendorCard key={vendor._id} vendor={vendor} />)}
           </div>
         ) : (
-          <div className="mt-5 rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center">
-            <FiBriefcase className="mx-auto text-4xl text-slate-300" />
-            <h3 className="mt-4 text-lg font-bold text-slate-950">No vendors found</h3>
-            <p className="mt-2 text-slate-500">No approved vendors are available for this service yet.</p>
+          <div className="mt-5 rounded-[24px] border-2 border-dashed border-slate-300 bg-white p-16 text-center">
+            <FiBriefcase className="mx-auto text-5xl text-slate-300 mb-4" />
+            <h3 className="text-xl font-sora font-bold text-slate-900">No vendors found</h3>
+            <p className="mt-2 text-slate-500 font-medium max-w-md mx-auto">No approved vendors are available for this specific service yet. Please check back later.</p>
           </div>
         )}
       </div>
     </div>
-  )
-}
-
-function ServiceVendorCard({ vendor }) {
-  const image = vendor.logo || vendor.images?.[0] || 'https://placehold.co/400x260?text=Vendor'
-  const contact = vendor.phone || vendor.contactNumber
-
-  return (
-    <article className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-      <img src={image} alt={vendor.name || vendor.businessName} className="h-44 w-full object-cover" />
-      <div className="p-5">
-        <h3 className="text-lg font-bold text-slate-950">{vendor.name || vendor.businessName}</h3>
-        <p className="mt-1 text-sm font-medium text-blue-700">{vendor.category}{vendor.subCategory ? ` / ${vendor.subCategory}` : ''}</p>
-        {vendor.description && <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">{vendor.description}</p>}
-        {vendor.address && <p className="mt-3 flex items-center gap-2 text-sm text-slate-500"><FiMapPin />{vendor.address}</p>}
-        <div className="mt-4 flex items-center justify-between gap-3">
-          {contact ? (
-            <a href={`tel:${contact}`} className="inline-flex items-center gap-2 font-semibold text-green-700"><FiPhone />{contact}</a>
-          ) : (
-            <span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500"><FiLock />Contact locked</span>
-          )}
-          <Link href={`/vendors/${vendor._id}`} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-            Details
-          </Link>
-        </div>
-      </div>
-    </article>
   )
 }

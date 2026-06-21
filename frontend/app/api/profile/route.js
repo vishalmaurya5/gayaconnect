@@ -40,10 +40,9 @@ export async function PUT(request) {
     if (!parsed.success) {
       return NextResponse.json({ success: false, message: validationError(parsed.error) }, { status: 400 })
     }
-    const { name, phone, address, profileImage, businessName, category, subCategory, businessAddress, description } = parsed.data
+    const { name, address, profileImage, businessName, category, subCategory, businessAddress, description } = parsed.data
 
     user.name = name
-    user.phone = phone
     user.address = address || ''
 
     if (profileImage !== undefined) {

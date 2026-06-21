@@ -1,8 +1,8 @@
 // app/api/labour/route.js — Labour listing API
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/db/connect";
-import Labour from "@/lib/db/models/Labour";
-import { checkSubscription } from "@/lib/checkSubscription";
+import { connectDB } from "@/lib/db/mongodb";
+import Labour from "@/lib/db/models/Labourer";
+import { checkSubscription } from "@/lib/security/subscription";
 
 // ─── GET /api/labour — List approved workers ──────────────────────────────────
 export async function GET(request) {

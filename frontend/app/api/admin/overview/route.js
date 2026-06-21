@@ -7,6 +7,7 @@ import Banner from '@/lib/db/models/Banner'
 import Payment from '@/lib/db/models/Payment'
 import Blog from '@/lib/db/models/Blog'
 import Labourer from '@/lib/db/models/Labourer'
+import Vehicle from '@/lib/db/models/Vehicle'
 import { verifyAdminRequest } from '@/lib/utils/adminAuth'
 
 export const dynamic = 'force-dynamic'
@@ -33,6 +34,7 @@ export async function GET(request) {
       payments,
       blogs,
       labourers,
+      vehicles,
       revenueAgg,
       paymentStatusAgg,
       roleAgg,
@@ -45,6 +47,7 @@ export async function GET(request) {
       Payment.find().sort({ createdAt: -1 }).limit(100).lean(),
       Blog.find().sort({ createdAt: -1 }).limit(100).lean(),
       Labourer.find().sort({ createdAt: -1 }).limit(100).lean(),
+      Vehicle.find().sort({ createdAt: -1 }).limit(100).lean(),
       Payment.aggregate([
         { $match: { status: { $in: ['success', 'paid'] } } },
         { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } },
@@ -93,6 +96,7 @@ export async function GET(request) {
       activeBanners: banners.filter((banner) => banner.isActive && new Date(banner.endDate) > now).length,
       blogs: blogs.length,
       labourers: labourers.length,
+      vehicles: vehicles.length,
       payments: payments.length,
       revenue: revenueAgg[0]?.total || 0,
       paidPayments: revenueAgg[0]?.count || 0,
@@ -108,6 +112,7 @@ export async function GET(request) {
       payments,
       blogs,
       labourers,
+      vehicles,
       analytics: {
         paymentStatus: paymentStatusAgg,
         usersByRole: roleAgg,

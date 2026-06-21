@@ -15,6 +15,7 @@ const labourerSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false },
   isAvailable: { type: Boolean, default: true },
   rating: { type: Number, default: 4.5 },
+  isDeleted: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

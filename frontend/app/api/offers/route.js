@@ -13,7 +13,7 @@ export async function GET(request) {
     if (vendorId) query.vendorId = vendorId
 
     const offers = await Offer.find(query)
-      .populate('vendorId', 'name category address')
+      .populate('vendorId', 'name category address location')
       .sort('-createdAt')
 
     return NextResponse.json({ success: true, offers })

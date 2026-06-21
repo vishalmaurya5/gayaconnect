@@ -1,9 +1,10 @@
 // app/api/payments/create-order/route.js — Create Razorpay / dummy order
 import { NextResponse } from "next/server";
-import connectDB         from "@/lib/db/connect";
-import { getLoggedInUser } from "@/lib/checkSubscription";
+import { connectDB } from "@/lib/db/mongodb";
+import { getAuthenticatedUser as getLoggedInUser } from "@/lib/security/auth";
+import Setting from "@/lib/db/models/Setting";
 
-const PLAN_PRICES = {
+const FALLBACK_PRICES = {
   user_monthly:  1100,  // ₹11 in paise
   offer_7days:   3900,  // ₹39
   offer_30days:  19900, // ₹199
@@ -28,7 +29,25 @@ export async function POST(request) {
       ? `offer_${duration}`
       : plan;
 
-    const amountPaise = PLAN_PRICES[planKey];
+    // Fetch dynamic pricing
+    let dynamicPricing = {};
+    try {
+      const setting = await Setting.findOne({ key: 'pricing' });
+      if (setting && setting.value) {
+        dynamicPricing = setting.value;
+      }
+    } catch (e) {
+      console.error('Failed to fetch pricing settings', e);
+    }
+
+    let baseAmount = FALLBACK_PRICES[planKey];
+    if (planKey === 'user_monthly' && dynamicPricing.subscription) {
+      baseAmount = dynamicPricing.subscription * 100;
+    } else if (planKey === 'banner' && dynamicPricing.banner) {
+      baseAmount = dynamicPricing.banner * 100;
+    }
+
+    const amountPaise = baseAmount;
     if (!amountPaise) {
       return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
     }

@@ -137,6 +137,11 @@ export async function DELETE(request) {
 
     const item = await Model.findByIdAndDelete(id)
     if (!item) return NextResponse.json({ success: false, message: 'Item not found' }, { status: 404 })
+
+    if (resource === 'users') {
+      await Vendor.deleteOne({ userId: id });
+    }
+
     await AuditLog.create({ adminId: admin.sub, action: adminAction('DELETE', resource), targetType: resource, targetId: String(id) })
     return NextResponse.json({ success: true, message: 'Deleted successfully' })
   } catch (error) {

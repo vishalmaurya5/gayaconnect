@@ -34,16 +34,19 @@ export default function CategoryGrid() {
             onClick={() => router.push(`/services/${slugifyService(category.name)}`)}
             className="group relative w-full"
           >
-            <div className="h-full bg-white rounded-3xl p-6 text-center shadow-sm border border-slate-100 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-100 hover:-translate-y-2 flex flex-col items-center">
-              <div className={`w-16 h-16 mb-5 rounded-2xl bg-gradient-to-br ${gradient} p-[2px] shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
-                <div className="w-full h-full bg-white/20 backdrop-blur-sm rounded-[14px] flex items-center justify-center">
-                  <Icon className="text-2xl text-white drop-shadow-md" />
+            <div className="h-full bg-white rounded-[24px] p-6 text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-slate-100 transition-all duration-300 hover:shadow-[0_20px_40px_-10px_rgba(79,70,229,0.15)] hover:border-indigo-100 hover:-translate-y-2 flex flex-col items-center relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${gradient}"></div>
+              <div className={`w-14 h-14 mb-4 rounded-[16px] bg-gradient-to-br ${gradient} p-[2px] shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                <div className="w-full h-full bg-white/20 backdrop-blur-md rounded-[14px] flex items-center justify-center">
+                  <Icon className="text-xl text-white drop-shadow-sm" />
                 </div>
               </div>
-              <h3 className="text-sm font-extrabold text-slate-800 leading-tight mb-1.5">{category.name}</h3>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">{category.subcategories.length} services</p>
+              <h3 className="text-[14px] font-[800] text-slate-900 leading-tight mb-1">{category.name}</h3>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{category.subcategories.length} services</p>
               
-              <FiArrowUpRight className="absolute top-4 right-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 -translate-x-2 group-hover:translate-y-0 group-hover:translate-x-0" />
+              <div className="absolute top-4 right-4 w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 -translate-x-2 group-hover:translate-y-0 group-hover:translate-x-0">
+                <FiArrowUpRight className="text-indigo-500 w-3 h-3" />
+              </div>
             </div>
           </motion.button>
         )

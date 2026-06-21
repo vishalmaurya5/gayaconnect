@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { FiBriefcase, FiLock, FiMapPin, FiPhone, FiSearch } from 'react-icons/fi'
+import { FiBriefcase, FiSearch, FiGrid, FiArrowRight } from 'react-icons/fi'
 import { SERVICE_CATEGORIES, mergeServiceCategories, slugifyService } from '@/lib/utils/serviceCategories'
+import VendorCard from '@/components/ui/VendorCard'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function ServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState('')
@@ -11,7 +13,8 @@ export default function ServicesPage() {
   const [search, setSearch] = useState('')
   const [vendors, setVendors] = useState([])
   const [serviceCategories, setServiceCategories] = useState(SERVICE_CATEGORIES)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const { user } = useAuth()
 
   const activeCategory = useMemo(
     () => serviceCategories.find((category) => category.name === selectedCategory),
@@ -56,146 +59,173 @@ export default function ServicesPage() {
   }
 
   const selectCategory = (categoryName) => {
-    setSelectedCategory(categoryName)
+    if (selectedCategory === categoryName) {
+      setSelectedCategory('') // toggle off
+    } else {
+      setSelectedCategory(categoryName)
+    }
     setSelectedSubcategory('')
   }
 
-  return (
-    <div className="bg-slate-50 py-8">
-      <div className="container-custom">
-        <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-600">Services</p>
-          <h1 className="mt-2 text-3xl font-bold text-slate-950">Browse Services by Category</h1>
-          <p className="mt-2 text-slate-600">Choose a category and subcategory to find matching vendors in the database.</p>
-        </div>
+  const handleSearchSubmit = (event) => {
+    event.preventDefault()
+    fetchVendors()
+  }
 
-        <div className="mb-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-          <form onSubmit={(event) => { event.preventDefault(); fetchVendors() }} className="flex flex-col gap-3 sm:flex-row">
-            <div className="relative flex-1">
-              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                className="input-field pl-10"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search shop name, category, subcategory, address"
-              />
+  return (
+    <div className="bg-[#F8F9FC] min-h-screen pb-20">
+      {/* Premium Hero Section */}
+      <section className="relative bg-slate-900 pt-20 pb-28 md:pt-28 md:pb-36 overflow-hidden z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/40 via-slate-900 to-slate-900 z-0"></div>
+        <div className="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-indigo-600/20 to-transparent blur-[100px] pointer-events-none"></div>
+        
+        <div className="container-custom relative z-10 text-center px-5 max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-bold text-xs uppercase tracking-widest mb-6">
+            <FiGrid /> Professional Directory
+          </div>
+          
+          <h1 className="text-4xl md:text-6xl font-sora font-extrabold text-white mb-6 leading-tight">
+            {user?.name ? (
+              <>Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">{user.name.split(' ')[0]}</span>.</>
+            ) : (
+              <>Find the perfect <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Professional</span> for your needs.</>
+            )}
+          </h1>
+          <p className="text-lg md:text-xl text-slate-300 font-medium mb-12 max-w-2xl mx-auto">
+            Browse our extensive directory of verified vendors, mechanics, artists, and experts across Gaya.
+          </p>
+
+          {/* Premium Search Bar */}
+          <form onSubmit={handleSearchSubmit} className="relative max-w-3xl mx-auto flex items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-2 shadow-2xl transition-all focus-within:bg-white/10 focus-within:border-indigo-400/50 focus-within:shadow-indigo-500/20">
+            <div className="pl-4 pr-2 text-slate-400">
+              <FiSearch className="w-6 h-6" />
             </div>
-            <button type="submit" className="rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700">Search</button>
+            <input
+              type="text"
+              className="flex-1 bg-transparent border-none text-white px-2 py-4 focus:ring-0 placeholder:text-slate-500 outline-none font-medium text-lg"
+              placeholder="Search by shop name, category, location, or service..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2">
+              Search <span className="hidden sm:inline">Now</span>
+            </button>
           </form>
         </div>
+      </section>
 
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="mb-4 font-bold text-slate-950">Categories</h2>
-            <div className="grid gap-3 sm:grid-cols-2">
+      {/* Main Content Area */}
+      <div className="container-custom max-w-[1536px] px-5 lg:px-10 mx-auto -mt-10 relative z-20">
+        <div className="grid gap-8 lg:grid-cols-[300px_1fr] xl:grid-cols-[320px_1fr]">
+          
+          {/* Sidebar: Categories */}
+          <aside className="bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 h-fit sticky top-24">
+            <h2 className="font-sora font-extrabold text-xl text-slate-900 mb-6 flex items-center gap-2">
+              <FiGrid className="text-indigo-600" /> Categories
+            </h2>
+            <div className="flex flex-col gap-2 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
               {serviceCategories.map((category) => (
                 <button
                   key={category.name}
-                  type="button"
                   onClick={() => selectCategory(category.name)}
-                  className={`rounded-lg border p-4 text-left transition ${
+                  className={`group flex items-center justify-between w-full p-3.5 rounded-xl font-bold text-[13px] transition-all text-left ${
                     selectedCategory === category.name
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-slate-200 hover:border-blue-200 hover:bg-slate-50'
+                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="font-semibold text-slate-950">{category.name}</span>
-                    <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{category.subcategories.length}</span>
-                  </div>
-                  <Link href={`/services/${slugifyService(category.name)}`} className="mt-2 inline-block text-sm font-semibold text-blue-700">
-                    Open category
-                  </Link>
+                  <span className="line-clamp-1 pr-2">{category.name}</span>
+                  <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full transition-colors ${
+                    selectedCategory === category.name 
+                      ? 'bg-white/20 text-white' 
+                      : 'bg-white text-slate-500 group-hover:bg-slate-200'
+                  }`}>
+                    {category.subcategories.length}
+                  </span>
                 </button>
               ))}
             </div>
-          </section>
+          </aside>
 
-          <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="mb-4 flex items-center justify-between gap-4">
-              <h2 className="font-bold text-slate-950">{selectedCategory || 'Select a category'}</h2>
-              {(selectedCategory || selectedSubcategory) && (
-                <button type="button" onClick={() => { setSelectedCategory(''); setSelectedSubcategory('') }} className="text-sm font-semibold text-blue-700">
-                  Clear
-                </button>
-              )}
-            </div>
-            {activeCategory ? (
-              <div className="flex flex-wrap gap-2">
-                {activeCategory.subcategories.map((subcategory) => (
-                  <button
-                    key={subcategory}
-                    type="button"
-                    onClick={() => setSelectedSubcategory(subcategory)}
-                    className={`rounded-full px-3 py-2 text-sm font-medium transition ${
-                      selectedSubcategory === subcategory
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
+          {/* Main Feed: Subcategories & Vendors */}
+          <main>
+            {/* Dynamic Subcategory Pills */}
+            <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-sora font-bold text-lg text-slate-800">
+                  {selectedCategory ? `${selectedCategory} Sub-categories` : 'Popular Filters'}
+                </h3>
+                {(selectedCategory || selectedSubcategory || search) && (
+                  <button 
+                    onClick={() => { setSelectedCategory(''); setSelectedSubcategory(''); setSearch(''); fetchVendors(); }}
+                    className="text-xs font-bold text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-full transition-colors"
                   >
-                    {subcategory}
+                    Clear All Filters
                   </button>
-                ))}
+                )}
+              </div>
+              
+              <div className="flex flex-wrap gap-2">
+                {activeCategory ? (
+                  activeCategory.subcategories.map((subcategory) => (
+                    <button
+                      key={subcategory}
+                      onClick={() => setSelectedSubcategory(subcategory === selectedSubcategory ? '' : subcategory)}
+                      className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all border ${
+                        selectedSubcategory === subcategory
+                          ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-sm'
+                          : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600'
+                      }`}
+                    >
+                      {subcategory}
+                    </button>
+                  ))
+                ) : (
+                  <p className="text-sm font-medium text-slate-500 py-2">
+                    Please select a main category from the sidebar to view its specific sub-categories and refine your search.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Vendor Grid */}
+            <div className="mb-6 flex items-center justify-between px-2">
+              <h2 className="text-2xl font-sora font-extrabold text-slate-900">
+                {search ? `Results for "${search}"` : selectedSubcategory ? selectedSubcategory : selectedCategory ? `${selectedCategory} Vendors` : 'All Vendors'}
+              </h2>
+              <span className="text-sm font-bold text-slate-500 bg-slate-200/70 px-4 py-1.5 rounded-full border border-slate-200">
+                {vendors.length} {vendors.length === 1 ? 'Result' : 'Results'}
+              </span>
+            </div>
+
+            {loading ? (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+                {[...Array(6)].map((_, index) => <div key={index} className="h-[340px] animate-pulse rounded-3xl bg-slate-200/60 border border-slate-100" />)}
+              </div>
+            ) : vendors.length ? (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+                {vendors.map((vendor) => <VendorCard key={vendor._id} vendor={vendor} />)}
               </div>
             ) : (
-              <p className="text-sm text-slate-500">Pick a category to see its subcategories.</p>
+              <div className="rounded-3xl border-2 border-dashed border-slate-200 bg-white p-16 text-center shadow-sm mt-4">
+                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <FiBriefcase className="text-4xl text-slate-300" />
+                </div>
+                <h3 className="text-2xl font-sora font-bold text-slate-800 mb-2">No vendors found</h3>
+                <p className="text-slate-500 font-medium max-w-md mx-auto">
+                  We couldn't find any professionals matching your current filters or search terms. Try clearing them and searching again.
+                </p>
+                <button 
+                  onClick={() => { setSelectedCategory(''); setSelectedSubcategory(''); setSearch(''); fetchVendors(); }}
+                  className="mt-6 text-indigo-600 font-bold hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-6 py-2.5 rounded-full transition-colors inline-flex items-center gap-2"
+                >
+                  View All Vendors <FiArrowRight />
+                </button>
+              </div>
             )}
-          </section>
+          </main>
         </div>
-
-        <section className="mt-8">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-slate-950">Matching Vendors</h2>
-            <span className="text-sm text-slate-500">{vendors.length} found</span>
-          </div>
-          {loading ? (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {[...Array(6)].map((_, index) => <div key={index} className="h-64 animate-pulse rounded-lg bg-white" />)}
-            </div>
-          ) : vendors.length ? (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {vendors.map((vendor) => <ServiceVendorCard key={vendor._id} vendor={vendor} />)}
-            </div>
-          ) : (
-            <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center">
-              <FiBriefcase className="mx-auto text-4xl text-slate-300" />
-              <h3 className="mt-4 text-lg font-bold text-slate-950">No vendors found</h3>
-              <p className="mt-2 text-slate-500">Try another category, subcategory, or search term.</p>
-            </div>
-          )}
-        </section>
       </div>
     </div>
-  )
-}
-
-function ServiceVendorCard({ vendor }) {
-  const image = vendor.logo || vendor.images?.[0] || vendor.profileImage || 'https://placehold.co/400x260?text=Vendor'
-  const contact = vendor.phone || vendor.contactNumber
-
-  return (
-    <article className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-      <img src={image} alt={vendor.name || vendor.businessName} className="h-44 w-full object-cover" />
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="text-lg font-bold text-slate-950">{vendor.name || vendor.businessName}</h3>
-            <p className="mt-1 text-sm font-medium text-blue-700">{vendor.category}{vendor.subCategory ? ` / ${vendor.subCategory}` : ''}</p>
-          </div>
-        </div>
-        {vendor.description && <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">{vendor.description}</p>}
-        {vendor.address && <p className="mt-3 flex items-center gap-2 text-sm text-slate-500"><FiMapPin />{vendor.address}</p>}
-        <div className="mt-4 flex items-center justify-between gap-3">
-          {contact ? (
-            <a href={`tel:${contact}`} className="inline-flex items-center gap-2 font-semibold text-green-700"><FiPhone />{contact}</a>
-          ) : (
-            <span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500"><FiLock />Contact locked</span>
-          )}
-          <Link href={`/vendors/${vendor._id}`} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-            Details
-          </Link>
-        </div>
-      </div>
-    </article>
   )
 }

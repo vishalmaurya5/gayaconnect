@@ -1,11 +1,11 @@
 // app/api/payments/verify/route.js — Payment verification for all plans
 import { NextResponse } from "next/server";
 import crypto           from "crypto";
-import connectDB        from "@/lib/db/connect";
+import { connectDB } from "@/lib/db/mongodb";
 import User             from "@/lib/db/models/User";
 import Offer            from "@/lib/db/models/Offer";
 import Payment          from "@/lib/db/models/Payment";
-import { getLoggedInUser } from "@/lib/checkSubscription";
+import { getAuthenticatedUser as getLoggedInUser } from "@/lib/security/auth";
 
 const PLAN_DURATIONS = {
   user_monthly: 30,
