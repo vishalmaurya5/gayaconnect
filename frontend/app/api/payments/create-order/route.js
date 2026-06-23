@@ -45,6 +45,12 @@ export async function POST(request) {
       baseAmount = dynamicPricing.subscription * 100;
     } else if (planKey === 'banner' && dynamicPricing.banner) {
       baseAmount = dynamicPricing.banner * 100;
+    } else if (planKey === 'offer_7days' && dynamicPricing.offer7Days) {
+      baseAmount = dynamicPricing.offer7Days * 100;
+    } else if (planKey === 'offer_30days' && dynamicPricing.offer30Days) {
+      baseAmount = dynamicPricing.offer30Days * 100;
+    } else if (planKey === 'offer_365days' && dynamicPricing.offer365Days) {
+      baseAmount = dynamicPricing.offer365Days * 100;
     }
 
     const amountPaise = baseAmount;

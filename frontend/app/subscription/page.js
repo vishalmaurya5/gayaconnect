@@ -23,6 +23,13 @@ export default function SubscriptionPage() {
   const router = useRouter()
   const { user, loading, updateUser } = useAuth()
   const [paying, setPaying] = useState(false)
+  const [price, setPrice] = useState(11)
+
+  useEffect(() => {
+    fetch('/api/settings').then(r => r.json()).then(d => {
+      if (d.success && d.pricing?.subscription) setPrice(d.pricing.subscription)
+    }).catch(console.error)
+  }, [])
 
   useEffect(() => {
     if (loading) return
@@ -130,7 +137,7 @@ export default function SubscriptionPage() {
         
         <div className="p-8">
           <div className="flex justify-center items-end gap-1 mb-8">
-            <span className="text-6xl font-extrabold text-slate-900">₹11</span>
+            <span className="text-6xl font-extrabold text-slate-900">₹{price}</span>
             <span className="text-xl text-slate-500 font-medium mb-2">/ month</span>
           </div>
 
@@ -160,7 +167,7 @@ export default function SubscriptionPage() {
             className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-lg flex items-center justify-center gap-2 hover:from-emerald-600 hover:to-teal-600 transition disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/30 active:scale-[0.98]"
           >
             <FiCreditCard className="text-xl" />
-            {paying ? 'Connecting to Payment Gateway...' : 'Pay ₹11 & Subscribe'}
+            {paying ? 'Connecting to Payment Gateway...' : `Pay ₹${price} & Subscribe`}
           </button>
           
           <p className="text-center text-xs text-slate-400 mt-4 font-medium uppercase tracking-wider">

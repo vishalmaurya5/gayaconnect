@@ -7,6 +7,8 @@ import toast from 'react-hot-toast';
 export default function AdminLabourPage() {
   const [labourers, setLabourers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', skill: '', dailyRate: '', address: '' });
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     fetchLabourers();
@@ -61,10 +63,71 @@ export default function AdminLabourPage() {
     }
   };
 
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    setCreating(true);
+    try {
+      const res = await fetch('/api/admin/create-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'labourer', ...form })
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('Labourer created successfully');
+        setForm({ name: '', email: '', phone: '', password: '', skill: '', dailyRate: '', address: '' });
+        fetchLabourers();
+      } else {
+        toast.error(json.message || 'Failed to create labourer');
+      }
+    } catch (error) {
+      toast.error('Error creating labourer');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-slate-800">Labour Management</h1>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h2 className="text-lg font-bold text-slate-900 mb-4">Add New Labourer</h2>
+        <form onSubmit={handleCreate} className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Name</label>
+            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
+            <input required type="email" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
+            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Temporary Password</label>
+            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.password} onChange={e => setForm({...form, password: e.target.value})} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Skill (Category)</label>
+            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.skill} onChange={e => setForm({...form, skill: e.target.value})} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Daily Rate (₹)</label>
+            <input type="number" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.dailyRate} onChange={e => setForm({...form, dailyRate: e.target.value})} />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Area / Address</label>
+            <input type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
+          </div>
+          <button type="submit" disabled={creating} className="sm:col-span-2 md:col-span-4 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition-colors disabled:opacity-50">
+            {creating ? 'Creating...' : 'Create Labourer'}
+          </button>
+        </form>
       </div>
 
       {loading ? (

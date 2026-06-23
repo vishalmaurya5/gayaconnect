@@ -8,6 +8,8 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     fetchUsers(filter);
@@ -63,12 +65,61 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    setCreating(true);
+    try {
+      const res = await fetch('/api/admin/create-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'user', ...form })
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('User created successfully');
+        setForm({ name: '', email: '', phone: '', password: '' });
+        fetchUsers(filter);
+      } else {
+        toast.error(json.message || 'Failed to create user');
+      }
+    } catch (error) {
+      toast.error('Error creating user');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const isSubscribed = (u) => u.subscriptionActive && u.subscriptionExpiry && new Date(u.subscriptionExpiry) > new Date();
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-slate-800">User Management</h1>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h2 className="text-lg font-bold text-slate-900 mb-4">Add New User</h2>
+        <form onSubmit={handleCreate} className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Name</label>
+            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
+            <input required type="email" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
+            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Temporary Password</label>
+            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.password} onChange={e => setForm({...form, password: e.target.value})} />
+          </div>
+          <button type="submit" disabled={creating} className="sm:col-span-2 md:col-span-4 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition-colors disabled:opacity-50">
+            {creating ? 'Creating...' : 'Create User'}
+          </button>
+        </form>
       </div>
 
       <div className="flex gap-2">

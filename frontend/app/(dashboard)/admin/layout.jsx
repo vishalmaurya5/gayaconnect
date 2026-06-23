@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
   FiGrid, FiUsers, FiShoppingBag, FiTool, FiTag, 
-  FiImage, FiDollarSign, FiLogOut, FiShield, FiMenu, FiX 
+  FiImage, FiDollarSign, FiLogOut, FiShield, FiMenu, FiX,
+  FiPhoneCall, FiSettings, FiMonitor
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -58,6 +59,9 @@ export default function AdminLayout({ children }) {
     { name: 'Offers', path: '/admin/offers', icon: FiTag },
     { name: 'Banners', path: '/admin/banners', icon: FiImage },
     { name: 'Payments', path: '/admin/payments', icon: FiDollarSign },
+    { name: 'Call Logs', path: '/admin/calls', icon: FiPhoneCall },
+    { name: 'Popup Ad', path: '/admin/popup', icon: FiMonitor },
+    { name: 'Settings', path: '/admin/settings', icon: FiSettings },
   ];
 
   return (

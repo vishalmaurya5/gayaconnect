@@ -10,7 +10,10 @@ const DEFAULT_PRICING = {
   banner: 199,
   vehicle: 200,
   vendorRegistration: 49,
-  chargeVendorRegistration: false
+  chargeVendorRegistration: false,
+  offer7Days: 39,
+  offer30Days: 199,
+  offer365Days: 399
 }
 
 export async function GET(request) {

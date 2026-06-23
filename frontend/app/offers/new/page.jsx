@@ -18,8 +18,24 @@ export default function NewOfferPage() {
   const [form, setForm]     = useState({ title:"", description:"", discount:"", category:"", terms:"" });
   const [plan, setPlan]     = useState("30days");
   const [errors, setErrors] = useState({});
+  const [dynamicPrices, setDynamicPrices] = useState({
+    "7days": 39, "30days": 199, "365days": 399
+  });
 
-  const selectedPlan = PLANS.find(p => p.key === plan);
+  useEffect(() => {
+    fetch('/api/settings').then(r => r.json()).then(d => {
+      if (d.success && d.pricing) {
+        setDynamicPrices({
+          "7days": d.pricing.offer7Days || 39,
+          "30days": d.pricing.offer30Days || 199,
+          "365days": d.pricing.offer365Days || 399
+        });
+      }
+    }).catch(console.error);
+  }, []);
+
+  const currentPlans = PLANS.map(p => ({ ...p, price: dynamicPrices[p.key] }));
+  const selectedPlan = currentPlans.find(p => p.key === plan);
 
   const validateStep1 = () => {
     const e = {};
@@ -181,7 +197,7 @@ export default function NewOfferPage() {
         {step === 2 && (
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
-              {PLANS.map(p => (
+              {currentPlans.map(p => (
                 <button key={p.key} onClick={() => setPlan(p.key)}
                   className={`border-2 rounded-2xl p-5 text-left transition-all hover:-translate-y-0.5 ${
                     plan === p.key ? p.color + " bg-indigo-50/50" : "border-gray-200 bg-white hover:border-gray-300"

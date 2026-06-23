@@ -1,13 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FiCheckCircle, FiXCircle, FiClock, FiImage, FiExternalLink } from 'react-icons/fi';
+import { FiCheckCircle, FiXCircle, FiClock, FiImage, FiExternalLink, FiUpload } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('pending'); // pending, active, expired
+  const [form, setForm] = useState({ title: '', link: '', position: 'home_top', endDate: '' });
+  const [imageUrl, setImageUrl] = useState('');
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     fetchBanners();
@@ -46,13 +49,54 @@ export default function AdminBannersPage() {
     }
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== "image/jpeg" && file.type !== "image/jpg") {
+      return toast.error("Only JPG/JPEG files are allowed.");
+    }
+    if (file.size > 200 * 1024) {
+      return toast.error("Image size must be less than 200KB.");
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => setImageUrl(ev.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    if (!imageUrl) return toast.error("Please upload a banner image");
+    setCreating(true);
+    try {
+      const res = await fetch('/api/admin/banners', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, imageUrl })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Banner published successfully");
+        setForm({ title: '', link: '', position: 'home_top', endDate: '' });
+        setImageUrl('');
+        fetchBanners();
+        setFilter('active');
+      } else {
+        toast.error(data.message || 'Failed to create banner');
+      }
+    } catch (err) {
+      toast.error('Error creating banner');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const isExpired = (endDate) => new Date(endDate) < new Date();
 
   const filteredBanners = banners.filter(banner => {
     const expired = isExpired(banner.endDate);
     if (filter === 'expired') return expired;
     if (filter === 'pending') return !expired && !banner.adminApproved;
-    if (filter === 'active') return !expired && banner.adminApproved && banner.isActive;
+    if (filter === 'active') return !expired && banner.adminApproved;
     return true;
   });
 
@@ -60,6 +104,48 @@ export default function AdminBannersPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-slate-800">Manage Banners</h1>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+        <h2 className="text-lg font-bold text-slate-900 mb-4">Post New Banner</h2>
+        <form onSubmit={handleCreate} className="grid gap-5 sm:grid-cols-2 md:grid-cols-4">
+          <div className="md:col-span-4 flex flex-col sm:flex-row items-center gap-4 border border-dashed border-slate-300 p-4 rounded-xl bg-slate-50">
+            <div className="w-48 h-24 bg-white border border-slate-200 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
+              {imageUrl ? <img src={imageUrl} className="w-full h-full object-cover" /> : <FiImage className="text-3xl text-slate-300" />}
+            </div>
+            <div>
+              <input type="file" id="adminBannerImg" accept="image/jpeg,image/jpg" className="hidden" onChange={handleImageUpload} />
+              <label htmlFor="adminBannerImg" className="cursor-pointer inline-flex items-center gap-2 bg-white border border-slate-300 hover:border-emerald-500 hover:text-emerald-600 font-semibold px-4 py-2 rounded-lg transition-colors text-sm">
+                <FiUpload /> Upload JPEG (Max 200KB)
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Title</label>
+            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500" value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Target Link (Optional)</label>
+            <input type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500" placeholder="https://" value={form.link} onChange={e => setForm({...form, link: e.target.value})} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Position</label>
+            <select className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500" value={form.position} onChange={e => setForm({...form, position: e.target.value})}>
+              <option value="home_top">Home Top</option>
+              <option value="home_middle">Home Middle</option>
+              <option value="category_top">Category Top</option>
+              <option value="community">Community</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">End Date (Optional)</label>
+            <input type="date" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} />
+          </div>
+          <button type="submit" disabled={creating} className="sm:col-span-2 md:col-span-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition-colors disabled:opacity-50">
+            {creating ? 'Publishing...' : 'Publish Banner'}
+          </button>
+        </form>
       </div>
 
       <div className="flex gap-4 mb-6 border-b border-slate-200 pb-2">
@@ -73,7 +159,7 @@ export default function AdminBannersPage() {
           onClick={() => setFilter('active')}
           className={`pb-2 px-2 font-semibold ${filter === 'active' ? 'text-emerald-600 border-b-2 border-emerald-600' : 'text-slate-500 hover:text-slate-700'}`}
         >
-          Active Banners
+          Approved Banners
         </button>
         <button 
           onClick={() => setFilter('expired')}
