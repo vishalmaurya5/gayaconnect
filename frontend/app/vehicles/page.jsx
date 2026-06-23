@@ -82,6 +82,25 @@ export default function VehiclesPage() {
 }
 
 function VehicleCard({ vehicle, isSubscribed }) {
+  const handleContact = async (e) => {
+    if (!isSubscribed) return;
+    e.preventDefault();
+    try {
+      await fetch('/api/calls', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          receiverId: vehicle._id,
+          receiverName: vehicle.ownerName || "Vehicle Owner",
+          receiverType: 'Vehicle',
+          receiverPhone: vehicle.phone,
+          actionType: 'Call'
+        })
+      });
+    } catch (err) {}
+    window.location.href = `tel:${vehicle.phone}`;
+  };
+
   return (
     <article className="group relative rounded-3xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 overflow-hidden flex flex-col h-full">
       <div className={`p-6 flex-1 flex flex-col ${!isSubscribed ? 'blur-[3px] select-none pointer-events-none' : ''}`}>
@@ -106,7 +125,7 @@ function VehicleCard({ vehicle, isSubscribed }) {
       </div>
 
       <div className={`p-4 border-t border-slate-100 bg-slate-50/50 mt-auto ${!isSubscribed ? 'blur-[3px] select-none pointer-events-none' : ''}`}>
-        <a href={`tel:${vehicle.phone}`} className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md shadow-indigo-600/20">
+        <a href={`tel:${vehicle.phone}`} onClick={isSubscribed ? handleContact : undefined} className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md shadow-indigo-600/20 cursor-pointer">
           <FiPhone /> {vehicle.phone}
         </a>
       </div>

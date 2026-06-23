@@ -17,7 +17,7 @@ export default function LabourRegisterPage() {
     category: '',
     area: '',
     dailyRate: '',
-    photoStr: '',
+    photo: '',
     availability: true
   });
 
@@ -25,17 +25,17 @@ export default function LabourRegisterPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Must be an image file');
+    if (file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
+      toast.error('Only JPG and JPEG images are allowed');
       return;
     }
-    if (file.size > 3 * 1024 * 1024) {
-      toast.error('Image must be under 3MB');
+    if (file.size > 150 * 1024) {
+      toast.error('Image must be under 150 KB');
       return;
     }
 
     const reader = new FileReader();
-    reader.onload = () => setForm({ ...form, photoStr: reader.result });
+    reader.onload = () => setForm({ ...form, photo: reader.result });
     reader.readAsDataURL(file);
   };
 
@@ -106,9 +106,9 @@ export default function LabourRegisterPage() {
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Profile Photo (Optional)</label>
               <div className="flex items-center gap-4">
-                {form.photoStr ? (
+                {form.photo ? (
                   <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-200">
-                    <img src={form.photoStr} alt="Preview" className="w-full h-full object-cover" />
+                    <img src={form.photo} alt="Preview" className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <div className="w-20 h-20 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400">
@@ -118,9 +118,9 @@ export default function LabourRegisterPage() {
                 <div>
                   <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition">
                     <FiUpload /> Choose Image
-                    <input type="file" accept="image/*" onChange={handlePhoto} className="hidden" />
+                    <input type="file" accept="image/jpeg, image/jpg" onChange={handlePhoto} className="hidden" />
                   </label>
-                  <p className="text-xs text-slate-500 mt-2">Max size: 3MB. Clear photo helps get more jobs.</p>
+                  <p className="text-xs text-slate-500 mt-2">Max size: 150 KB. Only JPG/JPEG allowed.</p>
                 </div>
               </div>
             </div>

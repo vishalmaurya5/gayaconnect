@@ -21,13 +21,11 @@ export const SERVICE_CATEGORIES = [
   {
     name: 'Education Services',
     subcategories: [
-      'Home Tutor',
       'Coaching Center',
       'Spoken English Classes',
       'Computer Training',
       'Dance Classes',
       'Music Classes',
-      'Online Tuition',
       'Competitive Exam Coaching',
     ],
   },
@@ -232,6 +230,21 @@ export const SERVICE_CATEGORIES = [
       'Insurance Agent',
       'RTO Agent',
       'Passport Agent',
+    ],
+  },
+  {
+    name: 'Street Food',
+    subcategories: [
+      'Panipuri / Golgappa',
+      'Chaat Stall',
+      'Momos Stall',
+      'Burger & Sandwich Stall',
+      'Dosa Stall',
+      'Pav Bhaji Stall',
+      'Rolls & Wraps',
+      'Samosa & Kachori',
+      'Tea / Coffee Stall',
+      'Juice & Shakes',
     ],
   },
 ]

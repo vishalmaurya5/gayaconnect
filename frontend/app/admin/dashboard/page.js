@@ -21,7 +21,9 @@ import {
   FiTruck,
   FiSettings,
   FiDownload,
-  FiTool
+  FiTool,
+  FiPhoneCall,
+  FiMonitor
 } from 'react-icons/fi'
 import { Bar } from 'react-chartjs-2'
 import {
@@ -46,6 +48,8 @@ const tabs = [
   { id: 'labour', label: 'Labour', icon: FiTool },
   { id: 'vehicles', label: 'Vehicles', icon: FiTruck },
   { id: 'payments', label: 'Payments', icon: FiDollarSign },
+  { id: 'calls', label: 'Call Logs', icon: FiPhoneCall },
+  { id: 'popup', label: 'Popup Ad', icon: FiMonitor },
   { id: 'deleted_accounts', label: 'Deleted', icon: FiTrash2 },
   { id: 'settings', label: 'Settings', icon: FiSettings },
 ]
@@ -267,6 +271,7 @@ export default function AdminDashboard() {
           <Metric label="Banners" value={stats.banners || 0} icon={FiImage} />
           <Metric label="Labour" value={stats.labourers || 0} icon={FiTool} />
           <Metric label="Vehicles" value={stats.vehicles || 0} icon={FiTruck} />
+          <Metric label="Calls" value={stats.calls || 0} icon={FiPhoneCall} />
           <Metric label="Revenue" value={`Rs. ${revenue}`} icon={FiDollarSign} />
           <Metric label="Paid Rate" value={`${conversionRate}%`} icon={FiCheckCircle} />
         </section>
@@ -323,6 +328,7 @@ export default function AdminDashboard() {
               }}
             />
           )}
+          {activeTab === 'calls' && <CallsView calls={data?.calls || []} />}
           {activeTab === 'payments' && <PaymentsView payments={data?.payments || []} onUpdate={updateResource} onDelete={(id) => deleteResource('payments', id)} />}
           {activeTab === 'deleted_accounts' && (
             <DeletedAccountsView 
@@ -333,6 +339,7 @@ export default function AdminDashboard() {
               onDelete={deleteResource} 
             />
           )}
+          {activeTab === 'popup' && <PopupAdView />}
           {activeTab === 'settings' && (
             <SettingsView 
               settings={settings} 
@@ -346,6 +353,151 @@ export default function AdminDashboard() {
         </section>
       </main>
     </div>
+  )
+}
+
+function CallsView({ calls }) {
+  return (
+    <Panel 
+      title="Platform Call Logs"
+      action={<ExportButton filename="call_logs" headers={['Date', 'Caller', 'Phone', 'Receiver', 'Receiver Type', 'Receiver Phone', 'Action']} data={calls.map(c => [new Date(c.createdAt).toLocaleString(), c.callerName, c.callerPhone, c.receiverName, c.receiverType, c.receiverPhone, c.actionType])} />}
+    >
+      <Table
+        headers={['Date & Time', 'Caller', 'Caller Phone', 'Contacted', 'Target Type', 'Target Phone', 'Method']}
+        rows={calls.map((c) => [
+          new Date(c.createdAt).toLocaleString(),
+          c.callerName,
+          c.callerPhone,
+          c.receiverName,
+          <span key={`type-${c._id}`} className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${
+            c.receiverType === 'Vendor' ? 'bg-purple-100 text-purple-700' :
+            c.receiverType === 'Labourer' ? 'bg-amber-100 text-amber-700' :
+            'bg-blue-100 text-blue-700'
+          }`}>
+            {c.receiverType}
+          </span>,
+          c.receiverPhone,
+          <span key={`action-${c._id}`} className={`px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider ${
+            c.actionType === 'WhatsApp' ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'
+          }`}>
+            {c.actionType}
+          </span>
+        ])}
+      />
+    </Panel>
+  )
+}
+
+function PopupAdView() {
+  const [isActive, setIsActive] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/admin/popup')
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.data) {
+          setIsActive(d.data.isActive);
+          setImageUrl(d.data.imageUrl);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.type !== "image/jpeg" && file.type !== "image/jpg") {
+      toast.error("Only JPG/JPEG files are allowed.");
+      return;
+    }
+    
+    if (file.size > 200 * 1024) {
+      toast.error("Image size must be less than 200KB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => setImageUrl(e.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch('/api/admin/popup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive, imageUrl })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      toast.error("Failed to save popup settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="p-8 text-center text-slate-500">Loading settings...</div>;
+
+  return (
+    <Panel 
+      title="Popup Advertisement" 
+      action={
+        <button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold shadow-sm transition-colors disabled:opacity-50">
+          {saving ? 'Saving...' : 'Save Settings'}
+        </button>
+      }
+    >
+      <div className="max-w-2xl space-y-6">
+        <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+          <div>
+            <h3 className="font-semibold text-slate-900">Enable Popup</h3>
+            <p className="text-sm text-slate-500">Show this advertisement when users visit the homepage.</p>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" className="sr-only peer" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Advertisement Image</label>
+          <div className="flex items-start gap-4">
+            <div className="w-64 h-64 bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+              {imageUrl ? (
+                <img src={imageUrl} alt="Popup Ad" className="w-full h-full object-cover" />
+              ) : (
+                <div className="text-slate-400 flex flex-col items-center">
+                  <FiImage size={32} className="mb-2" />
+                  <span className="text-sm">No image uploaded</span>
+                </div>
+              )}
+            </div>
+            <div>
+              <input type="file" id="popupImage" accept="image/jpeg,image/jpg" className="hidden" onChange={handleImageUpload} />
+              <label htmlFor="popupImage" className="cursor-pointer inline-flex items-center gap-2 bg-white border border-slate-300 hover:border-blue-500 text-slate-700 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
+                <FiUpload /> Upload Image
+              </label>
+              <ul className="text-xs text-slate-500 mt-3 list-disc pl-4 space-y-1">
+                <li>Only JPEG / JPG format allowed.</li>
+                <li>Maximum file size: 200 KB.</li>
+                <li>Aspect ratio: Vertical (e.g. 4:5 or 9:16) recommended for mobile.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Panel>
   )
 }
 

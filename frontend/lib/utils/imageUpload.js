@@ -1,9 +1,9 @@
 export const PROFILE_IMAGE_MAX_BYTES = 50 * 1024
 export const PROFILE_IMAGE_MAX_LABEL = '50 KB'
 
-export function validateImageDataUrl(dataUrl, fieldName = 'Profile photo') {
+export function validateImageDataUrl(dataUrl, fieldName = 'Profile photo', maxBytes = PROFILE_IMAGE_MAX_BYTES, maxLabel = PROFILE_IMAGE_MAX_LABEL) {
   if (!dataUrl) return null
-  if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/jpeg;')) {
+  if (typeof dataUrl !== 'string' || (!dataUrl.startsWith('data:image/jpeg;') && !dataUrl.startsWith('data:image/jpg;'))) {
     throw new Error(`${fieldName} must be a JPG or JPEG image file`)
   }
 
@@ -18,8 +18,8 @@ export function validateImageDataUrl(dataUrl, fieldName = 'Profile photo') {
   }
 
   const sizeInBytes = Math.ceil((base64.length * 3) / 4)
-  if (sizeInBytes > PROFILE_IMAGE_MAX_BYTES) {
-    throw new Error(`${fieldName} must be less than ${PROFILE_IMAGE_MAX_LABEL}`)
+  if (sizeInBytes > maxBytes) {
+    throw new Error(`${fieldName} must be less than ${maxLabel}`)
   }
 
   return dataUrl

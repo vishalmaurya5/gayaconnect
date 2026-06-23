@@ -132,7 +132,7 @@ export default function SubscriptionGuard({ children }) {
             
             <div className="text-center mb-6 mt-2">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Unlock Gaya Connect</h3>
-              <p className="text-gray-500 text-sm">Get full access to all vendors, offers, and daily labour contacts.</p>
+              <p className="text-gray-500 text-sm">Get full access to all vendors, offers, and local workforce contacts.</p>
             </div>
 
             <div className="bg-indigo-50 border-2 border-indigo-600 rounded-2xl p-5 mb-6 relative">
@@ -149,7 +149,7 @@ export default function SubscriptionGuard({ children }) {
                   "View all vendor phone numbers",
                   "Direct WhatsApp access to businesses",
                   "Claim exclusive local offers",
-                  "Contact daily labour workers",
+                  "Contact local workers",
                   "Cancel anytime"
                 ].map((feature, idx) => (
                   <li key={idx} className="flex items-start gap-2 text-sm text-indigo-900 font-medium">

@@ -205,7 +205,7 @@ export default function MapView({ fullScreen = false }) {
           <label className="flex items-center justify-between cursor-pointer group">
             <div className="flex items-center gap-2 text-sm font-medium text-slate-700 group-hover:text-green-600 transition-colors">
               <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-600"><HardHat className="w-3.5 h-3.5" /></div>
-              Labour
+              Workforce
             </div>
             <input type="checkbox" checked={filters.labour} onChange={() => setFilters(f => ({...f, labour: !f.labour}))} className="w-4 h-4 rounded text-green-600 focus:ring-green-500 border-gray-300" />
           </label>

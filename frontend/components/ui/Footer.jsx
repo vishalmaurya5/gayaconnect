@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import { useAuth } from '@/contexts/AuthContext';
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
   const { openSubscriptionModal } = useAuth();
+  const pathname = usePathname();
+
+  if (pathname?.startsWith('/admin')) return null;
 
   return (
     <footer className="bg-slate-900 text-white/70 pt-12 pb-6">
@@ -28,7 +32,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/vendors" className="hover:text-white transition">Vendors</Link></li>
               <li><Link href="/offers" className="hover:text-white transition">Offers & deals</Link></li>
-              <li><Link href="/labour" className="hover:text-white transition">Daily labour</Link></li>
+              <li><Link href="/labour" className="hover:text-white transition">Local Workforce</Link></li>
               <li><Link href="/services" className="hover:text-white transition">Services</Link></li>
               <li><Link href="/hotels" className="hover:text-white transition">Hotels</Link></li>
             </ul>

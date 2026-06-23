@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   // Vendor Fields
   businessName: { type: String },
   category: { type: String },
+  subCategory: { type: String },
   address: { type: String },
   gstNumber: { type: String },
   description: { type: String },

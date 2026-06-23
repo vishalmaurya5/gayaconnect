@@ -1,7 +1,7 @@
 const testimonials = [
   { text: "Found a good electrician within 10 minutes for my house wiring work. The subscription for ₹11 is literally nothing compared to the time it saves.", name: "Rajeev Verma", role: "Resident, Gaya City", initials: "RV", bg: "bg-indigo-50" },
   { text: "As a vendor, I got 3 new customers in the first week of listing. The offer posting feature really helped promote my shop during festivals.", name: "Amit Sharma", role: "Vendor, Bodh Gaya", initials: "AS", bg: "bg-teal-50" },
-  { text: "Needed a daily labour for construction. Found Ramesh Mistri on GayaConnect in minutes. Professional, punctual, excellent work.", name: "Priya Kumari", role: "Homeowner, Tekari Road", initials: "PK", bg: "bg-amber-50" },
+  { text: "Needed a local worker for construction. Found Ramesh Mistri on GayaConnect in minutes. Professional, punctual, excellent work.", name: "Priya Kumari", role: "Homeowner, Tekari Road", initials: "PK", bg: "bg-amber-50" },
 ];
 
 export default function Testimonials() {

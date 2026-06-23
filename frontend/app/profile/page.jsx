@@ -22,6 +22,7 @@ export default function ProfilePage() {
   const [vehicles, setVehicles] = useState([]);
   const [vehForm, setVehForm] = useState({ vehicleName: '', vehicleModel: '', vehicleNumber: '', dlNumber: '', isCommercial: true, liabilityAccepted: false });
   const [postingVeh, setPostingVeh] = useState(false);
+  const [callHistory, setCallHistory] = useState([]);
 
   useEffect(() => {
     fetch("/api/profile")
@@ -33,6 +34,8 @@ export default function ProfilePage() {
           fetch(`/api/users/transactions?userId=${d.user._id}`).then(r=>r.json()).then(t => setTransactions(t.transactions || []));
           // fetch vehicles
           fetch(`/api/vehicles?ownerId=${d.user._id}`).then(r=>r.json()).then(v => setVehicles(v.vehicles || []));
+          // fetch call history
+          fetch('/api/calls').then(r=>r.json()).then(c => setCallHistory(c.calls || []));
 
           setForm({
             name:        d.user.name || "",
@@ -205,6 +208,7 @@ export default function ProfilePage() {
     { id:"subscription", label:"Subscription",     icon:CreditCard  },
     ...(isVendor ? [{ id:"vendor", label:"My listing", icon:Store }] : []),
     { id:"vehicles",     label:"My Vehicles",      icon:Car         },
+    { id:"calls",        label:"Call History",     icon:Phone       },
     { id:"settings",     label:"Settings",         icon:Shield      },
   ];
 
@@ -362,7 +366,7 @@ export default function ProfilePage() {
                       <p className="text-[13.5px] text-gray-600">
                         {subActive
                           ? `Your subscription is valid for ${daysLeft} more days (until ${new Date(user.subscriptionExpiry).toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" })})`
-                          : "Subscribe for ₹11/month to unlock all vendor contacts, offers and daily labour listings."}
+                          : "Subscribe for ₹11/month to unlock all vendor contacts, offers and local workforce listings."}
                       </p>
                     </div>
                   </div>
@@ -375,7 +379,7 @@ export default function ProfilePage() {
                     {[
                       "View all vendor contact numbers (2,400+ vendors)",
                       "Access all local offers & discounts",
-                      "Contact daily labour workers directly",
+                      "Contact local workers directly",
                       "Unlimited searches across Gaya district",
                       "New offers notified instantly",
                     ].map(f => (
@@ -509,6 +513,40 @@ export default function ProfilePage() {
                   <div className="bg-gray-50 rounded-xl px-4 py-3 text-[14px] text-gray-700 leading-relaxed">
                     {form.description || "No description added yet."}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── CALL HISTORY TAB ── */}
+            {tab === "calls" && (
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <h2 className="font-semibold text-gray-900 mb-5">Your Contact History</h2>
+                <div className="space-y-3">
+                  {callHistory.length > 0 ? callHistory.map((call) => (
+                    <div key={call._id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-100 bg-gray-50 rounded-xl gap-3">
+                      <div>
+                        <div className="font-bold text-[14.5px] text-gray-900">{call.receiverName}</div>
+                        <div className="text-[12.5px] font-medium text-gray-500 mt-0.5 capitalize">{call.receiverType} &bull; {call.receiverPhone}</div>
+                      </div>
+                      <div className="flex flex-col items-start sm:items-end">
+                        <div className={`px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide ${
+                          call.actionType === 'WhatsApp' ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'
+                        }`}>
+                          {call.actionType}
+                        </div>
+                        <div className="text-[11.5px] text-gray-400 mt-1.5 font-medium">
+                          {new Date(call.createdAt).toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-8">
+                      <div className="inline-flex w-12 h-12 rounded-full bg-gray-100 items-center justify-center text-gray-400 mb-3">
+                        <Phone size={20} />
+                      </div>
+                      <p className="text-[13.5px] text-gray-500 font-medium">You haven't contacted any professionals yet.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

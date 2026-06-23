@@ -1,6 +1,7 @@
 'use client'
 
 import Link from "next/link";
+import { FiGrid } from "react-icons/fi";
 import HeroSection from "@/components/ui/HeroSection";
 import TrustStrip from "@/components/ui/TrustStrip";
 import CategoryGrid from "@/components/ui/CategoryGrid";
@@ -10,6 +11,7 @@ import LabourSection from "@/components/ui/LabourSection";
 import HowItWorks from "@/components/ui/HowItWorks";
 import Testimonials from "@/components/ui/Testimonials";
 import VendorCTA from "@/components/ui/VendorCTA";
+import PopupAd from "@/components/ui/PopupAd";
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomePage() {
@@ -17,6 +19,7 @@ export default function HomePage() {
 
   return (
     <div className="bg-white min-h-screen">
+      <PopupAd />
       <HeroSection />
       
       {/* Trust Strip */}
@@ -40,7 +43,7 @@ export default function HomePage() {
               Get started for just <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300">₹11/month</span>
             </h3>
             <p className="text-slate-300 mt-3 text-[15px] max-w-xl leading-relaxed">
-              Unlock all verified vendor contacts, exclusive local offers, and daily labour listings instantly. Join thousands of users today.
+              Unlock all verified vendor contacts, exclusive local offers, and local workforce listings instantly. Join thousands of users today.
             </p>
           </div>
           <button 
@@ -61,7 +64,10 @@ export default function HomePage() {
               <div className="text-indigo-600 text-[11px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
                 <span className="w-8 h-[2px] bg-indigo-600 rounded-full"></span> Explore
               </div>
-              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Browse services</h2>
+              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight flex items-center gap-3">
+                <FiGrid className="text-indigo-500 w-8 h-8 md:w-10 md:h-10" /> 
+                Browse services
+              </h2>
             </div>
             <Link href="/services" className="text-[#0F172A] font-bold text-[14px] flex items-center gap-2 hover:text-indigo-600 transition-colors bg-white px-5 py-2.5 rounded-full border border-slate-200 shadow-sm hover:shadow-md">
               View all categories <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -127,9 +133,9 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
             <div>
               <div className="text-amber-500 text-[11px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
-                <span className="w-8 h-[2px] bg-amber-500 rounded-full"></span> Daily Wages
+                <span className="w-8 h-[2px] bg-amber-500 rounded-full"></span> Skilled Workforce
               </div>
-              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Hire daily labour</h2>
+              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Hire local workforce</h2>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/map" className="hidden sm:flex text-indigo-600 font-bold text-[14px] items-center gap-2 hover:text-indigo-800 transition-colors bg-indigo-50 px-5 py-2.5 rounded-full border border-indigo-100 hover:border-indigo-200">

@@ -64,7 +64,7 @@ export default function LabourSection() {
               <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
             <p className="text-[14px] font-semibold text-emerald-900">
-              Premium access active. Contact daily workers directly anytime.
+              Premium access active. Contact local workers directly anytime.
             </p>
           </div>
         </div>
@@ -78,7 +78,7 @@ export default function LabourSection() {
             </div>
             <div>
               <p className="text-[15px] font-bold text-white mb-1">
-                800+ daily workers registered.
+                800+ local workers registered.
               </p>
               <p className="text-[13px] font-medium text-slate-400">
                 Subscribe to unlock rates, availability & contact numbers instantly.

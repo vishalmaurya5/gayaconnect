@@ -3,26 +3,37 @@
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
-  FiActivity, FiBookOpen, FiBriefcase, FiCpu, FiGift, FiHeart, FiHome, FiMap, FiScissors, FiShoppingBag, FiTool, FiTruck, FiArrowUpRight
+  FiHome, FiBookOpen, FiScissors, FiActivity, FiCoffee,
+  FiTool, FiTruck, FiShoppingBag, FiCamera, FiMap,
+  FiClock, FiGlobe, FiArrowRight, FiCheckCircle
 } from 'react-icons/fi'
 import { SERVICE_CATEGORIES, slugifyService } from '@/lib/utils/serviceCategories'
 
-const icons = [FiHome, FiBookOpen, FiScissors, FiHeart, FiGift, FiCpu, FiTruck, FiShoppingBag, FiBriefcase, FiMap, FiTool, FiActivity]
-const gradients = [
-  'from-blue-500 to-cyan-400', 'from-emerald-500 to-teal-400', 'from-pink-500 to-rose-400', 
-  'from-red-500 to-orange-400', 'from-orange-500 to-yellow-400', 'from-indigo-500 to-purple-400', 
-  'from-cyan-600 to-blue-500', 'from-purple-500 to-pink-400'
-]
+const categoryStyles = {
+  'Home Services': { icon: FiHome, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100', shadow: 'hover:shadow-[0_8px_30px_rgb(37,99,235,0.12)]' },
+  'Education Services': { icon: FiBookOpen, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100', shadow: 'hover:shadow-[0_8px_30px_rgb(79,70,229,0.12)]' },
+  'Beauty & Personal Care': { icon: FiScissors, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100', shadow: 'hover:shadow-[0_8px_30px_rgb(225,29,72,0.12)]' },
+  'Health & Medical': { icon: FiActivity, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100', shadow: 'hover:shadow-[0_8px_30px_rgb(16,185,129,0.12)]' },
+  'Food & Restaurant': { icon: FiCoffee, color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-100', shadow: 'hover:shadow-[0_8px_30px_rgb(234,88,12,0.12)]' },
+  'Repair & Technical Services': { icon: FiTool, color: 'text-cyan-600', bg: 'bg-cyan-50', border: 'border-cyan-100', shadow: 'hover:shadow-[0_8px_30px_rgb(8,145,178,0.12)]' },
+  'Automotive & Vehicles': { icon: FiTruck, color: 'text-slate-700', bg: 'bg-slate-100', border: 'border-slate-200', shadow: 'hover:shadow-[0_8px_30px_rgb(51,65,85,0.12)]' },
+  'Shopping & Retail': { icon: FiShoppingBag, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100', shadow: 'hover:shadow-[0_8px_30px_rgb(147,51,234,0.12)]' },
+  'Event & Wedding Services': { icon: FiCamera, color: 'text-pink-600', bg: 'bg-pink-50', border: 'border-pink-100', shadow: 'hover:shadow-[0_8px_30px_rgb(219,39,119,0.12)]' },
+  'Real Estate & Property': { icon: FiMap, color: 'text-teal-600', bg: 'bg-teal-50', border: 'border-teal-100', shadow: 'hover:shadow-[0_8px_30px_rgb(13,148,136,0.12)]' },
+  'Daily Need Services': { icon: FiClock, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100', shadow: 'hover:shadow-[0_8px_30px_rgb(217,119,6,0.12)]' },
+  'Digital & Online Services': { icon: FiGlobe, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100', shadow: 'hover:shadow-[0_8px_30px_rgb(124,58,237,0.12)]' },
+}
 
 export default function CategoryGrid() {
   const router = useRouter()
+  // Ensure we get exactly 12 categories for a perfect grid
   const categories = SERVICE_CATEGORIES.slice(0, 12)
 
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6 relative z-10">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-5 relative z-10">
       {categories.map((category, index) => {
-        const Icon = icons[index % icons.length]
-        const gradient = gradients[index % gradients.length]
+        const style = categoryStyles[category.name] || { icon: FiCheckCircle, color: 'text-slate-600', bg: 'bg-slate-50', border: 'border-slate-200', shadow: 'hover:shadow-[0_8px_30px_rgb(100,116,139,0.12)]' }
+        const Icon = style.icon
         
         return (
           <motion.button
@@ -30,24 +41,35 @@ export default function CategoryGrid() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: index * 0.05 }}
+            transition={{ delay: index * 0.05, duration: 0.4, ease: "easeOut" }}
             onClick={() => router.push(`/services/${slugifyService(category.name)}`)}
-            className="group relative w-full"
+            className={`group relative w-full flex flex-col text-left bg-white rounded-[24px] p-6 border border-slate-200/60 hover:border-transparent transition-all duration-300 hover:-translate-y-1.5 ${style.shadow}`}
           >
-            <div className="h-full bg-white rounded-[24px] p-6 text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-slate-100 transition-all duration-300 hover:shadow-[0_20px_40px_-10px_rgba(79,70,229,0.15)] hover:border-indigo-100 hover:-translate-y-2 flex flex-col items-center relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${gradient}"></div>
-              <div className={`w-14 h-14 mb-4 rounded-[16px] bg-gradient-to-br ${gradient} p-[2px] shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
-                <div className="w-full h-full bg-white/20 backdrop-blur-md rounded-[14px] flex items-center justify-center">
-                  <Icon className="text-xl text-white drop-shadow-sm" />
-                </div>
+            {/* Top row: Icon and Arrow */}
+            <div className="flex justify-between items-start mb-6 w-full">
+              <div className={`w-14 h-14 rounded-[18px] ${style.bg} ${style.border} border border-opacity-50 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:-rotate-6`}>
+                <Icon className={`text-[22px] ${style.color} drop-shadow-sm`} />
               </div>
-              <h3 className="text-[14px] font-[800] text-slate-900 leading-tight mb-1">{category.name}</h3>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{category.subcategories.length} services</p>
-              
-              <div className="absolute top-4 right-4 w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 -translate-x-2 group-hover:translate-y-0 group-hover:translate-x-0">
-                <FiArrowUpRight className="text-indigo-500 w-3 h-3" />
+              <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300 border border-slate-100">
+                <FiArrowRight className="text-slate-600 w-4 h-4 group-hover:text-[#0F172A] transition-colors" />
               </div>
             </div>
+
+            {/* Bottom row: Texts */}
+            <div className="mt-auto w-full">
+              <h3 className="text-[15px] font-[800] text-[#0F172A] leading-snug mb-1.5 group-hover:text-indigo-600 transition-colors line-clamp-2">
+                {category.name}
+              </h3>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${style.bg.replace('bg-', 'bg-').replace('50', '400')}`}></span>
+                <p className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">
+                  {category.subcategories.length} Services
+                </p>
+              </div>
+            </div>
+
+            {/* Subtle bottom accent glow */}
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent transition-all duration-500 group-hover:w-3/4 opacity-0 group-hover:opacity-100 blur-[2px]"></div>
           </motion.button>
         )
       })}

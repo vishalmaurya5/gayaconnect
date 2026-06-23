@@ -9,7 +9,7 @@ export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { name, email, phone, password, role, businessName, category, address, gstNumber, description } = body;
+    const { name, email, phone, password, role, businessName, category, subCategory, address, gstNumber, description } = body;
 
     if (!name || !email || !phone || !password) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -36,6 +36,7 @@ export async function POST(request) {
     if (role === "vendor") {
       userData.businessName = businessName;
       userData.category = category;
+      userData.subCategory = subCategory;
       userData.address = address;
       userData.gstNumber = gstNumber;
       userData.description = description;

@@ -5,8 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Mail, Lock, ArrowRight, User as UserIcon, Phone, Store, MapPin, Tag, FileText } from "lucide-react";
-
-const CATEGORIES = ["Electrician", "Plumber", "Carpenter", "AC Repair", "Cleaning", "Painter", "Appliance Repair", "Pest Control", "Tourist Guide", "Agent", "Other"];
+import { SERVICE_CATEGORIES } from "@/lib/utils/serviceCategories";
 
 export default function RegisterVendorPage() {
   const [form, setForm] = useState({
@@ -17,11 +16,13 @@ export default function RegisterVendorPage() {
     confirmPassword: "",
     businessName: "",
     category: "",
+    subCategory: "",
     businessAddress: "",
     gstNumber: "",
     description: "",
   });
   const [customCategory, setCustomCategory] = useState("");
+  const [customSubCategory, setCustomSubCategory] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const { register, loading } = useAuth();
@@ -38,14 +39,24 @@ export default function RegisterVendorPage() {
   }, []);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "category") {
+      setForm({ ...form, category: value, subCategory: "" });
+      setCustomSubCategory("");
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
+
+  const availableSubcategories = form.category && form.category !== "Other" 
+    ? SERVICE_CATEGORIES.find(c => c.name === form.category)?.subcategories || []
+    : [];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (!form.name || !form.email || !form.phone || !form.password || !form.businessName || !form.businessAddress || (!form.category && !customCategory)) {
+    if (!form.name || !form.email || !form.phone || !form.password || !form.businessName || !form.businessAddress || (!form.category && !customCategory) || (!form.subCategory && !customSubCategory)) {
       setError("Please fill in all required fields.");
       return;
     }
@@ -56,10 +67,12 @@ export default function RegisterVendorPage() {
     }
 
     const finalCategory = form.category === "Other" && customCategory.trim() !== "" ? customCategory.trim() : form.category;
+    const finalSubCategory = form.subCategory === "Other" && customSubCategory.trim() !== "" ? customSubCategory.trim() : form.subCategory;
 
     const res = await register({
       ...form,
       category: finalCategory,
+      subCategory: finalSubCategory,
       role: "vendor"
     });
 
@@ -163,7 +176,7 @@ export default function RegisterVendorPage() {
                 <Store size={20} className="text-indigo-600" /> Business Information
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Business Name *</label>
                   <input
                     type="text"
@@ -183,9 +196,10 @@ export default function RegisterVendorPage() {
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
                   >
                     <option value="">Select Category</option>
-                    {CATEGORIES.map(c => (
-                      <option key={c} value={c}>{c}</option>
+                    {SERVICE_CATEGORIES.map(c => (
+                      <option key={c.name} value={c.name}>{c.name}</option>
                     ))}
+                    <option value="Other">Other (Type manually)</option>
                   </select>
                   {form.category === "Other" && (
                     <div className="mt-2">
@@ -195,6 +209,34 @@ export default function RegisterVendorPage() {
                         onChange={(e) => setCustomCategory(e.target.value)}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
                         placeholder="Type your category name..."
+                        required
+                      />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Sub Category *</label>
+                  <select
+                    name="subCategory"
+                    value={form.subCategory}
+                    onChange={handleChange}
+                    disabled={!form.category}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all disabled:opacity-50"
+                  >
+                    <option value="">Select Sub Category</option>
+                    {availableSubcategories.map(sc => (
+                      <option key={sc} value={sc}>{sc}</option>
+                    ))}
+                    <option value="Other">Other (Type manually)</option>
+                  </select>
+                  {form.subCategory === "Other" && (
+                    <div className="mt-2">
+                      <input
+                        type="text"
+                        value={customSubCategory}
+                        onChange={(e) => setCustomSubCategory(e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
+                        placeholder="Type sub category name..."
                         required
                       />
                     </div>
@@ -211,7 +253,7 @@ export default function RegisterVendorPage() {
                     placeholder="Complete address in Gaya"
                   />
                 </div>
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">GST Number (Optional)</label>
                   <input
                     type="text"

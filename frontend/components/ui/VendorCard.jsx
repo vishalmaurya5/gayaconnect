@@ -82,7 +82,7 @@ export default function VendorCard({ vendor }) {
         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm rounded-3xl">
           <FiLock className="w-8 h-8 text-slate-800 mb-3" />
           <h4 className="font-bold text-lg text-slate-900">Subscription Required</h4>
-          <p className="text-sm text-slate-600 mb-4 px-6 text-center">Unlock vendor contact details, offers & daily labour.</p>
+          <p className="text-sm text-slate-600 mb-4 px-6 text-center">Unlock vendor contact details, offers & local workforce.</p>
           <button 
             onClick={() => router.push('/profile')}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-semibold transition-all shadow-lg hover:shadow-blue-500/30"

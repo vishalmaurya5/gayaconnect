@@ -75,7 +75,7 @@ export default function TermsOfUsePage() {
             </h2>
             <div className="space-y-4 text-slate-600 leading-relaxed">
               <p>You agree not to use the platform to post false information, scam other users, or distribute illegal content.</p>
-              <p>Gaya Connect reserves the right to suspend, disable, or permanently delete any user, vendor, or labourer account at its sole discretion if it violates these Terms of Use, receives excessive negative feedback, or is suspected of fraudulent activity.</p>
+              <p>Gaya Connect reserves the right to suspend, disable, or permanently delete any user, vendor, or worker account at its sole discretion if it violates these Terms of Use, receives excessive negative feedback, or is suspected of fraudulent activity.</p>
             </div>
           </div>
 

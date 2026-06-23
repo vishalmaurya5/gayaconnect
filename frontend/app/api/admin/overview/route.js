@@ -8,6 +8,7 @@ import Payment from '@/lib/db/models/Payment'
 import Blog from '@/lib/db/models/Blog'
 import Labourer from '@/lib/db/models/Labourer'
 import Vehicle from '@/lib/db/models/Vehicle'
+import CallLog from '@/lib/db/models/CallLog'
 import { verifyAdminRequest } from '@/lib/utils/adminAuth'
 
 export const dynamic = 'force-dynamic'
@@ -38,7 +39,8 @@ export async function GET(request) {
       revenueAgg,
       paymentStatusAgg,
       roleAgg,
-      chartAgg
+      chartAgg,
+      calls
     ] = await Promise.all([
       User.find().select('-password').sort({ createdAt: -1 }).limit(100).lean(),
       Vendor.find().sort({ createdAt: -1 }).limit(100).lean(),
@@ -68,7 +70,8 @@ export async function GET(request) {
           }
         },
         { $sort: { _id: 1 } }
-      ])
+      ]),
+      CallLog.find().sort({ createdAt: -1 }).limit(100).lean()
     ])
 
     // Fill in missing days for the chart
@@ -98,6 +101,7 @@ export async function GET(request) {
       labourers: labourers.length,
       vehicles: vehicles.length,
       payments: payments.length,
+      calls: calls.length,
       revenue: revenueAgg[0]?.total || 0,
       paidPayments: revenueAgg[0]?.count || 0,
     }
@@ -113,6 +117,7 @@ export async function GET(request) {
       blogs,
       labourers,
       vehicles,
+      calls,
       analytics: {
         paymentStatus: paymentStatusAgg,
         usersByRole: roleAgg,

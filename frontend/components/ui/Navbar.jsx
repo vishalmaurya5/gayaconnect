@@ -3,17 +3,21 @@
 import Link from "next/link"
 import { useState } from "react"
 import { useAuth } from '@/contexts/AuthContext'
+import { usePathname } from 'next/navigation'
 import { UserIcon } from '@heroicons/react/24/outline'
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user, logout, openSubscriptionModal } = useAuth()
+  const pathname = usePathname()
+
+  if (pathname?.startsWith('/admin')) return null;
 
   return (
     <>
       {/* Topbar */}
       <div className="bg-indigo-700 text-white text-center py-1.5 text-xs">
-        Limited time: Unlock all vendor contacts, offers & daily labour listings for just{" "}
+        Limited time: Unlock all vendor contacts, offers & local workforce listings for just{" "}
         <strong className="text-amber-300">₹11/month</strong>
         <button onClick={openSubscriptionModal} className="text-indigo-200 underline ml-1.5 hover:text-white transition">
           Subscribe now →
@@ -54,7 +58,7 @@ export default function Navbar() {
           <NavLink href="/vendors">Vendors</NavLink>
           <NavLink href="/offers">Offers <span className="ml-1 bg-teal-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">New</span></NavLink>
           <NavLink href="/services">Services</NavLink>
-          <NavLink href="/labour">Daily Labour</NavLink>
+          <NavLink href="/labour">Local Workforce</NavLink>
           <NavLink href="/vehicles">Rent Vehicles <span className="ml-1 bg-teal-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">New</span></NavLink>
           <NavLink href="/about">About</NavLink>
         </div>
@@ -122,7 +126,7 @@ export default function Navbar() {
           <MobileNavLink href="/vendors" onClick={() => setMobileMenuOpen(false)}>Vendors</MobileNavLink>
           <MobileNavLink href="/offers" onClick={() => setMobileMenuOpen(false)}>Offers</MobileNavLink>
           <MobileNavLink href="/services" onClick={() => setMobileMenuOpen(false)}>Services</MobileNavLink>
-          <MobileNavLink href="/labour" onClick={() => setMobileMenuOpen(false)}>Daily Labour</MobileNavLink>
+          <MobileNavLink href="/labour" onClick={() => setMobileMenuOpen(false)}>Local Workforce</MobileNavLink>
           <MobileNavLink href="/vehicles" onClick={() => setMobileMenuOpen(false)}>Rent Vehicles</MobileNavLink>
           <MobileNavLink href="/about" onClick={() => setMobileMenuOpen(false)}>About</MobileNavLink>
           <div className="pt-3 flex flex-col gap-2 border-t border-gray-100 mt-2">

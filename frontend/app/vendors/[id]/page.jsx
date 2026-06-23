@@ -36,6 +36,28 @@ export default function VendorDetailPage() {
       }).catch(() => {});
   }, [id]);
 
+  const handleContact = async (e, actionType, url) => {
+    e.preventDefault();
+    try {
+      await fetch('/api/calls', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          receiverId: vendor?._id || id,
+          receiverName: vendor?.name || "Vendor",
+          receiverType: 'Vendor',
+          receiverPhone: vendor?.phone || "+91 98765 43210",
+          actionType
+        })
+      });
+    } catch (err) {}
+    if (actionType === 'WhatsApp') {
+      window.open(url, '_blank');
+    } else {
+      window.location.href = url;
+    }
+  };
+
   if (loading) return (
     <div className="min-h-screen bg-[#F8F9FC] flex items-center justify-center">
       <div className="w-8 h-8 border-2 border-indigo-300 border-t-indigo-700 rounded-full animate-spin" />
@@ -238,13 +260,14 @@ export default function VendorDetailPage() {
 
               {isSubscribed ? (
                 <div className="space-y-3">
-                  <a href={`tel:${v.phone}`}
-                    className="flex items-center justify-center gap-2.5 bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[14.5px] py-3.5 rounded-xl transition-colors no-underline w-full">
+                  <a href={`tel:${v.phone}`} onClick={(e) => handleContact(e, 'Call', `tel:${v.phone}`)}
+                    className="flex items-center justify-center gap-2.5 bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[14.5px] py-3.5 rounded-xl transition-colors no-underline w-full cursor-pointer">
                     <Phone size={17} /> Call now
                   </a>
                   <a href={`https://wa.me/${v.whatsapp?.replace(/[^0-9]/g, "")}?text=Hi, I found you on Gaya Connect. I need your services.`}
+                    onClick={(e) => handleContact(e, 'WhatsApp', `https://wa.me/${v.whatsapp?.replace(/[^0-9]/g, "")}?text=Hi, I found you on Gaya Connect. I need your services.`)}
                     target="_blank" rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1ebd5a] text-white font-bold text-[14.5px] py-3.5 rounded-xl transition-colors no-underline w-full">
+                    className="flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1ebd5a] text-white font-bold text-[14.5px] py-3.5 rounded-xl transition-colors no-underline w-full cursor-pointer">
                     <MessageCircle size={17} /> WhatsApp
                   </a>
 

@@ -137,7 +137,7 @@ export default function HeroSection() {
                 { icon: "⚡", label: "Electrician" },
                 { icon: "🔧", label: "Plumber" },
                 { icon: "❄️", label: "AC Repair" },
-                { icon: "👷", label: "Daily Labour" },
+                { icon: "👷", label: "Local Workforce" },
                 { icon: "🪚", label: "Carpenter" },
                 { icon: "🎨", label: "Painter" },
                 { icon: "🧹", label: "Cleaning" }

@@ -125,7 +125,7 @@ export default function SubscriptionPage() {
           <div className="absolute top-0 left-0 w-full h-full bg-white opacity-10 blur-2xl transform rotate-12 scale-150"></div>
           <FiStar className="mx-auto text-5xl text-emerald-100 mb-4 relative z-10" />
           <h1 className="text-3xl font-extrabold text-white relative z-10">Premium Subscription</h1>
-          <p className="mt-2 text-emerald-100 font-medium relative z-10">Unlock all contact details for Vendors & Labourers in Gaya.</p>
+          <p className="mt-2 text-emerald-100 font-medium relative z-10">Unlock all contact details for Vendors & Local Workers in Gaya.</p>
         </div>
         
         <div className="p-8">
@@ -137,7 +137,7 @@ export default function SubscriptionPage() {
           <ul className="space-y-4 mb-8">
             {[
               'Direct phone numbers of 500+ Vendors',
-              'Access to contact Daily Wage Labourers',
+              'Access to contact Local Workers',
               'Unlock exclusive vendor promotional offers',
               'Cancel anytime from your profile',
               'Instant activation after payment'

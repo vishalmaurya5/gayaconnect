@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
               <p>We only collect information about you if we have a reason to do so—for example, to provide our Services, to communicate with you, or to make our Services better.</p>
               <ul className="list-disc pl-5 space-y-2">
                 <li><strong>Account Data:</strong> Name, phone number, email address, and password (hashed).</li>
-                <li><strong>Vendor & Labour Data:</strong> Business name, category, skills, location/address, and daily rates for directory listings.</li>
+                <li><strong>Vendor & Workforce Data:</strong> Business name, category, skills, location/address, and daily rates for directory listings.</li>
                 <li><strong>Vehicle Data:</strong> Vehicle details and driving license numbers (stored securely) for verification purposes.</li>
                 <li><strong>Payment Data:</strong> We use Razorpay for payment processing. We do not store your credit card or UPI PIN details. We only store payment status and transaction IDs.</li>
               </ul>

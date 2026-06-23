@@ -155,6 +155,25 @@ export default function LabourListingPage() {
 }
 
 function LabourCard({ labour, isSubscribed, onSubscribe }) {
+  const handleContact = async (e) => {
+    if (!isSubscribed) return;
+    e.preventDefault();
+    try {
+      await fetch('/api/calls', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          receiverId: labour._id,
+          receiverName: labour.name,
+          receiverType: 'Labourer',
+          receiverPhone: labour.phone,
+          actionType: 'Call'
+        })
+      });
+    } catch (err) {}
+    window.location.href = `tel:${labour.phone}`;
+  };
+
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition relative group flex flex-col">
       <div className="flex items-start gap-4 mb-4">
@@ -204,7 +223,8 @@ function LabourCard({ labour, isSubscribed, onSubscribe }) {
             
             <a 
               href={isSubscribed ? `tel:${labour.phone}` : '#'}
-              className="flex items-center justify-center gap-2 w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold transition"
+              onClick={isSubscribed ? handleContact : undefined}
+              className="flex items-center justify-center gap-2 w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold transition cursor-pointer"
             >
               <FiPhone /> {isSubscribed ? labour.phone : '+91 XXXXX XXXXX'}
             </a>

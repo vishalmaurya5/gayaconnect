@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db/mongodb";
 import Labour from "@/lib/db/models/Labourer";
 import { checkSubscription } from "@/lib/security/subscription";
+import { validateImageDataUrl } from "@/lib/utils/imageUpload";
 
 // ─── GET /api/labour — List approved workers ──────────────────────────────────
 export async function GET(request) {
@@ -93,11 +94,20 @@ export async function POST(request) {
       );
     }
 
+    let validPhoto = null;
+    if (photo) {
+      try {
+        validPhoto = validateImageDataUrl(photo, 'Profile photo', 150 * 1024, '150 KB');
+      } catch (err) {
+        return NextResponse.json({ error: err.message }, { status: 400 });
+      }
+    }
+
     const worker = await Labour.create({
       name,
       phone,
       whatsapp: whatsapp || phone,
-      photo:    photo || null,
+      photo: validPhoto,
       role,
       category: category || role,
       area,
