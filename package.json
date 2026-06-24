@@ -11,7 +11,7 @@
     "dev-backend": "cd backend && npm run dev",
     "dev-frontend": "cd frontend && npm run dev",
     "heroku-postbuild": "cd frontend && npm install && npm run build",
-    "start": "cd frontend && npm run start"
+    "start": "cd frontend && npm run start -- -p $PORT"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
