@@ -1,6 +1,10 @@
 {
   "name": "gaya-connect-backend",
   "version": "1.0.0",
+  "engines": {
+    "node": "24.x",
+    "npm": "11.17.0"
+  },
   "type": "module",
   "main": "server.js",
   "scripts": {

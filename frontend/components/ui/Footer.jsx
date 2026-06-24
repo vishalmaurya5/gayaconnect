@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAuth } from '@/contexts/AuthContext';
 import { usePathname } from 'next/navigation';
+import { FiPhone, FiMail, FiMapPin, FiShield, FiMap } from 'react-icons/fi';
 
 export default function Footer() {
   const { openSubscriptionModal } = useAuth();
@@ -11,57 +12,87 @@ export default function Footer() {
   if (pathname?.startsWith('/admin')) return null;
 
   return (
-    <footer className="bg-slate-900 text-white/70 pt-12 pb-6">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          <div>
-            <div className="font-sora text-xl font-bold mb-3">
-              <span className="text-indigo-300">Gaya</span>
-              <span className="text-teal-300">Connect</span>
+    <footer className="bg-[#0A0F1C] text-slate-300 pt-16 pb-8 border-t border-slate-800/60 shadow-2xl relative overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+          
+          {/* Brand Column */}
+          <div className="space-y-4">
+            <div className="font-sora text-2xl font-extrabold tracking-tight">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-400">Gaya</span>
+              <span className="text-white">Connect</span>
             </div>
-            <p className="text-sm text-white/40 leading-relaxed max-w-xs">
-              Your trusted local discovery platform for Gaya &amp; Bodh Gaya district. Find services, vendors, deals, and daily workers — all in one place.
+            <p className="text-sm text-slate-400 leading-relaxed pr-4">
+              Your premium local discovery platform for Gaya &amp; Bodh Gaya. Find trusted services, vendors, deals, and local workers all in one place.
             </p>
-            <button onClick={openSubscriptionModal} className="mt-4 bg-indigo-600 text-white rounded-lg px-4 py-2 text-sm font-semibold flex items-center gap-2 hover:bg-indigo-700 transition">
-              Subscribe now
-              <span className="bg-white/20 rounded px-1.5 py-0.5 text-xs">₹11 / month</span>
+            <button onClick={openSubscriptionModal} className="mt-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl px-5 py-2.5 text-sm font-bold flex items-center gap-3 hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-900/30">
+              Subscribe Premium
+              <span className="bg-white/20 rounded px-2 py-0.5 text-xs">₹11 / mo</span>
             </button>
           </div>
+
+          {/* Explore Links */}
           <div>
-            <h4 className="text-white/60 text-xs font-bold uppercase tracking-wider mb-4">Explore</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/vendors" className="hover:text-white transition">Vendors</Link></li>
-              <li><Link href="/offers" className="hover:text-white transition">Offers & deals</Link></li>
-              <li><Link href="/labour" className="hover:text-white transition">Local Workforce</Link></li>
-              <li><Link href="/services" className="hover:text-white transition">Services</Link></li>
-              <li><Link href="/hotels" className="hover:text-white transition">Hotels</Link></li>
+            <h4 className="text-emerald-400 text-xs font-bold uppercase tracking-widest mb-5">Explore</h4>
+            <ul className="space-y-3 text-sm font-medium">
+              <li><Link href="/vendors" className="text-slate-400 hover:text-emerald-400 transition-colors flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500/0 hover:bg-emerald-500 transition-colors"></span> Vendors</Link></li>
+              <li><Link href="/offers" className="text-slate-400 hover:text-emerald-400 transition-colors flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500/0 hover:bg-emerald-500 transition-colors"></span> Offers & deals</Link></li>
+              <li><Link href="/labour" className="text-slate-400 hover:text-emerald-400 transition-colors flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500/0 hover:bg-emerald-500 transition-colors"></span> Local Workforce</Link></li>
+              <li><Link href="/services" className="text-slate-400 hover:text-emerald-400 transition-colors flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500/0 hover:bg-emerald-500 transition-colors"></span> Services</Link></li>
+              <li><Link href="/hotels" className="text-slate-400 hover:text-emerald-400 transition-colors flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500/0 hover:bg-emerald-500 transition-colors"></span> Hotels</Link></li>
             </ul>
           </div>
+
+          {/* Vendor Links */}
           <div>
-            <h4 className="text-white/60 text-xs font-bold uppercase tracking-wider mb-4">For vendors</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/vendor/register" className="hover:text-white transition">Register business</Link></li>
-              <li><Link href="/vendor/offers" className="hover:text-white transition">Post an offer</Link></li>
-              <li><Link href="/vendor/banners" className="hover:text-white transition">Banner advertising</Link></li>
-              <li><Link href="/vendor/dashboard" className="hover:text-white transition">Vendor dashboard</Link></li>
-              <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
+            <h4 className="text-emerald-400 text-xs font-bold uppercase tracking-widest mb-5">For Vendors</h4>
+            <ul className="space-y-3 text-sm font-medium">
+              <li><Link href="/vendor/register" className="text-slate-400 hover:text-emerald-400 transition-colors">Register Business</Link></li>
+              <li><Link href="/vendor/offers" className="text-slate-400 hover:text-emerald-400 transition-colors">Post an Offer</Link></li>
+              <li><Link href="/vendor/banners" className="text-slate-400 hover:text-emerald-400 transition-colors">Banner Advertising</Link></li>
+              <li><Link href="/vendor/dashboard" className="text-slate-400 hover:text-emerald-400 transition-colors">Vendor Dashboard</Link></li>
+              <li><Link href="/pricing" className="text-slate-400 hover:text-emerald-400 transition-colors">Pricing & Plans</Link></li>
             </ul>
           </div>
+
+          {/* Contact & Support */}
           <div>
-            <h4 className="text-white/60 text-xs font-bold uppercase tracking-wider mb-4">Company</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/about" className="hover:text-white transition">About us</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition">Contact</Link></li>
-              <li><Link href="/privacy" className="hover:text-white transition">Privacy policy</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition">Terms of use</Link></li>
-            </ul>
+            <h4 className="text-emerald-400 text-xs font-bold uppercase tracking-widest mb-5">Contact Support</h4>
+            <div className="space-y-3.5 text-sm font-medium">
+              <a href="tel:+919117588242" className="flex items-center gap-3 text-slate-400 hover:text-emerald-400 transition-colors group">
+                <div className="p-1.5 rounded-lg bg-slate-800/50 group-hover:bg-emerald-500/20 transition-colors"><FiPhone className="text-emerald-500" /></div>
+                +91 9117588242
+              </a>
+              <a href="tel:+918544491413" className="flex items-center gap-3 text-slate-400 hover:text-emerald-400 transition-colors group">
+                <div className="p-1.5 rounded-lg bg-slate-800/50 group-hover:bg-emerald-500/20 transition-colors"><FiPhone className="text-emerald-500" /></div>
+                +91 8544491413
+              </a>
+              <a href="mailto:support@gayaconnect.in" className="flex items-center gap-3 text-slate-400 hover:text-emerald-400 transition-colors group">
+                <div className="p-1.5 rounded-lg bg-slate-800/50 group-hover:bg-emerald-500/20 transition-colors"><FiMail className="text-emerald-500" /></div>
+                support@gayaconnect.in
+              </a>
+              <a href="mailto:gayaconnectin@gmail.com" className="flex items-center gap-3 text-slate-400 hover:text-emerald-400 transition-colors group">
+                <div className="p-1.5 rounded-lg bg-slate-800/50 group-hover:bg-emerald-500/20 transition-colors"><FiMail className="text-emerald-500" /></div>
+                <span className="truncate">gayaconnectin@gmail.com</span>
+              </a>
+            </div>
+
+            <div className="flex items-center gap-4 mt-6 pt-6 border-t border-slate-800/60 text-xs font-semibold">
+              <Link href="/about" className="text-slate-500 hover:text-emerald-400 transition-colors">About</Link>
+              <Link href="/privacy" className="text-slate-500 hover:text-emerald-400 transition-colors">Privacy</Link>
+              <Link href="/terms" className="text-slate-500 hover:text-emerald-400 transition-colors">Terms</Link>
+            </div>
           </div>
         </div>
-        <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/30">
-          <p>© 2025 GayaConnect · Made with ♥ in Gaya, Bihar</p>
-          <div className="flex gap-3">
-            <span className="flex items-center gap-1 bg-white/5 px-3 py-1 rounded-full"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg> Secure payments</span>
-            <span className="flex items-center gap-1 bg-white/5 px-3 py-1 rounded-full"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /></svg> Gaya district</span>
+
+        {/* Footer Bottom */}
+        <div className="border-t border-slate-800/60 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-500">
+          <p>© {new Date().getFullYear()} GayaConnect. Premium Local Discovery.</p>
+          <div className="flex flex-wrap gap-3">
+            <span className="flex items-center gap-1.5 bg-slate-800/50 border border-slate-700/50 px-3 py-1.5 rounded-full text-slate-400"><FiShield className="text-emerald-500" /> 100% Secure Payments</span>
+            <span className="flex items-center gap-1.5 bg-slate-800/50 border border-slate-700/50 px-3 py-1.5 rounded-full text-slate-400"><FiMap className="text-emerald-500" /> Proudly in Gaya, Bihar</span>
           </div>
         </div>
       </div>

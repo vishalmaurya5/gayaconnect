@@ -1,7 +1,7 @@
 // app/offers/new/page.jsx — Vendor: Post new offer
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Tag, Clock, IndianRupee, CheckCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";

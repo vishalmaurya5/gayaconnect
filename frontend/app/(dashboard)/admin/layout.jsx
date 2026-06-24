@@ -75,37 +75,44 @@ export default function AdminLayout({ children }) {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 text-slate-300 transform transition-transform duration-300 lg:translate-x-0 lg:static lg:flex-shrink-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="h-16 flex items-center justify-between px-6 bg-slate-950">
-          <span className="text-white font-bold text-lg flex items-center gap-2">
-            <FiShield className="text-emerald-500" /> Admin Portal
+      <aside className={`fixed inset-y-0 left-0 z-30 w-[280px] bg-[#0A0F1C] border-r border-slate-800/60 shadow-2xl text-slate-300 transform transition-transform duration-300 lg:translate-x-0 lg:static lg:flex-shrink-0 flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="h-20 flex items-center justify-between px-6 border-b border-slate-800/60 bg-[#0A0F1C]/80 backdrop-blur-xl shrink-0">
+          <span className="font-extrabold text-xl flex items-center gap-3 tracking-tight">
+            <div className="bg-gradient-to-tr from-emerald-500 to-teal-400 p-2 rounded-xl shadow-lg shadow-emerald-500/20">
+              <FiShield className="text-white text-xl" /> 
+            </div>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Admin Pro</span>
           </span>
-          <button className="lg:hidden text-slate-400 hover:text-white" onClick={() => setSidebarOpen(false)}>
+          <button className="lg:hidden text-slate-400 hover:text-white transition-colors" onClick={() => setSidebarOpen(false)}>
             <FiX className="text-2xl" />
           </button>
         </div>
-        <div className="p-4 space-y-1">
+        
+        <div className="p-4 space-y-1.5 overflow-y-auto flex-1 custom-scrollbar">
           {menuItems.map((item) => {
-            // Precise active matching
             const isActive = item.path === '/admin' ? pathname === '/admin' : pathname.startsWith(item.path);
             return (
               <Link
                 key={item.name}
                 href={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${
-                  isActive ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/50' : 'hover:bg-slate-800 hover:text-white'
+                className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl transition-all duration-300 font-medium group ${
+                  isActive 
+                    ? 'bg-gradient-to-r from-emerald-500/10 to-teal-500/5 text-emerald-400 border border-emerald-500/20 shadow-lg shadow-emerald-900/20' 
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent hover:border-slate-800/60'
                 }`}
               >
-                <item.icon className={`text-lg ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                {item.name}
+                <item.icon className={`text-xl transition-transform duration-300 ${isActive ? 'text-emerald-400 scale-110' : 'text-slate-500 group-hover:text-slate-300 group-hover:scale-110'}`} />
+                <span className="tracking-wide">{item.name}</span>
               </Link>
             )
           })}
         </div>
-        <div className="absolute bottom-0 w-full p-4 border-t border-slate-800">
-          <button onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl hover:bg-slate-800 hover:text-white transition-colors text-left text-slate-400 font-medium">
-            <FiLogOut className="text-lg" /> Logout
+
+        <div className="p-4 border-t border-slate-800/60 bg-[#0A0F1C] shrink-0">
+          <button onClick={logout} className="flex items-center gap-3.5 px-4 py-3.5 w-full rounded-2xl hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20 transition-all duration-300 text-left text-slate-400 font-medium group">
+            <FiLogOut className="text-xl transition-transform duration-300 group-hover:-translate-x-1" /> 
+            <span className="tracking-wide">Logout Securely</span>
           </button>
         </div>
       </aside>

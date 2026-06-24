@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function VendorCTA() {
   return (
     <div className="relative rounded-[32px] py-14 md:py-20 px-8 md:px-16 overflow-hidden mt-6 mb-10 shadow-2xl">
@@ -24,13 +26,13 @@ export default function VendorCTA() {
         </div>
         
         <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto shrink-0">
-          <button className="border border-white/20 bg-white/5 text-white px-8 py-4 rounded-[16px] text-[15px] font-bold hover:bg-white/10 transition-all duration-300 backdrop-blur-sm">
+          <Link href="/pricing" className="border border-white/20 bg-white/5 text-white px-8 py-4 rounded-[16px] text-[15px] font-bold hover:bg-white/10 transition-all duration-300 backdrop-blur-sm flex items-center justify-center">
             Learn more
-          </button>
-          <button className="bg-white text-[#0F172A] px-8 py-4 rounded-[16px] text-[15px] font-bold hover:shadow-[0_10px_30px_rgba(255,255,255,0.2)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
+          </Link>
+          <Link href="/register-vendor" className="bg-white text-[#0F172A] px-8 py-4 rounded-[16px] text-[15px] font-bold hover:shadow-[0_10px_30px_rgba(255,255,255,0.2)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
             Register for Free
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-          </button>
+          </Link>
         </div>
       </div>
     </div>

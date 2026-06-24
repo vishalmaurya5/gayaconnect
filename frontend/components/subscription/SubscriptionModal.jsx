@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { FiCheck, FiX } from 'react-icons/fi';
@@ -14,6 +15,7 @@ const plans = [
 
 export default function SubscriptionModal({ isOpen, onClose }) {
   const { user, token } = useAuth();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -25,6 +27,8 @@ export default function SubscriptionModal({ isOpen, onClose }) {
   const handleSubscribe = async (plan) => {
     if (!user) {
       toast.error('Please login to subscribe');
+      onClose();
+      router.push('/login');
       return;
     }
 

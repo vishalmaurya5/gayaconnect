@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db/mongodb';
 import CallLog from '@/lib/db/models/CallLog';
-import { checkAuth } from '@/lib/security/auth';
+import { getAuthenticatedUser } from '@/lib/security/auth';
 
 export async function POST(request) {
   try {
     await connectDB();
-    const { user } = await checkAuth(request);
+    const user = await getAuthenticatedUser(request);
 
     const body = await request.json();
     const { receiverId, receiverName, receiverType, receiverPhone, actionType } = body;
@@ -36,7 +36,7 @@ export async function POST(request) {
 export async function GET(request) {
   try {
     await connectDB();
-    const { user } = await checkAuth(request);
+    const user = await getAuthenticatedUser(request);
 
     if (!user) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
