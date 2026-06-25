@@ -65,6 +65,25 @@ export default function AdminUsersPage() {
     }
   };
 
+  const restoreUser = async (id) => {
+    try {
+      const res = await fetch(`/api/admin/users/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isDeleted: false })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('User restored successfully');
+        setUsers(users.filter(u => u._id !== id));
+      } else {
+        toast.error(data.message || 'Failed to restore');
+      }
+    } catch (error) {
+      toast.error('Error restoring user');
+    }
+  };
+
   const handleCreate = async (e) => {
     e.preventDefault();
     setCreating(true);
@@ -122,10 +141,11 @@ export default function AdminUsersPage() {
         </form>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <button onClick={() => setFilter('all')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${filter === 'all' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}>All Users</button>
         <button onClick={() => setFilter('subscribed')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${filter === 'subscribed' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}>Subscribed</button>
         <button onClick={() => setFilter('unsubscribed')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${filter === 'unsubscribed' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}>Unsubscribed</button>
+        <button onClick={() => setFilter('deleted')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${filter === 'deleted' ? 'bg-red-600 text-white' : 'bg-white text-red-600 hover:bg-red-50 border border-red-200'}`}>Deleted Accounts</button>
       </div>
 
       {loading ? (
@@ -139,7 +159,7 @@ export default function AdminUsersPage() {
               <thead className="bg-slate-50 text-slate-500 uppercase font-semibold">
                 <tr>
                   <th className="px-6 py-4">Name / Contact</th>
-                  <th className="px-6 py-4">Subscription</th>
+                  <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4">Joined</th>
                   <th className="px-6 py-4">Actions</th>
                 </tr>
@@ -155,7 +175,11 @@ export default function AdminUsersPage() {
                         <div className="text-slate-500 text-xs">{user.phone}</div>
                       </td>
                       <td className="px-6 py-4">
-                        {active ? (
+                        {user.isDeleted ? (
+                          <span className="inline-flex items-center gap-1 text-red-600 bg-red-100 px-2 py-1 rounded font-semibold text-xs">
+                            <FiTrash2 /> Deleted
+                          </span>
+                        ) : active ? (
                           <div>
                             <span className="inline-flex items-center gap-1 text-emerald-600 bg-emerald-100 px-2 py-1 rounded font-semibold text-xs mb-1">
                               <FiCheckCircle /> Active
@@ -172,10 +196,16 @@ export default function AdminUsersPage() {
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 space-x-2 whitespace-nowrap">
-                        <button onClick={() => extendSub(user._id)} className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 font-semibold hover:bg-blue-100 transition inline-flex items-center gap-1" title="Extend 30 Days">
-                          <FiClock /> +30 Days
-                        </button>
-                        <button onClick={() => deleteUser(user._id)} className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" title="Delete">
+                        {!user.isDeleted ? (
+                          <button onClick={() => extendSub(user._id)} className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 font-semibold hover:bg-blue-100 transition inline-flex items-center gap-1" title="Extend 30 Days">
+                            <FiClock /> +30 Days
+                          </button>
+                        ) : (
+                          <button onClick={() => restoreUser(user._id)} className="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 font-semibold hover:bg-emerald-100 transition inline-flex items-center gap-1" title="Restore Account">
+                            <FiCheckCircle /> Restore
+                          </button>
+                        )}
+                        <button onClick={() => deleteUser(user._id)} className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" title={user.isDeleted ? "Permanently Delete" : "Delete"}>
                           <FiTrash2 className="text-lg" />
                         </button>
                       </td>

@@ -4,8 +4,9 @@ import { verifyAdminRequest } from '@/lib/utils/adminAuth'
 import Labourer from '@/lib/db/models/Labourer'
 import AuditLog from '@/lib/db/models/AuditLog'
 
-export async function PATCH(request, { params }) {
+export async function PATCH(request, props) {
   try {
+    const params = await props.params;
     await connectDB()
     const adminUser = verifyAdminRequest(request)
     if (!adminUser) {
@@ -30,8 +31,9 @@ export async function PATCH(request, { params }) {
   }
 }
 
-export async function DELETE(request, { params }) {
+export async function DELETE(request, props) {
   try {
+    const params = await props.params;
     await connectDB()
     const adminUser = verifyAdminRequest(request)
     if (!adminUser) {

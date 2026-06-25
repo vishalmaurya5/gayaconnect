@@ -29,9 +29,7 @@ export default function VendorDetailPage() {
       .then(r => r.ok ? r.json() : null)
       .then(d => {
         if (d?.user) {
-          const active = d.user.subscriptionActive &&
-            new Date(d.user.subscriptionExpiry) > new Date();
-          setIsSub(active);
+          setIsSub(d.user.isSubscribed);
         }
       }).catch(() => {});
   }, [id]);

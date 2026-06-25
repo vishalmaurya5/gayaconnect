@@ -4,8 +4,9 @@ import { verifyAdminRequest } from '@/lib/utils/adminAuth'
 import User from '@/lib/db/models/User'
 import AuditLog from '@/lib/db/models/AuditLog'
 
-export async function PATCH(request, { params }) {
+export async function PATCH(request, props) {
   try {
+    const params = await props.params;
     await connectDB()
     const adminUser = verifyAdminRequest(request)
     if (!adminUser) {
@@ -37,6 +38,7 @@ export async function PATCH(request, { params }) {
       if (updates.name) user.name = updates.name
       if (updates.email) user.email = updates.email
       if (updates.phone) user.phone = updates.phone
+      if (updates.isDeleted !== undefined) user.isDeleted = updates.isDeleted
       
       await AuditLog.create({
         adminId: adminUser._id || 'admin',
@@ -54,8 +56,9 @@ export async function PATCH(request, { params }) {
   }
 }
 
-export async function DELETE(request, { params }) {
+export async function DELETE(request, props) {
   try {
+    const params = await props.params;
     await connectDB()
     const adminUser = verifyAdminRequest(request)
     if (!adminUser) {

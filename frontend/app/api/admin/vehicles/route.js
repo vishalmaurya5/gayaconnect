@@ -3,6 +3,25 @@ import { connectDB } from '@/lib/db/mongodb';
 import Vehicle from '@/lib/db/models/Vehicle';
 import User from '@/lib/db/models/User';
 
+export async function GET(request) {
+  try {
+    await connectDB();
+    const { searchParams } = new URL(request.url);
+    const filter = searchParams.get('filter') || 'all';
+
+    const query = {};
+    if (filter !== 'all') {
+      query.status = filter;
+    }
+
+    const vehicles = await Vehicle.find(query).sort({ createdAt: -1 });
+    return NextResponse.json({ success: true, vehicles });
+  } catch (error) {
+    console.error('Admin Fetch Vehicles Error:', error);
+    return NextResponse.json({ success: false, message: error.message || 'Internal server error' }, { status: 500 });
+  }
+}
+
 export async function POST(request) {
   try {
     await connectDB();

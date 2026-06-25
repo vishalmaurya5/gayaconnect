@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { connectDB } from "@/lib/db/mongodb";
 import User from "@/lib/db/models/User";
 import { createUserSession } from "@/lib/security/auth";
+import { toAuthUser } from "@/lib/utils/contactAccess";
 
 export async function POST(request) {
   try {
@@ -50,9 +51,8 @@ export async function POST(request) {
       { expiresIn: "7d" }
     );
 
-    // Remove password from response
-    const userObj = user.toObject();
-    delete userObj.password;
+    // Return standardized user object
+    const userObj = toAuthUser(user);
 
     const response = NextResponse.json({ success: true, user: userObj, token });
 

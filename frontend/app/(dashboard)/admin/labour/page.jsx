@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 export default function AdminLabourPage() {
   const [labourers, setLabourers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', skill: '', dailyRate: '', address: '' });
+  const [form, setForm] = useState({ name: '', phone: '', skill: '', dailyRate: '', address: '' });
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function AdminLabourPage() {
       const json = await res.json();
       if (json.success) {
         toast.success('Labourer created successfully');
-        setForm({ name: '', email: '', phone: '', password: '', skill: '', dailyRate: '', address: '' });
+        setForm({ name: '', phone: '', skill: '', dailyRate: '', address: '' });
         fetchLabourers();
       } else {
         toast.error(json.message || 'Failed to create labourer');
@@ -101,16 +101,8 @@ export default function AdminLabourPage() {
             <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
-            <input required type="email" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
-          </div>
-          <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
             <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Temporary Password</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.password} onChange={e => setForm({...form, password: e.target.value})} />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Skill (Category)</label>

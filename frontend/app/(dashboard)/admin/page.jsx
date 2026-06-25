@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { 
   FiUsers, FiShoppingBag, FiTool, FiTag, 
-  FiImage, FiDollarSign, FiUserPlus, FiAlertCircle 
+  FiImage, FiDollarSign, FiUserPlus, FiAlertCircle, FiBriefcase
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { Bar } from 'react-chartjs-2';
@@ -67,6 +67,7 @@ export default function AdminDashboardPage() {
     { label: 'Total Users', value: data?.stats?.users, icon: FiUsers, color: 'text-blue-600', bg: 'bg-blue-100' },
     { label: 'Total Vendors', value: data?.stats?.vendors, icon: FiShoppingBag, color: 'text-purple-600', bg: 'bg-purple-100' },
     { label: 'Total Labour', value: data?.stats?.labourers, icon: FiTool, color: 'text-orange-600', bg: 'bg-orange-100' },
+    { label: 'Jobs & Sales', value: data?.stats?.jobs, icon: FiBriefcase, color: 'text-teal-600', bg: 'bg-teal-100' },
     { label: 'Active Offers', value: data?.stats?.activeOffers, icon: FiTag, color: 'text-pink-600', bg: 'bg-pink-100' },
     { label: 'Active Banners', value: data?.stats?.activeBanners, icon: FiImage, color: 'text-indigo-600', bg: 'bg-indigo-100' },
     { label: 'Revenue (Total)', value: `₹${data?.stats?.revenue}`, icon: FiDollarSign, color: 'text-emerald-600', bg: 'bg-emerald-100' },

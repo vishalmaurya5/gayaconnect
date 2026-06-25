@@ -16,6 +16,43 @@ export async function POST(request) {
     const body = await request.json();
     const { type, name, email, phone, password, businessName, category, address, skill, dailyRate } = body;
 
+    if (type === "labourer") {
+      if (!name || !phone || !skill) {
+        return NextResponse.json({ success: false, message: "Name, phone, and skill are required for labourers" }, { status: 400 });
+      }
+
+      const existingLabourer = await Labourer.findOne({ phone });
+      if (existingLabourer) {
+        return NextResponse.json({ success: false, message: "A worker with this phone number is already registered" }, { status: 400 });
+      }
+
+      let userId = null;
+      try {
+        const existingUser = await User.findOne({ phone });
+        if (existingUser) userId = existingUser._id;
+      } catch (e) {}
+
+      const newLabourer = await Labourer.create({
+        userId,
+        name,
+        phone,
+        whatsapp: phone,
+        role: skill,
+        category: skill,
+        area: address,
+        dailyRate: dailyRate ? Number(dailyRate) : 0,
+        isApproved: true,
+        rating: 0,
+        reviewCount: 0
+      });
+
+      return NextResponse.json({ 
+        success: true, 
+        message: "Labourer profile created successfully.",
+        user: newLabourer
+      }, { status: 201 });
+    }
+
     if (!type || !name || !email || !phone || !password) {
       return NextResponse.json({ success: false, message: "Missing required core fields (name, email, phone, password)" }, { status: 400 });
     }
@@ -60,19 +97,6 @@ export async function POST(request) {
         category: category,
         address: address,
         isApproved: true, // Auto-approved
-      });
-    } else if (type === "labourer") {
-      if (!skill) {
-         return NextResponse.json({ success: false, message: "Skill is required for labourers" }, { status: 400 });
-      }
-      await Labourer.create({
-        userId: newUser._id,
-        name: name,
-        phone: phone,
-        skill: skill,
-        dailyRate: dailyRate ? Number(dailyRate) : undefined,
-        address: address,
-        isVerified: true, // Auto-verified
       });
     }
 

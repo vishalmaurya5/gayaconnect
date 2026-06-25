@@ -15,7 +15,7 @@ import PopupAd from "@/components/ui/PopupAd";
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomePage() {
-  const { openSubscriptionModal } = useAuth();
+  const { user, openSubscriptionModal } = useAuth();
 
   return (
     <div className="bg-white min-h-screen">
@@ -103,29 +103,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Offers Section */}
-      <section className="bg-slate-50/50 py-20 border-y border-slate-100">
-        <div className="max-w-[1440px] mx-auto px-5 lg:px-10">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
-            <div>
-              <div className="text-rose-500 text-[11px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
-                <span className="w-8 h-[2px] bg-rose-500 rounded-full"></span> Savings
+      {/* Offers Section - Only visible to logged-in users */}
+      {user && (
+        <section className="bg-slate-50/50 py-20 border-y border-slate-100">
+          <div className="max-w-[1440px] mx-auto px-5 lg:px-10">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
+              <div>
+                <div className="text-rose-500 text-[11px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+                  <span className="w-8 h-[2px] bg-rose-500 rounded-full"></span> Savings
+                </div>
+                <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Latest local offers</h2>
               </div>
-              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Latest local offers</h2>
+              <div className="flex items-center gap-3">
+                <Link href="/map" className="hidden sm:flex text-indigo-600 font-bold text-[14px] items-center gap-2 hover:text-indigo-800 transition-colors bg-indigo-50 px-5 py-2.5 rounded-full border border-indigo-100 hover:border-indigo-200">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  Map
+                </Link>
+                <Link href="/offers" className="text-[#0F172A] font-bold text-[14px] flex items-center gap-2 hover:text-rose-600 transition-colors bg-white px-5 py-2.5 rounded-full border border-slate-200 shadow-sm">
+                  View all offers <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </Link>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Link href="/map" className="hidden sm:flex text-indigo-600 font-bold text-[14px] items-center gap-2 hover:text-indigo-800 transition-colors bg-indigo-50 px-5 py-2.5 rounded-full border border-indigo-100 hover:border-indigo-200">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                Map
-              </Link>
-              <Link href="/offers" className="text-[#0F172A] font-bold text-[14px] flex items-center gap-2 hover:text-rose-600 transition-colors bg-white px-5 py-2.5 rounded-full border border-slate-200 shadow-sm">
-                View all offers <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-              </Link>
-            </div>
+            <OfferSection />
           </div>
-          <OfferSection />
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Labour Section */}
       <section className="bg-white py-24 relative overflow-hidden">

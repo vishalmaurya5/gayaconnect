@@ -75,42 +75,25 @@ export default function ServicesPage() {
   return (
     <div className="bg-[#F8F9FC] min-h-screen pb-20">
       {/* Premium Hero Section */}
-      <section className="relative bg-slate-900 pt-20 pb-28 md:pt-28 md:pb-36 overflow-hidden z-10">
+      <section className="relative bg-slate-900 pt-10 pb-16 overflow-hidden z-10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/40 via-slate-900 to-slate-900 z-0"></div>
         <div className="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-indigo-600/20 to-transparent blur-[100px] pointer-events-none"></div>
         
         <div className="container-custom relative z-10 text-center px-5 max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-bold text-xs uppercase tracking-widest mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-bold text-[11px] uppercase tracking-widest mb-4">
             <FiGrid /> Professional Directory
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-sora font-extrabold text-white mb-6 leading-tight">
+          <h1 className="text-3xl md:text-5xl font-sora font-extrabold text-white mb-4 leading-tight">
             {user?.name ? (
               <>Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">{user.name.split(' ')[0]}</span>.</>
             ) : (
               <>Find the perfect <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Professional</span> for your needs.</>
             )}
           </h1>
-          <p className="text-lg md:text-xl text-slate-300 font-medium mb-12 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto">
             Browse our extensive directory of verified vendors, mechanics, artists, and experts across Gaya.
           </p>
-
-          {/* Premium Search Bar */}
-          <form onSubmit={handleSearchSubmit} className="relative max-w-3xl mx-auto flex items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-2 shadow-2xl transition-all focus-within:bg-white/10 focus-within:border-indigo-400/50 focus-within:shadow-indigo-500/20">
-            <div className="pl-4 pr-2 text-slate-400">
-              <FiSearch className="w-6 h-6" />
-            </div>
-            <input
-              type="text"
-              className="flex-1 bg-transparent border-none text-white px-2 py-4 focus:ring-0 placeholder:text-slate-500 outline-none font-medium text-lg"
-              placeholder="Search by shop name, category, location, or service..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2">
-              Search <span className="hidden sm:inline">Now</span>
-            </button>
-          </form>
         </div>
       </section>
 
@@ -149,10 +132,28 @@ export default function ServicesPage() {
 
           {/* Main Feed: Subcategories & Vendors */}
           <main>
-            {/* Dynamic Subcategory Pills */}
+            {/* Search & Dynamic Subcategory Pills */}
             <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 mb-8">
+              
+              {/* Search Bar */}
+              <form onSubmit={handleSearchSubmit} className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl p-1.5 mb-5 transition-all focus-within:bg-white focus-within:border-indigo-400 focus-within:shadow-md focus-within:shadow-indigo-500/10">
+                <div className="pl-4 pr-2 text-slate-400">
+                  <FiSearch className="w-5 h-5" />
+                </div>
+                <input
+                  type="text"
+                  className="flex-1 bg-transparent border-none text-slate-800 px-2 py-3 focus:ring-0 placeholder:text-slate-400 outline-none font-medium text-base"
+                  placeholder="Search by shop name, category, location, or service..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-bold transition-all shadow-sm flex items-center gap-2">
+                  Search <span className="hidden sm:inline">Now</span>
+                </button>
+              </form>
+
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-sora font-bold text-lg text-slate-800">
+                <h3 className="font-sora font-bold text-sm text-slate-500 uppercase tracking-wider">
                   {selectedCategory ? `${selectedCategory} Sub-categories` : 'Popular Filters'}
                 </h3>
                 {(selectedCategory || selectedSubcategory || search) && (

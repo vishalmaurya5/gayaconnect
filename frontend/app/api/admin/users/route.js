@@ -16,15 +16,22 @@ export async function GET(request) {
     const filter = searchParams.get('filter') || 'all'
 
     const query = { role: 'user' }
-    if (filter === 'subscribed') {
-      query.subscriptionActive = true
-      query.subscriptionExpiry = { $gt: new Date() }
-    } else if (filter === 'unsubscribed') {
-      query.$or = [
-        { subscriptionActive: false },
-        { subscriptionExpiry: { $lte: new Date() } },
-        { subscriptionExpiry: null }
-      ]
+    
+    if (filter === 'deleted') {
+      query.isDeleted = true
+    } else {
+      query.isDeleted = { $ne: true } // Hide deleted from all other views
+      
+      if (filter === 'subscribed') {
+        query.subscriptionActive = true
+        query.subscriptionExpiry = { $gt: new Date() }
+      } else if (filter === 'unsubscribed') {
+        query.$or = [
+          { subscriptionActive: false },
+          { subscriptionExpiry: { $lte: new Date() } },
+          { subscriptionExpiry: null }
+        ]
+      }
     }
 
     const users = await User.find(query).sort('-createdAt')

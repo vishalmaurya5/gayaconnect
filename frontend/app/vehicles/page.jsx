@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { FiPhone, FiLock, FiTruck, FiAlertCircle } from 'react-icons/fi'
+import { FiPhone, FiLock, FiTruck, FiAlertCircle, FiUser, FiCheckCircle } from 'react-icons/fi'
+import { FaWhatsapp } from 'react-icons/fa'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function VehiclesPage() {
@@ -82,9 +83,11 @@ export default function VehiclesPage() {
 }
 
 function VehicleCard({ vehicle, isSubscribed }) {
-  const handleContact = async (e) => {
-    if (!isSubscribed) return;
-    e.preventDefault();
+  const handleContact = async (actionType, e) => {
+    if (!isSubscribed) {
+      e.preventDefault();
+      return;
+    }
     try {
       await fetch('/api/calls', {
         method: 'POST',
@@ -94,50 +97,98 @@ function VehicleCard({ vehicle, isSubscribed }) {
           receiverName: vehicle.ownerName || "Vehicle Owner",
           receiverType: 'Vehicle',
           receiverPhone: vehicle.phone,
-          actionType: 'Call'
+          actionType: actionType
         })
       });
     } catch (err) {}
-    window.location.href = `tel:${vehicle.phone}`;
   };
 
   return (
-    <article className="group relative rounded-3xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 overflow-hidden flex flex-col h-full">
-      <div className={`p-6 flex-1 flex flex-col ${!isSubscribed ? 'blur-[3px] select-none pointer-events-none' : ''}`}>
-        <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-          <FiTruck className="text-2xl" />
+    <article className="group relative rounded-[2rem] bg-white shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden flex flex-col h-full border border-slate-200">
+      
+      {/* Header - Purple Gradient */}
+      <div className={`bg-gradient-to-br from-indigo-500 to-indigo-600 p-6 relative overflow-hidden ${!isSubscribed ? 'blur-[3px] select-none pointer-events-none' : ''}`}>
+        {/* Abstract shapes for background */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-x-1/2 -translate-y-1/2 blur-2xl"></div>
+        
+        <div className="flex items-start justify-between relative z-10">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shadow-inner backdrop-blur-md border border-white/20 shrink-0">
+              <FiTruck className="text-2xl text-white drop-shadow-md" />
+            </div>
+            <div>
+              <h3 className="font-sora font-bold text-lg text-white mb-0.5 line-clamp-1">{vehicle.vehicleName}</h3>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-300"></span>
+                <p className="text-indigo-100 text-sm font-medium">{vehicle.vehicleModel}</p>
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <h3 className="font-sora font-bold text-xl text-slate-900 mb-1 line-clamp-1">{vehicle.vehicleName}</h3>
-        <p className="text-indigo-600 font-bold text-[13px] mb-4">{vehicle.vehicleModel}</p>
-        
-        <div className="space-y-3 mt-auto">
-          <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-            <p className="text-[11px] font-bold uppercase text-slate-400 mb-1">Vehicle Number</p>
-            <p className="font-semibold text-slate-800">{vehicle.vehicleNumber}</p>
+
+        {/* Verified Badge */}
+        <div className="absolute bottom-4 right-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 border border-white/20">
+          <FiCheckCircle className="text-emerald-400 text-[13px]" />
+          <span className="text-white text-xs font-bold tracking-wide">Verified</span>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className={`p-6 flex-1 flex flex-col ${!isSubscribed ? 'blur-[3px] select-none pointer-events-none' : ''}`}>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider">
+              <FiTruck className="text-sm" /> Vehicle Number
+            </div>
+            <div className="font-bold text-slate-900">{vehicle.vehicleNumber}</div>
           </div>
           
-          <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-            <p className="text-[11px] font-bold uppercase text-slate-400 mb-1">Owner</p>
-            <p className="font-semibold text-slate-800 line-clamp-1">{vehicle.ownerName}</p>
+          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider">
+              <FiUser className="text-sm" /> Owner
+            </div>
+            <div className="font-bold text-slate-900 line-clamp-1 text-right max-w-[120px]">{vehicle.ownerName}</div>
+          </div>
+
+          <div className="flex justify-between items-center pb-2">
+            <div className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider">
+              <FiPhone className="text-sm" /> Contact
+            </div>
+            <div className="font-bold text-indigo-700">{vehicle.phone}</div>
           </div>
         </div>
       </div>
 
-      <div className={`p-4 border-t border-slate-100 bg-slate-50/50 mt-auto ${!isSubscribed ? 'blur-[3px] select-none pointer-events-none' : ''}`}>
-        <a href={`tel:${vehicle.phone}`} onClick={isSubscribed ? handleContact : undefined} className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md shadow-indigo-600/20 cursor-pointer">
-          <FiPhone /> {vehicle.phone}
+      {/* Action Buttons */}
+      <div className={`px-5 pb-6 mt-auto flex gap-3 ${!isSubscribed ? 'blur-[3px] select-none pointer-events-none' : ''}`}>
+        <a 
+          href={`tel:${vehicle.phone}`} 
+          onClick={(e) => handleContact('Call', e)}
+          className="flex-1 flex items-center justify-center gap-2 bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 rounded-xl transition-all shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] active:scale-95 text-sm sm:text-base"
+        >
+          <FiPhone className="text-lg" /> Call Now
+        </a>
+        <a 
+          href={`https://wa.me/91${vehicle.phone.replace(/\D/g, '')}?text=Hi, I want to rent your ${vehicle.vehicleName} from Gaya Connect.`} 
+          onClick={(e) => handleContact('WhatsApp', e)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 rounded-xl transition-all shadow-[0_4px_14px_0_rgba(37,211,102,0.39)] active:scale-95 text-sm sm:text-base"
+        >
+          <FaWhatsapp className="text-lg" /> WhatsApp
         </a>
       </div>
 
       {!isSubscribed && (
-        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/60 backdrop-blur-[2px] rounded-3xl">
-          <FiLock className="w-10 h-10 text-slate-800 mb-3 drop-shadow-md" />
-          <h4 className="font-sora font-bold text-lg text-slate-900 mb-1">Subscription Required</h4>
-          <p className="text-sm text-slate-600 font-medium mb-5 px-6 text-center leading-snug">Unlock direct contacts & rental details.</p>
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/70 backdrop-blur-[4px] rounded-[2rem]">
+          <div className="bg-white p-4 rounded-2xl shadow-xl mb-4">
+            <FiLock className="w-8 h-8 text-indigo-600 drop-shadow-sm" />
+          </div>
+          <h4 className="font-sora font-bold text-xl text-slate-900 mb-2">Subscription Required</h4>
+          <p className="text-sm text-slate-600 font-medium mb-6 px-8 text-center leading-relaxed">Unlock owner details and direct contact numbers.</p>
           <Link 
             href="/pricing"
-            className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg hover:shadow-emerald-500/30"
+            className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(79,70,229,0.4)]"
           >
             Subscribe ₹11/mo
           </Link>

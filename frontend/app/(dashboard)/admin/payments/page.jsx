@@ -38,10 +38,10 @@ export default function AdminPaymentsPage() {
       new Date(p.createdAt).toLocaleString(),
       p.userId?.name || 'Unknown',
       p.userId?.email || 'N/A',
-      p.planType,
+      p.purpose || p.planType || p.type || p.plan || 'Other',
       p.amount,
       p.status,
-      p.razorpayPaymentId || '-'
+      p.paymentId || p.razorpayPaymentId || '-'
     ]);
 
     const csvContent = [
@@ -72,13 +72,20 @@ export default function AdminPaymentsPage() {
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-2 border-b border-slate-200">
-        {['all', 'banner_post_monthly', 'subscription_monthly', 'offer_tier_7days', 'offer_tier_30days', 'offer_tier_365days'].map(type => (
+        {[
+          { id: 'all', label: 'All Payments' },
+          { id: 'user_subscription', label: 'Subscriptions' },
+          { id: 'offer_post', label: 'Offer Posts' },
+          { id: 'banner_fee', label: 'Banner Ads' },
+          { id: 'vehicle_listing', label: 'Vehicle Listings' },
+          { id: 'vendor_registration', label: 'Vendor Registrations' }
+        ].map(tab => (
           <button 
-            key={type}
-            onClick={() => setFilter(type)} 
-            className={`px-4 py-2 whitespace-nowrap rounded-lg text-sm font-semibold transition ${filter === type ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
+            key={tab.id}
+            onClick={() => setFilter(tab.id)} 
+            className={`px-4 py-2 whitespace-nowrap rounded-lg text-sm font-semibold transition ${filter === tab.id ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
           >
-            {type === 'all' ? 'All Payments' : type.split('_').join(' ').toUpperCase()}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -113,7 +120,7 @@ export default function AdminPaymentsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 font-semibold text-xs px-2 py-1 rounded">
-                        {payment.planType}
+                        {payment.purpose || payment.planType || payment.type || payment.plan || 'Other'}
                       </span>
                     </td>
                     <td className="px-6 py-4">

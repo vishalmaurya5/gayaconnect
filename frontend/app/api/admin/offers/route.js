@@ -19,6 +19,45 @@ export async function GET(request) {
   }
 }
 
+export async function POST(request) {
+  try {
+    await connectDB()
+    const adminUser = verifyAdminRequest(request)
+    if (!adminUser) {
+      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const { vendorId, title, description, discountText, validUntil } = body
+
+    if (!vendorId || !title) {
+      return NextResponse.json({ success: false, message: 'Vendor and Title are required' }, { status: 400 })
+    }
+
+    const offer = new Offer({
+      vendorId,
+      title,
+      description,
+      discountText,
+      validUntil: validUntil ? new Date(validUntil) : undefined,
+      isActive: true
+    })
+    
+    await offer.save()
+    
+    await AuditLog.create({
+      adminId: adminUser._id || 'admin',
+      action: 'CREATE_OFFER',
+      resource: 'Offer',
+      details: { offerId: offer._id, title }
+    })
+
+    return NextResponse.json({ success: true, offer })
+  } catch (error) {
+    return NextResponse.json({ success: false, message: error.message }, { status: 500 })
+  }
+}
+
 export async function DELETE(request) {
   try {
     await connectDB()

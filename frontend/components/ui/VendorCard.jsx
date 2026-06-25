@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { FiStar, FiMapPin, FiPhone, FiHeart, FiUser, FiLock } from 'react-icons/fi'
+import { FaWhatsapp } from 'react-icons/fa'
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
@@ -12,7 +13,8 @@ export default function VendorCard({ vendor }) {
   const { user } = useAuth()
   const router = useRouter()
 
-  const isSubscriptionActive = user?.subscriptionActive
+  const isSubscriptionActive = user?.isSubscribed
+  const phoneNumber = vendor.phone || vendor.userId?.phone || '+910000000000';
 
   return (
     <div className="relative bg-white rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 overflow-hidden group">
@@ -41,7 +43,7 @@ export default function VendorCard({ vendor }) {
       <div className={`p-5 ${!isSubscriptionActive ? 'blur-[2px]' : ''}`}>
         <div className="flex justify-between items-start mb-1">
           <Link href={`/vendors/${vendor._id}`} className="flex-1 pr-3">
-            <h3 className="font-extrabold text-xl text-slate-800 hover:text-blue-600 transition-colors line-clamp-1 leading-tight">
+            <h3 className="font-extrabold text-xl text-slate-800 hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
               {vendor.name}
             </h3>
           </Link>
@@ -53,25 +55,29 @@ export default function VendorCard({ vendor }) {
 
         <p className="text-blue-600 text-xs font-bold uppercase tracking-wider mb-3">{vendor.category}</p>
 
-        <div className="flex items-center gap-2 text-slate-500 text-sm mb-5">
-          <FiMapPin className="text-slate-400 shrink-0" />
-          <span className="line-clamp-1 font-medium">{vendor.address}</span>
+        <div className="flex items-start gap-2 text-slate-500 text-sm mb-5">
+          <FiMapPin className="text-slate-400 shrink-0 mt-0.5" />
+          <span className="line-clamp-2 font-medium">{vendor.address}</span>
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-          <div className="flex items-center gap-2">
-            <div className="flex -space-x-2">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] text-slate-500 font-bold overflow-hidden">
-                  <FiUser className="w-3 h-3 opacity-50" />
-                </div>
-              ))}
-            </div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase">{vendor.reviews || 23} reviews</span>
-          </div>
+        <div className="grid grid-cols-3 gap-2 pt-4 border-t border-slate-100">
+          <a
+            href={`tel:${phoneNumber}`}
+            className="flex items-center justify-center gap-1.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-100 hover:border-transparent py-2 rounded-xl text-[13px] font-bold transition-all duration-300 shadow-sm"
+          >
+            <FiPhone /> Call
+          </a>
+          <a
+            href={`https://wa.me/91${phoneNumber.replace(/\D/g, '')}?text=Hi, I found your business on Gaya Connect.`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 bg-emerald-50 hover:bg-emerald-500 text-emerald-700 hover:text-white border border-emerald-100 hover:border-transparent py-2 rounded-xl text-[13px] font-bold transition-all duration-300 shadow-sm"
+          >
+            <FaWhatsapp /> Chat
+          </a>
           <Link
             href={`/vendors/${vendor._id}`}
-            className="bg-slate-50 hover:bg-blue-600 text-slate-700 hover:text-white border border-slate-200 hover:border-transparent px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-blue-500/30"
+            className="flex items-center justify-center gap-1.5 bg-slate-50 hover:bg-blue-600 text-slate-700 hover:text-white border border-slate-200 hover:border-transparent py-2 rounded-xl text-[13px] font-bold transition-all duration-300 shadow-sm"
           >
             Details
           </Link>

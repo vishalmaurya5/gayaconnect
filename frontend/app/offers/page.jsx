@@ -3,19 +3,19 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Clock, Lock, Tag, Plus, ArrowRight, Search, Filter } from "lucide-react";
+import { Clock, Lock, Tag, Plus, ArrowRight, Search, Filter, User, Gift, X, MapPin, Phone, CheckCircle2 } from "lucide-react";
 
 const CATEGORIES = ["All", "Electronics", "Food", "Hotels", "Auto", "Home Services", "Shopping"];
 
 const DEMO_OFFERS = [
-  { _id:"o1", discount:"20%", unit:"OFF",  stripColor:"#4338CA", bgColor:"#EEF2FF", textColor:"#4338CA", vendor:"Sonu AC Repair",       area:"Gaya City",  category:"Electronics",    title:"AC servicing & gas refill discount",        desc:"Get 20% off on complete AC servicing including gas refill. Valid on all AC brands.",   expiresAt:"2025-07-10", daysLeft:23, hot:true  },
-  { _id:"o2", discount:"₹99", unit:"FLAT", stripColor:"#0D9488", bgColor:"#F0FDFA", textColor:"#0D9488", vendor:"Raja Motors",           area:"Bodh Gaya",  category:"Auto",           title:"Full bike service at flat ₹99 only",        desc:"Complete bike servicing including oil change, chain lube, brake adjustment and wash.", expiresAt:"2025-06-25", daysLeft:8,  hot:true  },
-  { _id:"o3", discount:"30%", unit:"OFF",  stripColor:"#D97706", bgColor:"#FFFBEB", textColor:"#D97706", vendor:"Hotel Gaya Inn",        area:"Gaya City",  category:"Hotels",         title:"Monsoon season room discount",               desc:"Book any room category and get 30% off. Valid Mon–Thu. Complimentary breakfast included.", expiresAt:"2025-08-31", daysLeft:75, hot:false },
-  { _id:"o4", discount:"FREE",unit:"Visit",stripColor:"#BE123C", bgColor:"#FFF1F2", textColor:"#BE123C", vendor:"Mishra Electricals",    area:"Manpur",     category:"Home Services",  title:"Free home inspection on first visit",       desc:"First-time customers get a free electrical inspection. No hidden charges.",           expiresAt:"2025-07-05", daysLeft:18, hot:false },
-  { _id:"o5", discount:"15%", unit:"OFF",  stripColor:"#7E22CE", bgColor:"#FDF4FF", textColor:"#7E22CE", vendor:"Sharma Plumbing",       area:"Bodh Gaya",  category:"Home Services",  title:"Pipe fitting & leakage repair discount",    desc:"All pipe fitting and leakage repair jobs at 15% off. Same day service available.",    expiresAt:"2025-07-20", daysLeft:33, hot:false },
-  { _id:"o6", discount:"₹49", unit:"OFF",  stripColor:"#15803D", bgColor:"#F0FDF4", textColor:"#15803D", vendor:"Fresh Veg Corner",      area:"Gaya City",  category:"Food",           title:"₹49 off on grocery orders above ₹300",     desc:"Order fresh vegetables and groceries worth ₹300 or more and get ₹49 off instantly.",  expiresAt:"2025-06-30", daysLeft:13, hot:true  },
-  { _id:"o7", discount:"25%", unit:"OFF",  stripColor:"#C2410C", bgColor:"#FFF7ED", textColor:"#C2410C", vendor:"Guddu Auto Works",      area:"Tekari",     category:"Auto",           title:"Car wash & detailing at 25% off",           desc:"Complete car exterior wash, interior vacuuming and dashboard polish at 25% off.",     expiresAt:"2025-07-15", daysLeft:28, hot:false },
-  { _id:"o8", discount:"BUY 1",unit:"GET 1",stripColor:"#0369A1",bgColor:"#EFF6FF", textColor:"#0369A1", vendor:"Kapda World",           area:"Gaya City",  category:"Shopping",       title:"Buy 1 get 1 free on all kurtas",            desc:"Buy any kurta and get one free. Valid on selected stock only. While stocks last.",     expiresAt:"2025-06-28", daysLeft:11, hot:true  },
+  { _id:"o1", avatar: "https://randomuser.me/api/portraits/men/22.jpg", discount:"20%", unit:"OFF",  stripColor:"#4338CA", bgColor:"#EEF2FF", textColor:"#4338CA", vendor:"Sonu AC Repair",       area:"Gaya City",  category:"Electronics",    title:"AC servicing & gas refill discount",        desc:"Get 20% off on complete AC servicing including gas refill. Valid on all AC brands.", businessDesc: "Expert AC technicians with 10+ years of experience in Gaya. We handle all brands including LG, Samsung, and Voltas.", phone: "9876543210", address: "G.B Road, Gaya", expiresAt:"2025-07-10", daysLeft:23, hot:true  },
+  { _id:"o2", avatar: "https://randomuser.me/api/portraits/men/32.jpg", discount:"₹99", unit:"FLAT", stripColor:"#0D9488", bgColor:"#F0FDFA", textColor:"#0D9488", vendor:"Raja Motors",           area:"Bodh Gaya",  category:"Auto",           title:"Full bike service at flat ₹99 only",        desc:"Complete bike servicing including oil change, chain lube, brake adjustment and wash.", businessDesc: "Premium multi-brand two-wheeler service center. Genuine parts guaranteed with quick service.", phone: "8765432109", address: "Main Road, Bodh Gaya", expiresAt:"2025-07-15", daysLeft:45,  hot:true  },
+  { _id:"o3", avatar: "https://randomuser.me/api/portraits/men/44.jpg", discount:"30%", unit:"OFF",  stripColor:"#D97706", bgColor:"#FFFBEB", textColor:"#D97706", vendor:"Hotel Gaya Inn",        area:"Gaya City",  category:"Hotels",         title:"Monsoon season room discount",               desc:"Book any room category and get 30% off. Valid Mon–Thu. Complimentary breakfast included.", businessDesc: "Luxury stay in the heart of Gaya with free WiFi, AC rooms, and 24/7 room service.", phone: "7654321098", address: "Station Road, Gaya", expiresAt:"2025-08-31", daysLeft:75, hot:false },
+  { _id:"o4", avatar: "https://randomuser.me/api/portraits/men/55.jpg", discount:"FREE",unit:"Visit",stripColor:"#BE123C", bgColor:"#FFF1F2", textColor:"#BE123C", vendor:"Mishra Electricals",    area:"Manpur",     category:"Home Services",  title:"Free home inspection on first visit",       desc:"First-time customers get a free electrical inspection. No hidden charges.", businessDesc: "Licensed electricians for residential and commercial wiring, repairing, and new installations.", phone: "6543210987", address: "Manpur Bazaar, Gaya", expiresAt:"2025-07-05", daysLeft:18, hot:false },
+  { _id:"o5", avatar: "https://randomuser.me/api/portraits/men/66.jpg", discount:"15%", unit:"OFF",  stripColor:"#7E22CE", bgColor:"#FDF4FF", textColor:"#7E22CE", vendor:"Sharma Plumbing",       area:"Bodh Gaya",  category:"Home Services",  title:"Pipe fitting & leakage repair discount",    desc:"All pipe fitting and leakage repair jobs at 15% off. Same day service available.", businessDesc: "Professional plumbing services. We fix leaks, install motors, and handle complete bathroom fittings.", phone: "9988776655", address: "Kaluahi, Bodh Gaya", expiresAt:"2025-07-20", daysLeft:33, hot:false },
+  { _id:"o6", avatar: "https://randomuser.me/api/portraits/men/77.jpg", discount:"₹49", unit:"OFF",  stripColor:"#15803D", bgColor:"#F0FDF4", textColor:"#15803D", vendor:"Fresh Veg Corner",      area:"Gaya City",  category:"Food",           title:"₹49 off on grocery orders above ₹300",     desc:"Order fresh vegetables and groceries worth ₹300 or more and get ₹49 off instantly.", businessDesc: "Daily fresh vegetables, fruits, and daily needs delivered to your doorstep in Gaya.", phone: "9123456780", address: "AP Colony, Gaya", expiresAt:"2025-06-30", daysLeft:13, hot:true  },
+  { _id:"o7", avatar: "https://randomuser.me/api/portraits/men/88.jpg", discount:"25%", unit:"OFF",  stripColor:"#C2410C", bgColor:"#FFF7ED", textColor:"#C2410C", vendor:"Guddu Auto Works",      area:"Tekari",     category:"Auto",           title:"Car wash & detailing at 25% off",           desc:"Complete car exterior wash, interior vacuuming and dashboard polish at 25% off.", businessDesc: "High-tech foam wash and ceramic coating center for all cars and SUVs.", phone: "8877665544", address: "Tekari Road, Gaya", expiresAt:"2025-07-15", daysLeft:28, hot:false },
+  { _id:"o8", avatar: "https://randomuser.me/api/portraits/men/99.jpg", discount:"BUY 1",unit:"GET 1",stripColor:"#0369A1",bgColor:"#EFF6FF", textColor:"#0369A1", vendor:"Kapda World",           area:"Gaya City",  category:"Shopping",       title:"Buy 1 get 1 free on all kurtas",            desc:"Buy any kurta and get one free. Valid on selected stock only. While stocks last.", businessDesc: "Gaya's biggest showroom for men's and women's ethnic wear.", phone: "7766554433", address: "Tower Chowk, Gaya", expiresAt:"2025-06-28", daysLeft:11, hot:true  },
 ];
 
 export default function OffersPage() {
@@ -23,6 +23,7 @@ export default function OffersPage() {
   const [category, setCategory]         = useState("All");
   const [search, setSearch]             = useState("");
   const [offers, setOffers]             = useState(DEMO_OFFERS);
+  const [selectedOffer, setSelectedOffer] = useState(null);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -61,10 +62,6 @@ export default function OffersPage() {
               Exclusive deals from verified local businesses — updated daily
             </p>
           </div>
-          <Link href="/offers/new"
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[14px] px-5 py-3 rounded-xl transition-colors no-underline flex-shrink-0">
-            <Plus size={16} /> Post an offer
-          </Link>
         </div>
       </div>
 
@@ -122,9 +119,9 @@ export default function OffersPage() {
               <h2 className="font-['Sora',sans-serif] text-[18px] font-bold text-gray-900">Hot deals</h2>
               <span className="bg-red-100 text-red-600 text-[11px] font-bold px-2 py-0.5 rounded-full">{hotOffers.length} offers</span>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {hotOffers.map(offer => (
-                <OfferCard key={offer._id} offer={offer} isSubscribed={isSubscribed} hot />
+                <OfferCard key={offer._id} offer={offer} isSubscribed={isSubscribed} hot onClick={() => setSelectedOffer(offer)} />
               ))}
             </div>
           </div>
@@ -134,9 +131,9 @@ export default function OffersPage() {
         {allOffers.length > 0 && (
           <div>
             <h2 className="font-['Sora',sans-serif] text-[18px] font-bold text-gray-900 mb-4">All offers</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {allOffers.map(offer => (
-                <OfferCard key={offer._id} offer={offer} isSubscribed={isSubscribed} />
+                <OfferCard key={offer._id} offer={offer} isSubscribed={isSubscribed} onClick={() => setSelectedOffer(offer)} />
               ))}
             </div>
           </div>
@@ -150,72 +147,205 @@ export default function OffersPage() {
           </div>
         )}
       </div>
+
+      {/* Offer Modal */}
+      {selectedOffer && (
+        <OfferModal 
+          offer={selectedOffer} 
+          isSubscribed={isSubscribed} 
+          onClose={() => setSelectedOffer(null)} 
+        />
+      )}
     </main>
   );
 }
 
-function OfferCard({ offer: o, isSubscribed, hot }) {
+function OfferCard({ offer: o, isSubscribed, hot, onClick }) {
   return (
-    <div className={`bg-white border rounded-2xl overflow-hidden flex hover:-translate-y-1 hover:shadow-xl transition-all duration-200 cursor-pointer ${
-      hot ? "border-orange-200 shadow-md shadow-orange-50" : "border-gray-200 hover:border-gray-300"
-    }`}>
-      {/* Left color strip */}
-      <div className="w-2 flex-shrink-0" style={{ background: o.stripColor }} />
+    <div 
+      onClick={onClick}
+      className="bg-white rounded-[1.25rem] hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col relative"
+      style={{ boxShadow: "0 10px 40px -10px rgba(0,0,0,0.08)" }}
+    >
+      {/* Top color strip */}
+      <div className="h-[6px] w-full rounded-t-[1.25rem]" style={{ background: o.stripColor }} />
 
-      <div className="flex gap-4 p-5 flex-1">
+      <div className="flex gap-4 p-5 md:p-6 flex-1">
         {/* Discount badge */}
-        <div className="w-20 h-20 rounded-2xl flex flex-col items-center justify-center flex-shrink-0"
+        <div className="w-[84px] h-[84px] rounded-2xl flex flex-col items-center justify-center flex-shrink-0"
           style={{ background: o.bgColor }}>
-          <span className="font-['Sora',sans-serif] font-extrabold leading-none text-center"
-            style={{ color: o.textColor, fontSize: o.discount.length > 3 ? "13px" : "22px" }}>
+          <span className="font-['Sora',sans-serif] font-extrabold leading-none text-center tracking-tight"
+            style={{ color: o.textColor, fontSize: o.discount.length > 3 ? "18px" : "26px" }}>
             {o.discount}
           </span>
-          <span className="font-bold tracking-wide mt-0.5 text-center"
-            style={{ color: o.textColor, fontSize: "9.5px" }}>
+          <span className="font-bold tracking-widest mt-1 text-center"
+            style={{ color: o.textColor, fontSize: "10px" }}>
             {o.unit}
           </span>
         </div>
 
         {/* Info */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">
+        <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex items-center gap-2 mb-2">
+            {o.avatar ? (
+              <img src={o.avatar} alt={o.vendor} className="w-6 h-6 rounded-full object-cover shrink-0 border border-slate-200" />
+            ) : (
+              <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200">
+                <User size={12} className="text-slate-500" />
+              </div>
+            )}
+            <p className="text-[11.5px] font-semibold text-slate-500 uppercase tracking-wide truncate">
               {o.vendor} · {o.area}
             </p>
             {hot && (
-              <span className="bg-red-50 text-red-500 text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0">🔥 Hot</span>
+              <span className="ml-auto bg-red-50 text-red-500 text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0">🔥 Hot</span>
             )}
           </div>
 
-          <h3 className="text-[14.5px] font-semibold text-gray-900 mb-1.5 leading-snug">{o.title}</h3>
+          <h3 className="text-[16px] font-bold text-slate-900 mb-2 leading-snug line-clamp-2">{o.title}</h3>
 
           {isSubscribed ? (
-            <p className="text-[12.5px] text-gray-500 mb-3 leading-relaxed">{o.desc}</p>
+            <p className="text-[13px] text-slate-500 mb-4 leading-relaxed line-clamp-2">{o.desc}</p>
           ) : (
-            <div className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-3 py-2 mb-3">
-              <Lock size={11} className="text-gray-400" />
-              <span className="text-[12px] text-gray-400">Subscribe to view full offer details</span>
+            <div className="flex items-center gap-1.5 bg-slate-50 rounded-xl px-3 py-2 mb-4 w-max border border-slate-100">
+              <Lock size={12} className="text-slate-400" />
+              <span className="text-[12px] font-medium text-slate-500">Subscribe to view details</span>
             </div>
           )}
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-[11.5px] text-gray-400">
-              <Clock size={11} />
-              <span className={o.daysLeft <= 7 ? "text-red-500 font-semibold" : ""}>
-                {o.daysLeft <= 0 ? "Expired" : `${o.daysLeft} days left`}
+          <div className="flex items-center justify-between mt-auto pt-2">
+            <div className="flex items-center gap-1.5 text-[12.5px] font-medium text-slate-400">
+              <Clock size={14} className="text-slate-300" />
+              <span className={o.daysLeft <= 7 ? "text-red-500" : ""}>
+                {o.daysLeft <= 0 ? "Expired" : o.daysLeft > 30 ? new Date(o.expiresAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : `${o.daysLeft} days left`}
               </span>
             </div>
             {isSubscribed ? (
-              <button className="bg-indigo-700 hover:bg-indigo-800 text-white text-[12px] font-semibold px-4 py-1.5 rounded-xl transition-colors">
-                Claim offer
+              <button className="flex items-center gap-1.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white text-[13px] font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm shadow-indigo-500/20 active:scale-95">
+                <Gift size={14} /> Claim offer
               </button>
             ) : (
               <Link href="/pricing"
-                className="flex items-center gap-1 bg-amber-50 hover:bg-amber-100 text-amber-700 text-[12px] font-semibold px-4 py-1.5 rounded-xl transition-colors no-underline">
-                <Lock size={11} /> Unlock
+                className="flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 text-[13px] font-semibold px-4 py-2 rounded-xl transition-colors no-underline border border-amber-200/50">
+                <Lock size={13} /> Unlock
               </Link>
             )}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OfferModal({ offer, isSubscribed, onClose }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-[2rem] w-full max-w-xl shadow-2xl relative flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
+        
+        {/* Top Strip */}
+        <div className="h-2 w-full shrink-0" style={{ background: offer.stripColor }} />
+        
+        {/* Close Button */}
+        <button 
+          onClick={onClose}
+          className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors z-10"
+        >
+          <X size={18} />
+        </button>
+
+        <div className="overflow-y-auto p-6 md:p-8 flex-1 custom-scrollbar">
+          
+          {/* Header */}
+          <div className="flex items-center gap-4 mb-6">
+            {offer.avatar ? (
+              <img src={offer.avatar} alt={offer.vendor} className="w-16 h-16 rounded-full object-cover border-2 border-slate-100 shadow-sm" />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center border-2 border-slate-200 shadow-sm">
+                <User size={28} className="text-slate-400" />
+              </div>
+            )}
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">{offer.vendor}</h2>
+              <div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
+                <span className="flex items-center gap-1"><MapPin size={14} /> {offer.area}</span>
+                <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                <span className="flex items-center gap-1"><Tag size={14} /> {offer.category}</span>
+              </div>
+            </div>
+          </div>
+
+          <hr className="border-slate-100 mb-6" />
+
+          {/* The Offer Highlights */}
+          <div className="flex items-start gap-5 mb-6">
+            <div className="w-[100px] h-[100px] rounded-3xl flex flex-col items-center justify-center flex-shrink-0 shadow-inner"
+              style={{ background: offer.bgColor }}>
+              <span className="font-['Sora',sans-serif] font-extrabold leading-none text-center tracking-tight"
+                style={{ color: offer.textColor, fontSize: offer.discount.length > 3 ? "20px" : "32px" }}>
+                {offer.discount}
+              </span>
+              <span className="font-bold tracking-widest mt-1.5 text-center"
+                style={{ color: offer.textColor, fontSize: "12px" }}>
+                {offer.unit}
+              </span>
+            </div>
+            
+            <div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2 leading-tight">{offer.title}</h3>
+              <p className="text-slate-600 text-[15px] leading-relaxed">{offer.desc}</p>
+            </div>
+          </div>
+
+          <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 mb-6">
+            <h4 className="font-semibold text-slate-900 mb-2 flex items-center gap-2">
+              <User size={16} className="text-slate-500" /> About the Business
+            </h4>
+            <p className="text-slate-600 text-sm leading-relaxed">
+              {offer.businessDesc}
+            </p>
+          </div>
+
+          {/* Contact Details (Locked for Non-Subscribers) */}
+          <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+            <Phone size={16} className="text-slate-500" /> Contact Info & Redemption
+          </h4>
+          
+          {isSubscribed ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
+                    <Phone size={18} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Phone Number</p>
+                    <p className="font-bold text-slate-900">{offer.phone}</p>
+                  </div>
+                </div>
+                <a href={`tel:${offer.phone}`} className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg font-semibold text-sm transition-colors shadow-sm">
+                  Call Now
+                </a>
+              </div>
+              <div className="flex items-center gap-3 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500">
+                  <MapPin size={18} />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Business Address</p>
+                  <p className="font-semibold text-slate-900">{offer.address}</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center">
+              <Lock size={32} className="text-slate-300 mx-auto mb-3" />
+              <h5 className="font-bold text-slate-800 mb-1">Details Locked</h5>
+              <p className="text-sm text-slate-500 mb-4 px-4">Subscribe to view the contact number, full address, and claim this exclusive offer.</p>
+              <Link href="/pricing" className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-all shadow-md shadow-indigo-500/20">
+                Subscribe for ₹11/mo
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

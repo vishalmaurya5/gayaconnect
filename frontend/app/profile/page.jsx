@@ -31,9 +31,9 @@ export default function ProfilePage() {
         if (d?.user) {
           setUser(d.user);
           // fetch transactions
-          fetch(`/api/users/transactions?userId=${d.user._id}`).then(r=>r.json()).then(t => setTransactions(t.transactions || []));
+          fetch(`/api/users/transactions?userId=${d.user.id}`).then(r=>r.json()).then(t => setTransactions(t.transactions || []));
           // fetch vehicles
-          fetch(`/api/vehicles?ownerId=${d.user._id}`).then(r=>r.json()).then(v => setVehicles(v.vehicles || []));
+          fetch(`/api/vehicles?ownerId=${d.user.id}`).then(r=>r.json()).then(v => setVehicles(v.vehicles || []));
           // fetch call history
           fetch('/api/calls').then(r=>r.json()).then(c => setCallHistory(c.calls || []));
 
@@ -116,7 +116,9 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "/";
+    localStorage.removeItem("gc_token");
+    localStorage.removeItem("gc_user");
+    window.location.href = "/login";
   };
 
   const handlePostVehicle = async (e) => {
@@ -129,7 +131,7 @@ export default function ProfilePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...vehForm,
-          ownerId: user._id,
+          ownerId: user.id,
           ownerName: user.name,
           phone: user.phone
         }),
@@ -158,8 +160,8 @@ export default function ProfilePage() {
           if (verifyRes.ok) {
             alert("Vehicle posted successfully! Pending admin approval.");
             setVehForm({ vehicleName: '', vehicleModel: '', vehicleNumber: '', dlNumber: '', isCommercial: true, liabilityAccepted: false });
-            fetch(`/api/vehicles?ownerId=${user._id}`).then(r=>r.json()).then(v => setVehicles(v.vehicles || []));
-            fetch(`/api/users/transactions?userId=${user._id}`).then(r=>r.json()).then(t => setTransactions(t.transactions || []));
+            fetch(`/api/vehicles?ownerId=${user.id}`).then(r=>r.json()).then(v => setVehicles(v.vehicles || []));
+            fetch(`/api/users/transactions?userId=${user.id}`).then(r=>r.json()).then(t => setTransactions(t.transactions || []));
           } else {
             alert("Payment verification failed.");
           }

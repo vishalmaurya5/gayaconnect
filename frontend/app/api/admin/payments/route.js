@@ -16,7 +16,11 @@ export async function GET(request) {
 
     const query = {}
     if (filter !== 'all') {
-      query.planType = filter
+      query.$or = [
+        { purpose: filter },
+        { type: filter },
+        { planType: filter }
+      ]
     }
 
     const payments = await Payment.find(query).populate('userId', 'name email').sort('-createdAt')

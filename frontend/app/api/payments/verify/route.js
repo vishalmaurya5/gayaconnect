@@ -74,6 +74,7 @@ async function handlePlanActivation({ plan, duration, offerData, user, paymentId
 
     await Payment.create({
       userId:    user._id,
+      purpose:   "user_subscription",
       type:      "user_subscription",
       plan:      "monthly",
       amount:    11,
@@ -125,6 +126,7 @@ async function handlePlanActivation({ plan, duration, offerData, user, paymentId
 
     await Payment.create({
       userId:    user._id,
+      purpose:   "offer_post",
       type:      "offer_post",
       plan:      duration,
       amount:    price,
@@ -149,6 +151,7 @@ async function handlePlanActivation({ plan, duration, offerData, user, paymentId
     // Record payment; admin activates the slot separately
     await Payment.create({
       userId:    user._id,
+      purpose:   "banner_fee",
       type:      "banner_fee",
       plan:      "banner",
       amount:    999,

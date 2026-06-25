@@ -24,6 +24,18 @@ export function AuthProvider({ children }) {
     if (token && storedUser) {
       try {
         setUser(JSON.parse(storedUser));
+        
+        // Fetch fresh user data in the background to keep subscription status updated
+        fetch(`/api/profile?t=${Date.now()}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && data.user) {
+              setUser(data.user);
+              localStorage.setItem("gc_user", JSON.stringify(data.user));
+            }
+          })
+          .catch(console.error);
+
       } catch (e) {
         localStorage.removeItem("gc_token");
         localStorage.removeItem("gc_user");
@@ -37,10 +49,11 @@ export function AuthProvider({ children }) {
     if (loading) return;
 
     const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register");
-    const isVendorRoute = pathname.startsWith("/vendor");
+    const isVendorRoute = pathname === "/vendor" || pathname.startsWith("/vendor/");
     const isProfileRoute = pathname.startsWith("/profile");
+    const isOffersRoute = pathname.startsWith("/offers");
 
-    if (!user && (isVendorRoute || isProfileRoute)) {
+    if (!user && (isVendorRoute || isProfileRoute || isOffersRoute)) {
       router.push("/login");
     }
 
@@ -102,7 +115,12 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (e) {
+      console.error(e);
+    }
     localStorage.removeItem("gc_token");
     localStorage.removeItem("gc_user");
     setUser(null);

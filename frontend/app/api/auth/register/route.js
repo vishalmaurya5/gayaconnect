@@ -80,7 +80,18 @@ export async function POST(request) {
       }
     }
 
-    await User.create(userData);
+    const newUser = await User.create(userData);
+
+    // Auto-link any existing labour profile with this phone number
+    try {
+      const Labour = (await import("@/lib/db/models/Labourer")).default;
+      await Labour.updateMany(
+        { phone: phone, $or: [{ userId: null }, { userId: { $exists: false } }] },
+        { $set: { userId: newUser._id } }
+      );
+    } catch (e) {
+      console.error("Error auto-linking labour profile to user:", e);
+    }
 
     return NextResponse.json({ 
       success: true, 

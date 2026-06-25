@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/security/auth";
+import { toAuthUser } from "@/lib/utils/contactAccess";
 
 export async function GET(request) {
   try {
@@ -10,8 +11,7 @@ export async function GET(request) {
     }
 
     // Remove password from response just in case
-    const userObj = user.toObject();
-    delete userObj.password;
+    const userObj = toAuthUser(user);
 
     return NextResponse.json({ success: true, user: userObj });
 

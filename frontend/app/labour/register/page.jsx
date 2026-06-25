@@ -15,8 +15,10 @@ export default function LabourRegisterPage() {
     name: '',
     phone: '',
     category: '',
+    customCategory: '',
     area: '',
     dailyRate: '',
+    onCall: false,
     photo: '',
     availability: true
   });
@@ -41,8 +43,15 @@ export default function LabourRegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.phone || !form.category || !form.area) {
+    const finalCategory = form.category === 'Other' ? form.customCategory : form.category;
+    
+    if (!form.name || !form.phone || !finalCategory || !form.area) {
       toast.error('Please fill all required fields');
+      return;
+    }
+
+    if (!form.onCall && !form.dailyRate) {
+      toast.error('Please enter a daily rate or select "On Call"');
       return;
     }
 
@@ -51,7 +60,11 @@ export default function LabourRegisterPage() {
       const res = await fetch('/api/labour', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify({ 
+          ...form, 
+          category: finalCategory,
+          dailyRate: form.onCall ? null : form.dailyRate 
+        })
       });
       const data = await res.json();
       if (data.success) {
@@ -75,7 +88,7 @@ export default function LabourRegisterPage() {
           </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Registration Successful!</h2>
           <p className="text-slate-600 mb-8">
-            Your profile has been submitted. Our admin team will review and approve it shortly.
+            Your profile has been created successfully. You are now officially listed in the Gaya Connect worker directory.
           </p>
           <button 
             onClick={() => router.push('/labour')}
@@ -154,15 +167,28 @@ export default function LabourRegisterPage() {
 
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">Category / Profession *</label>
-                <select 
-                  required
-                  value={form.category}
-                  onChange={(e) => setForm({...form, category: e.target.value})}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition appearance-none"
-                >
-                  <option value="">Select Category</option>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <div className="flex flex-col gap-3">
+                  <select 
+                    required
+                    value={form.category}
+                    onChange={(e) => setForm({...form, category: e.target.value})}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition appearance-none"
+                  >
+                    <option value="">Select Category</option>
+                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  
+                  {form.category === 'Other' && (
+                    <input 
+                      type="text" 
+                      required
+                      value={form.customCategory}
+                      onChange={(e) => setForm({...form, customCategory: e.target.value})}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
+                      placeholder="Please specify your profession"
+                    />
+                  )}
+                </div>
               </div>
 
               <div>
@@ -178,15 +204,28 @@ export default function LabourRegisterPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Daily Wage (₹/day)</label>
-                <input 
-                  type="number" 
-                  min="0"
-                  value={form.dailyRate}
-                  onChange={(e) => setForm({...form, dailyRate: e.target.value})}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
-                  placeholder="e.g. 500"
-                />
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Daily Wage / Rate *</label>
+                <div className="flex flex-col gap-3">
+                  <input 
+                    type="number" 
+                    min="0"
+                    disabled={form.onCall}
+                    required={!form.onCall}
+                    value={form.dailyRate}
+                    onChange={(e) => setForm({...form, dailyRate: e.target.value})}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition disabled:opacity-50 disabled:bg-slate-100"
+                    placeholder="e.g. 500 (₹/day)"
+                  />
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-700 text-sm font-medium">
+                    <input 
+                      type="checkbox" 
+                      checked={form.onCall}
+                      onChange={(e) => setForm({...form, onCall: e.target.checked, dailyRate: ''})}
+                      className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+                    />
+                    Rate is Negotiable / On Call
+                  </label>
+                </div>
               </div>
             </div>
 

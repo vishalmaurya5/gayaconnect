@@ -35,8 +35,10 @@ export async function GET(request) {
     if (area)     query.area  = { $regex: area,     $options: "i" };
     if (available) query.availability = true;
 
-    // Rate filter
-    query.dailyRate = { $gte: minRate, $lte: maxRate };
+    // Rate filter - only apply if minRate or maxRate was explicitly requested
+    if (searchParams.has("minRate") || searchParams.has("maxRate")) {
+      query.dailyRate = { $gte: minRate, $lte: maxRate };
+    }
 
     const [workers, total] = await Promise.all([
       Labour.find(query)
@@ -55,10 +57,9 @@ export async function GET(request) {
       ...w,
       phone:    allowed ? w.phone    : null,
       whatsapp: allowed ? w.whatsapp : null,
-      dailyRate: allowed ? w.dailyRate : null, // optionally hide rate too
     }));
 
-    return NextResponse.json({ workers: sanitized, total, page, isSubscribed: allowed });
+    return NextResponse.json({ success: true, labourers: sanitized, total, page, isSubscribed: allowed });
   } catch (err) {
     console.error("GET /api/labour error:", err);
     return NextResponse.json({ error: "Failed to fetch workers" }, { status: 500 });
@@ -77,10 +78,12 @@ export async function POST(request) {
       dailyRate, skills, availability,
     } = body;
 
+    const actualRole = role || category;
+
     // Basic validation
-    if (!name || !phone || !role || !area || !dailyRate) {
+    if (!name || !phone || !actualRole || !area) {
       return NextResponse.json(
-        { error: "name, phone, role, area and dailyRate are required" },
+        { success: false, message: "Name, phone, category, and area are required" },
         { status: 400 }
       );
     }
@@ -89,7 +92,7 @@ export async function POST(request) {
     const existing = await Labour.findOne({ phone });
     if (existing) {
       return NextResponse.json(
-        { error: "A worker with this phone number is already registered" },
+        { success: false, message: "A worker with this phone number is already registered" },
         { status: 409 }
       );
     }
@@ -99,32 +102,45 @@ export async function POST(request) {
       try {
         validPhoto = validateImageDataUrl(photo, 'Profile photo', 150 * 1024, '150 KB');
       } catch (err) {
-        return NextResponse.json({ error: err.message }, { status: 400 });
+        return NextResponse.json({ success: false, message: err.message }, { status: 400 });
       }
     }
 
+    // Auto-link to existing user if phone matches
+    let userId = null;
+    try {
+      const User = (await import("@/lib/db/models/User")).default;
+      const existingUser = await User.findOne({ phone });
+      if (existingUser) {
+        userId = existingUser._id;
+      }
+    } catch (e) {
+      console.error("Error auto-linking user to labour:", e);
+    }
+
     const worker = await Labour.create({
+      userId,
       name,
       phone,
       whatsapp: whatsapp || phone,
       photo: validPhoto,
-      role,
-      category: category || role,
+      role: actualRole,
+      category: category || actualRole,
       area,
-      dailyRate: Number(dailyRate),
+      dailyRate: dailyRate ? Number(dailyRate) : null,
       skills:    Array.isArray(skills) ? skills : [],
       availability: availability !== false,
-      isApproved: false, // admin must approve
+      isApproved: true, // auto-approve
       rating:    0,
       reviewCount: 0,
     });
 
     return NextResponse.json(
-      { message: "Registration submitted. You'll be listed after admin approval.", worker: { _id: worker._id, name: worker.name } },
+      { success: true, message: "Registration successful! You are now listed in the directory.", worker: { _id: worker._id, name: worker.name } },
       { status: 201 }
     );
   } catch (err) {
     console.error("POST /api/labour error:", err);
-    return NextResponse.json({ error: "Registration failed" }, { status: 500 });
+    return NextResponse.json({ success: false, message: "Registration failed" }, { status: 500 });
   }
 }
