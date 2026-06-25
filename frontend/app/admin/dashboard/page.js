@@ -23,7 +23,8 @@ import {
   FiDownload,
   FiTool,
   FiPhoneCall,
-  FiMonitor
+  FiMonitor,
+  FiBriefcase
 } from 'react-icons/fi'
 import { Bar } from 'react-chartjs-2'
 import {
@@ -45,6 +46,7 @@ const tabs = [
   { id: 'offers', label: 'Offers', icon: FiTag },
   { id: 'banners', label: 'Banners', icon: FiImage },
   { id: 'blogs', label: 'Blogs', icon: FiBookOpen },
+  { id: 'jobs', label: 'Jobs & Sales', icon: FiBriefcase },
   { id: 'labour', label: 'Labour', icon: FiTool },
   { id: 'vehicles', label: 'Vehicles', icon: FiTruck },
   { id: 'payments', label: 'Payments', icon: FiDollarSign },
@@ -269,6 +271,7 @@ export default function AdminDashboard() {
           <Metric label="Vendors" value={stats.vendors || 0} icon={FiShoppingBag} />
           <Metric label="Offers" value={stats.offers || 0} icon={FiTag} />
           <Metric label="Banners" value={stats.banners || 0} icon={FiImage} />
+          <Metric label="Jobs & Sales" value={stats.jobs || 0} icon={FiBriefcase} />
           <Metric label="Labour" value={stats.labourers || 0} icon={FiTool} />
           <Metric label="Vehicles" value={stats.vehicles || 0} icon={FiTruck} />
           <Metric label="Calls" value={stats.calls || 0} icon={FiPhoneCall} />
@@ -300,6 +303,19 @@ export default function AdminDashboard() {
               onCreate={() => createResource('blogs', blogForm, () => setBlogForm(emptyBlog))}
               onUpdate={updateResource}
               onDelete={(id) => deleteResource('blogs', id)}
+            />
+          )}
+          {activeTab === 'jobs' && (
+            <JobsView
+              jobs={data?.jobs || []}
+              onRefresh={loadOverview}
+              onDelete={async (id) => {
+                if (window.confirm('Delete this posting?')) {
+                  await fetch(`/api/jobs/${id}`, { method: 'DELETE' })
+                  toast.success('Deleted')
+                  loadOverview()
+                }
+              }}
             />
           )}
           {activeTab === 'labour' && <LabourView labourers={(data?.labourers || []).filter(l => !l.isDeleted)} onUpdate={updateResource} onDelete={(id) => deleteResource('labourers', id)} onRefresh={loadOverview} />}
@@ -352,6 +368,73 @@ export default function AdminDashboard() {
           )}
         </section>
       </main>
+    </div>
+  )
+}
+
+function JobsView({ jobs, onRefresh, onDelete }) {
+  const [form, setForm] = useState({ title: '', description: '', type: 'job', salaryOrPrice: '', location: '' })
+  const [loading, setLoading] = useState(false)
+
+  const handlePost = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const res = await fetch('/api/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success('Posted successfully')
+        setForm({ title: '', description: '', type: 'job', salaryOrPrice: '', location: '' })
+        onRefresh()
+      } else {
+        toast.error(data.message || 'Failed to post')
+      }
+    } catch (error) {
+      toast.error('An error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <Panel title="Post New Job or Sale (As Admin)">
+        <form onSubmit={handlePost} className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+          <div className="sm:col-span-2 md:col-span-4 flex bg-slate-100 p-1 rounded-lg w-fit">
+            <button type="button" onClick={() => setForm({...form, type: 'job'})} className={`px-4 py-1.5 text-sm font-semibold rounded-md transition ${form.type === 'job' ? 'bg-white shadow-sm text-blue-700' : 'text-slate-500 hover:text-slate-700'}`}>Job</button>
+            <button type="button" onClick={() => setForm({...form, type: 'sale'})} className={`px-4 py-1.5 text-sm font-semibold rounded-md transition ${form.type === 'sale' ? 'bg-white shadow-sm text-green-700' : 'text-slate-500 hover:text-slate-700'}`}>Sale</button>
+          </div>
+          <TextInput label="Title" value={form.title} onChange={v => setForm({...form, title: v})} required />
+          <TextInput label={form.type === 'job' ? 'Salary' : 'Price'} value={form.salaryOrPrice} onChange={v => setForm({...form, salaryOrPrice: v})} />
+          <TextInput label="Location" value={form.location} onChange={v => setForm({...form, location: v})} />
+          <div className="sm:col-span-2 md:col-span-4">
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Description</label>
+            <textarea required rows="2" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"></textarea>
+          </div>
+          <button type="submit" disabled={loading} className="sm:col-span-2 md:col-span-4 mt-2 rounded-xl bg-blue-600 py-2.5 font-bold text-white hover:bg-blue-700 disabled:opacity-50">
+            {loading ? 'Posting...' : 'Post ' + form.type}
+          </button>
+        </form>
+      </Panel>
+      <Panel 
+        title="Active Jobs & Sales"
+        action={<ExportButton filename="jobs_sales" headers={['Type', 'Title', 'Salary/Price', 'Location', 'Posted By', 'Date']} data={jobs.map(j => [j.type, j.title, j.salaryOrPrice, j.location, j.postedByAdmin ? 'Admin' : j.vendorId?.name || 'Unknown', new Date(j.createdAt).toLocaleDateString()])} />}
+      >
+        <Table
+          headers={['Type', 'Title', 'Salary/Price', 'Posted By', 'Actions']}
+          rows={jobs.map((job) => [
+            <span key={'type'+job._id} className={`px-2 py-1 rounded text-xs font-bold uppercase ${job.type === 'job' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>{job.type}</span>,
+            job.title,
+            job.salaryOrPrice || '-',
+            job.postedByAdmin ? <span key={'admin'+job._id} className="text-purple-600 font-bold">Admin</span> : (job.vendorId?.name || 'Vendor'),
+            <IconButton key={job._id} icon={FiTrash2} label="Delete" onClick={() => onDelete(job._id)} danger />,
+          ])}
+        />
+      </Panel>
     </div>
   )
 }

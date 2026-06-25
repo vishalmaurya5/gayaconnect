@@ -10,7 +10,7 @@ export async function POST(request) {
     await connectDB();
     const body = await request.json();
     const { email, identifier, password, role } = body;
-    const loginId = identifier || email;
+    const loginId = (identifier || email)?.trim();
 
     if (!loginId || !password) {
       return NextResponse.json({ error: "Email/Mobile and password are required" }, { status: 400 });

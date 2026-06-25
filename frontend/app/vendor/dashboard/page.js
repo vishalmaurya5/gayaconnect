@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { FiTrendingUp, FiCheckCircle, FiDollarSign, FiClock, FiSettings, FiImage, FiGift } from 'react-icons/fi';
+import { FiTrendingUp, FiCheckCircle, FiDollarSign, FiClock, FiSettings, FiImage, FiGift, FiBriefcase } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function VendorDashboard() {
@@ -48,6 +48,9 @@ export default function VendorDashboard() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/offers/new" className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-yellow-400 to-yellow-500 px-5 py-2.5 font-bold text-yellow-950 shadow-md transition hover:scale-105 hover:shadow-lg">
                 <FiGift /> Post Offer
+              </Link>
+              <Link href="/vendor/dashboard/jobs" className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-5 py-2.5 font-bold text-white shadow-md transition hover:scale-105 hover:shadow-lg">
+                <FiBriefcase /> Jobs & Sales
               </Link>
               
               {(() => {

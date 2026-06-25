@@ -57,13 +57,13 @@ export function AuthProvider({ children }) {
 
   }, [user, loading, pathname, router]);
 
-  const login = async (email, password, role) => {
+  const login = async (identifier, password, role) => {
     setLoading(true);
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, role }),
+        body: JSON.stringify({ identifier, password, role }),
       });
       const data = await res.json();
       
