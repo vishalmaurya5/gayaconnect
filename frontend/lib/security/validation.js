@@ -87,6 +87,14 @@ export const profileSchema = z.object({
   subCategory: optionalSafeText('Subcategory', 80),
   businessAddress: optionalSafeText('Business address', 200),
   description: optionalSafeText('Description', 1000),
+  workerName: optionalSafeText('Worker Name', 80),
+  workerRole: optionalSafeText('Worker Role', 80),
+  workerCategory: optionalSafeText('Worker Category', 80),
+  workerArea: optionalSafeText('Worker Area', 80),
+  workerDailyRate: z.union([z.number(), z.string()]).optional(),
+  workerHourlyRate: z.union([z.number(), z.string()]).optional(),
+  workerAvailability: z.boolean().optional(),
+  workerSkills: z.array(z.string()).optional(),
 }).strict()
 
 export const paymentOrderSchema = z.object({

@@ -6,11 +6,12 @@ import Link from "next/link";
 import {
   User, Store, Tag, CreditCard, Edit3, LogOut,
   CheckCircle, Clock, AlertTriangle, Phone, Mail,
-  MapPin, Shield, Bell, Trash2, Save, Truck, Car
+  MapPin, Shield, Bell, Trash2, Save, Truck, Car, Briefcase
 } from "lucide-react";
 
 export default function ProfilePage() {
   const [user, setUser]       = useState(null);
+  const [worker, setWorker]   = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab]         = useState("profile");
   const [editing, setEditing] = useState(false);
@@ -46,7 +47,19 @@ export default function ProfilePage() {
             category:    d.vendor?.category || "",
             description: d.vendor?.description || "",
             businessAddress: d.vendor?.address || "",
+            // worker fields
+            workerName: d.worker?.name || "",
+            workerRole: d.worker?.role || "",
+            workerCategory: d.worker?.category || "",
+            workerArea: d.worker?.area || "",
+            workerDailyRate: d.worker?.dailyRate || "",
+            workerHourlyRate: d.worker?.hourlyRate || "",
+            workerAvailability: d.worker?.availability ?? true,
+            workerSkills: d.worker?.skills || [],
           });
+          if (d.worker) {
+            setWorker(d.worker);
+          }
         }
         setLoading(false);
       })
@@ -64,6 +77,7 @@ export default function ProfilePage() {
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
+        if (data.worker) setWorker(data.worker);
         setEditing(false);
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
@@ -209,6 +223,7 @@ export default function ProfilePage() {
     { id:"profile",      label:"Profile",         icon:User        },
     { id:"subscription", label:"Subscription",     icon:CreditCard  },
     ...(isVendor ? [{ id:"vendor", label:"My listing", icon:Store }] : []),
+    ...(worker ? [{ id:"worker", label:"Worker Profile", icon:Briefcase }] : []),
     { id:"vehicles",     label:"My Vehicles",      icon:Car         },
     { id:"calls",        label:"Call History",     icon:Phone       },
     { id:"settings",     label:"Settings",         icon:Shield      },
@@ -515,6 +530,75 @@ export default function ProfilePage() {
                   <div className="bg-gray-50 rounded-xl px-4 py-3 text-[14px] text-gray-700 leading-relaxed">
                     {form.description || "No description added yet."}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── WORKER TAB ── */}
+            {tab === "worker" && worker && (
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="font-semibold text-gray-900 text-[16px]">Local Worker Profile</h2>
+                  {!editing ? (
+                    <button onClick={() => setEditing(true)}
+                      className="flex items-center gap-1.5 text-[13px] text-indigo-600 hover:text-indigo-800 font-semibold">
+                      <Edit3 size={14} /> Edit
+                    </button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <button onClick={() => { setEditing(false); }}
+                        className="text-[13px] text-gray-500 border border-gray-200 px-3 py-1.5 rounded-lg">
+                        Cancel
+                      </button>
+                      <button onClick={handleSave} disabled={saving}
+                        className="flex items-center gap-1.5 text-[13px] bg-indigo-700 text-white px-3 py-1.5 rounded-lg font-semibold disabled:opacity-60">
+                        <Save size={13} /> {saving ? "Saving…" : "Save"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {saved && (
+                  <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-2.5 mb-4 text-[13.5px]">
+                    <CheckCircle size={15} /> Worker profile updated successfully!
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { label:"Worker Name",   key:"workerName",  type:"text" },
+                    { label:"Role/Category", key:"workerRole",  type:"text" },
+                    { label:"Service Area",  key:"workerArea",  type:"text" },
+                    { label:"Daily Rate (₹)",key:"workerDailyRate", type:"number" },
+                    { label:"Hourly Rate (₹)",key:"workerHourlyRate", type:"number" },
+                  ].map(f => (
+                    <div key={f.key}>
+                      <label className="block text-[12px] font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">{f.label}</label>
+                      {editing ? (
+                        <input type={f.type} value={form[f.key]}
+                          onChange={e => setForm(p => ({...p, [f.key]: e.target.value}))}
+                          className="w-full border border-gray-200 focus:border-indigo-400 rounded-xl px-4 py-2.5 text-[14px] text-gray-800 outline-none" />
+                      ) : (
+                        <div className="bg-gray-50 rounded-xl px-4 py-2.5 text-[14px] text-gray-700">
+                          {form[f.key] || "—"}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-4 flex items-center gap-3">
+                  <label className="block text-[12px] font-semibold text-gray-500 uppercase tracking-wide">Available for Work</label>
+                  {editing ? (
+                     <div className={`w-10 h-6 rounded-full transition-colors cursor-pointer flex items-center px-0.5 ${form.workerAvailability ? "bg-emerald-500" : "bg-gray-300"}`}
+                          onClick={() => setForm(p => ({...p, workerAvailability: !p.workerAvailability}))}>
+                       <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${form.workerAvailability ? "translate-x-4" : "translate-x-0"}`} />
+                     </div>
+                  ) : (
+                    <span className={`text-[12px] font-bold px-2 py-1 rounded-md ${form.workerAvailability ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
+                      {form.workerAvailability ? "Yes, Available" : "Not Available"}
+                    </span>
+                  )}
                 </div>
               </div>
             )}

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db/mongodb'
 import Vendor from '@/lib/db/models/Vendor'
+import Labourer from '@/lib/db/models/Labourer'
 import { toAuthUser } from '@/lib/utils/contactAccess'
 import { validateImageDataUrl } from '@/lib/utils/imageUpload'
 import { getAuthenticatedUser } from '@/lib/security/auth'
@@ -17,10 +18,17 @@ export async function GET(request) {
 
     const vendor = user.role === 'vendor' ? await Vendor.findOne({ userId: user._id }) : null
 
+    let worker = await Labourer.findOne({ $or: [{ userId: user._id }, { phone: user.phone }] })
+    if (worker && !worker.userId) {
+      worker.userId = user._id;
+      await worker.save();
+    }
+
     return NextResponse.json({
       success: true,
       user: toAuthUser(user),
       vendor,
+      worker,
     })
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 })
@@ -40,7 +48,11 @@ export async function PUT(request) {
     if (!parsed.success) {
       return NextResponse.json({ success: false, message: validationError(parsed.error) }, { status: 400 })
     }
-    const { name, address, profileImage, businessName, category, subCategory, businessAddress, description } = parsed.data
+    const { 
+      name, address, profileImage, 
+      businessName, category, subCategory, businessAddress, description,
+      workerName, workerRole, workerCategory, workerArea, workerDailyRate, workerHourlyRate, workerAvailability, workerSkills
+    } = parsed.data
 
     user.name = name
     user.address = address || ''
@@ -65,10 +77,25 @@ export async function PUT(request) {
       }
     }
 
+    let worker = await Labourer.findOne({ userId: user._id })
+    if (worker) {
+      if (workerName !== undefined && workerName !== '') worker.name = workerName;
+      if (workerRole !== undefined && workerRole !== '') worker.role = workerRole;
+      if (workerCategory !== undefined && workerCategory !== '') worker.category = workerCategory;
+      if (workerArea !== undefined && workerArea !== '') worker.area = workerArea;
+      if (workerDailyRate !== undefined && workerDailyRate !== '') worker.dailyRate = Number(workerDailyRate);
+      if (workerHourlyRate !== undefined && workerHourlyRate !== '') worker.hourlyRate = Number(workerHourlyRate);
+      if (workerAvailability !== undefined) worker.availability = workerAvailability;
+      if (workerSkills !== undefined) worker.skills = workerSkills;
+      if (profileImage !== undefined) worker.photo = user.profileImage || '';
+      await worker.save()
+    }
+
     return NextResponse.json({
       success: true,
       user: toAuthUser(user),
       vendor,
+      worker,
       message: 'Profile updated',
     })
   } catch (error) {

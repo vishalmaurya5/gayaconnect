@@ -12,10 +12,69 @@ export default function Footer() {
   if (pathname?.startsWith('/admin')) return null;
 
   return (
-    <footer className="bg-[#0A0F1C] text-slate-300 pt-16 pb-8 border-t border-slate-800/60 shadow-2xl relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <>
+      {/* Platform Guide Section - Distinct Design */}
+      <section className="bg-gradient-to-b from-white to-slate-50 py-16 border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-sora font-extrabold text-slate-900 mb-4 tracking-tight">How Gaya Connect Works</h3>
+            <p className="text-slate-500 text-[15px] max-w-2xl mx-auto">Your simple guide to navigating our local platform, connecting with vendors, and managing your services effectively.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Card 1 */}
+            <div className="bg-white border border-slate-100 shadow-xl shadow-slate-200/40 rounded-3xl p-8 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-300">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center mb-6 text-indigo-600 shadow-inner">
+                <FiShield size={24} strokeWidth={2.5} />
+              </div>
+              <h4 className="text-slate-900 font-bold mb-3 text-[15px] font-sora">User & Worker Accounts</h4>
+              <p className="text-slate-500 text-[13.5px] leading-relaxed">
+                Register as a Local Worker and log in with your phone number. Your worker profile automatically links to your User Account for easy, unified management.
+              </p>
+            </div>
+
+            {/* Card 2 */}
+            <div className="bg-white border border-slate-100 shadow-xl shadow-slate-200/40 rounded-3xl p-8 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-100/50 transition-all duration-300">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mb-6 text-emerald-600 shadow-inner">
+                <FiMap size={24} strokeWidth={2.5} />
+              </div>
+              <h4 className="text-slate-900 font-bold mb-3 text-[15px] font-sora">Posters & Offers</h4>
+              <p className="text-slate-500 text-[13.5px] leading-relaxed">
+                Registered Vendors can easily publish exclusive Offers and vivid Posters (Banners) directly from their dashboard to attract targeted local customers.
+              </p>
+            </div>
+
+            {/* Card 3 */}
+            <div className="bg-white border border-slate-100 shadow-xl shadow-slate-200/40 rounded-3xl p-8 hover:-translate-y-1 hover:shadow-2xl hover:shadow-orange-100/50 transition-all duration-300">
+              <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center mb-6 text-orange-600 shadow-inner">
+                <FiMapPin size={24} strokeWidth={2.5} />
+              </div>
+              <h4 className="text-slate-900 font-bold mb-3 text-[15px] font-sora">Find Local Services</h4>
+              <p className="text-slate-500 text-[13.5px] leading-relaxed">
+                Instantly search our comprehensive directory for top-rated vendors, compare exciting local deals, and browse verified workforce professionals across Gaya.
+              </p>
+            </div>
+
+            {/* Card 4 */}
+            <div className="bg-white border border-slate-100 shadow-xl shadow-slate-200/40 rounded-3xl p-8 hover:-translate-y-1 hover:shadow-2xl hover:shadow-teal-100/50 transition-all duration-300">
+              <div className="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center mb-6 text-teal-600 shadow-inner">
+                <FiPhone size={24} strokeWidth={2.5} />
+              </div>
+              <h4 className="text-slate-900 font-bold mb-3 text-[15px] font-sora">Unlock Contacts</h4>
+              <p className="text-slate-500 text-[13.5px] leading-relaxed">
+                Subscribe to our premium plan to instantly unlock direct contact numbers for thousands of verified vendors and local workers to fulfill your needs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Footer */}
+      <footer className="bg-[#0A0F1C] text-slate-300 pt-16 pb-8 border-t border-slate-800/60 relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
           
           {/* Brand Column */}
@@ -97,5 +156,6 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+  </>
   );
 }

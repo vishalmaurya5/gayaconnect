@@ -12,13 +12,23 @@ import HowItWorks from "@/components/ui/HowItWorks";
 import Testimonials from "@/components/ui/Testimonials";
 import VendorCTA from "@/components/ui/VendorCTA";
 import PopupAd from "@/components/ui/PopupAd";
+import AboutGaya from "@/components/ui/AboutGaya";
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomePage() {
   const { user, openSubscriptionModal } = useAuth();
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-[#F8F9FC] min-h-screen relative selection:bg-indigo-500/30 font-inter">
+      {/* Global subtle ambient background */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:32px_32px] opacity-[0.15]"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[120px]"></div>
+        <div className="absolute top-[40%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] bg-orange-500/10 rounded-full blur-[120px]"></div>
+      </div>
+
+      <div className="relative z-10">
       <PopupAd />
       <HeroSection />
       
@@ -56,8 +66,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* About Gaya Section */}
+      <AboutGaya />
+
       {/* Categories Section */}
-      <section className="bg-slate-50/50 py-20 border-y border-slate-100">
+      <section className="bg-transparent py-20 relative">
         <div className="max-w-[1440px] mx-auto px-5 lg:px-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
             <div>
@@ -78,9 +91,7 @@ export default function HomePage() {
       </section>
 
       {/* Vendors Section */}
-      <section className="bg-white py-24 relative overflow-hidden">
-        {/* Subtle background element */}
-        <div className="absolute top-40 left-0 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-20 mask-image:linear-gradient(to_bottom,white,transparent)"></div>
+      <section className="bg-transparent py-24 relative overflow-hidden">
         <div className="max-w-[1440px] mx-auto px-5 lg:px-10 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
             <div>
@@ -105,7 +116,7 @@ export default function HomePage() {
 
       {/* Offers Section - Only visible to logged-in users */}
       {user && (
-        <section className="bg-slate-50/50 py-20 border-y border-slate-100">
+        <section className="bg-transparent py-20 relative">
           <div className="max-w-[1440px] mx-auto px-5 lg:px-10">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
               <div>
@@ -130,7 +141,7 @@ export default function HomePage() {
       )}
 
       {/* Labour Section */}
-      <section className="bg-white py-24 relative overflow-hidden">
+      <section className="bg-transparent py-24 relative overflow-hidden">
         <div className="max-w-[1440px] mx-auto px-5 lg:px-10 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
             <div>
@@ -169,7 +180,7 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="bg-slate-50/50 py-24 border-y border-slate-100">
+      <section className="bg-transparent py-24 relative">
         <div className="max-w-[1440px] mx-auto px-5 lg:px-10">
           <div className="text-center mb-16">
             <div className="text-emerald-500 text-[11px] font-bold uppercase tracking-widest mb-3 flex items-center justify-center gap-2">
@@ -184,6 +195,7 @@ export default function HomePage() {
       {/* Final Vendor CTA */}
       <div className="max-w-[1440px] mx-auto px-5 lg:px-10 pb-20 pt-10">
         <VendorCTA />
+      </div>
       </div>
     </div>
   );
