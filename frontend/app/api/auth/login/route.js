@@ -55,10 +55,10 @@ export async function POST(request) {
     delete userObj.password;
 
     const response = NextResponse.json({ success: true, user: userObj, token });
-    
+
     // Set HTTP-only cookies for Server Components
     await createUserSession(response, user, true);
-    
+
     return response;
 
   } catch (error) {
