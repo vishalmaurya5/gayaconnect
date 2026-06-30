@@ -44,14 +44,14 @@ export async function GET(request) {
       calls,
       jobs
     ] = await Promise.all([
-      User.find().select('-password').sort({ createdAt: -1 }).limit(100).lean(),
-      Vendor.find().sort({ createdAt: -1 }).limit(100).lean(),
-      Offer.find().populate('vendorId', 'name category subCategory').sort({ createdAt: -1 }).limit(100).lean(),
-      Banner.find().sort({ createdAt: -1 }).limit(100).lean(),
-      Payment.find().sort({ createdAt: -1 }).limit(100).lean(),
-      Blog.find().sort({ createdAt: -1 }).limit(100).lean(),
-      Labourer.find().sort({ createdAt: -1 }).limit(100).lean(),
-      Vehicle.find().sort({ createdAt: -1 }).limit(100).lean(),
+      User.find().select('-password').sort({ createdAt: -1 }).lean(),
+      Vendor.find().sort({ createdAt: -1 }).lean(),
+      Offer.find().populate('vendorId', 'name category subCategory').sort({ createdAt: -1 }).lean(),
+      Banner.find().sort({ createdAt: -1 }).lean(),
+      Payment.find().sort({ createdAt: -1 }).lean(),
+      Blog.find().sort({ createdAt: -1 }).lean(),
+      Labourer.find().sort({ createdAt: -1 }).lean(),
+      Vehicle.find().sort({ createdAt: -1 }).lean(),
       Payment.aggregate([
         { $match: { status: { $in: ['success', 'paid'] } } },
         { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } },
@@ -73,8 +73,8 @@ export async function GET(request) {
         },
         { $sort: { _id: 1 } }
       ]),
-      CallLog.find().sort({ createdAt: -1 }).limit(100).lean(),
-      Job.find().populate('vendorId', 'name').sort({ createdAt: -1 }).limit(100).lean()
+      CallLog.find().sort({ createdAt: -1 }).lean(),
+      Job.find().populate('vendorId', 'name').sort({ createdAt: -1 }).lean()
     ])
 
     // Fill in missing days for the chart

@@ -24,8 +24,9 @@ export async function PATCH(request, { params }) {
       updateData.bannerPostExpiresAt = null
     }
 
+    const { id } = await params;
     const user = await User.findByIdAndUpdate(
-      params.id,
+      id,
       updateData,
       { new: true }
     )

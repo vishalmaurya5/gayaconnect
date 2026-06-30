@@ -12,7 +12,7 @@ export async function DELETE(request, { params }) {
     }
 
     await connectDB();
-    const { id } = params;
+    const { id } = await params;
 
     const job = await Job.findById(id);
     if (!job) {

@@ -11,7 +11,9 @@ export async function GET(request) {
     const query = { isActive: true, adminApproved: true }
     if (position) query.position = position
 
-    const banners = await Banner.find(query).sort('-createdAt')
+    const banners = await Banner.find(query)
+      .populate('vendorId', 'name')
+      .sort('-createdAt')
     return NextResponse.json({ success: true, banners })
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 })

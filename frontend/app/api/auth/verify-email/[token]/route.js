@@ -5,8 +5,9 @@ import { digestToken } from '@/lib/security/auth'
 
 export async function GET(request, { params }) {
   await connectDB()
+  const { token } = await params;
   const user = await User.findOne({
-    emailVerificationTokenHash: digestToken(params.token),
+    emailVerificationTokenHash: digestToken(token),
     emailVerificationExpiresAt: { $gt: new Date() },
   }).select('+emailVerificationTokenHash +emailVerificationExpiresAt')
 

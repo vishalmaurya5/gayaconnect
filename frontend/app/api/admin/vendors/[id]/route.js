@@ -13,7 +13,8 @@ export async function PATCH(request, { params }) {
     }
 
     const updates = await request.json()
-    const vendor = await Vendor.findByIdAndUpdate(params.id, updates, { new: true })
+    const { id } = await params;
+    const vendor = await Vendor.findByIdAndUpdate(id, updates, { new: true })
     if (!vendor) return NextResponse.json({ success: false, message: 'Vendor not found' }, { status: 404 })
 
     await AuditLog.create({
@@ -38,14 +39,15 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
 
-    const vendor = await Vendor.findByIdAndDelete(params.id)
+    const { id } = await params;
+    const vendor = await Vendor.findByIdAndDelete(id)
     if (!vendor) return NextResponse.json({ success: false, message: 'Vendor not found' }, { status: 404 })
 
     await AuditLog.create({
       adminId: adminUser._id || 'admin',
       action: 'DELETE_VENDOR',
       resource: 'Vendor',
-      resourceId: params.id,
+      resourceId: id,
       details: { businessName: vendor.name }
     })
 

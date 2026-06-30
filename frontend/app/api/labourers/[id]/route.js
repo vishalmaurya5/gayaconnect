@@ -5,8 +5,8 @@ import { getAuthenticatedUser } from '@/lib/security/auth';
 
 export async function GET(request, { params }) {
   try {
-    await connectDB();
-    const labourer = await Labourer.findById(params.id);
+    const { id } = await params;
+    const labourer = await Labourer.findById(id);
     
     if (!labourer) return NextResponse.json({ error: 'Labourer not found' }, { status: 404 });
     return NextResponse.json({ success: true, data: labourer });
@@ -22,7 +22,8 @@ export async function PUT(request, { params }) {
     
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const labourer = await Labourer.findById(params.id);
+    const { id } = await params;
+    const labourer = await Labourer.findById(id);
     if (!labourer) return NextResponse.json({ error: 'Labourer not found' }, { status: 404 });
 
     if (user.role !== 'admin' && String(labourer.userId) !== String(user._id)) {
@@ -33,7 +34,7 @@ export async function PUT(request, { params }) {
 
     if (user.role !== 'admin') delete body.isVerified;
 
-    const updatedLabourer = await Labourer.findByIdAndUpdate(params.id, body, {
+    const updatedLabourer = await Labourer.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
     });
@@ -53,7 +54,8 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: 'Unauthorized. Admin access required.' }, { status: 401 });
     }
 
-    const deletedLabourer = await Labourer.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const deletedLabourer = await Labourer.findByIdAndDelete(id);
     if (!deletedLabourer) return NextResponse.json({ error: 'Labourer not found' }, { status: 404 });
 
     return NextResponse.json({ success: true, data: {} });

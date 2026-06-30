@@ -11,7 +11,7 @@ export async function GET(request, { params }) {
     }
 
     await connectDB()
-    const { id } = params
+    const { id } = await params
     
     const vendor = await Vendor.findById(id).populate('userId', 'phone').select('phone contactNumber userId')
     if (!vendor) {

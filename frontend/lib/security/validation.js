@@ -54,6 +54,8 @@ export const vendorCreateSchema = z.object({
   location: z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) }).optional(),
   images: z.array(z.string().url()).max(10).optional(),
   logo: z.string().max(3_000_000).optional(),
+  instagram: optionalSafeText('Instagram Link', 300),
+  facebook: optionalSafeText('Facebook Link', 300),
 }).strict()
 
 export const vendorUpdateSchema = vendorCreateSchema.partial().strict()
@@ -95,6 +97,11 @@ export const profileSchema = z.object({
   workerHourlyRate: z.union([z.number(), z.string()]).optional(),
   workerAvailability: z.boolean().optional(),
   workerSkills: z.array(z.string()).optional(),
+  instagram: optionalSafeText('Instagram Link', 300),
+  facebook: optionalSafeText('Facebook Link', 300),
+  experience: optionalSafeText('Experience', 100),
+  workingHours: optionalSafeText('Working Hours', 200),
+  services: optionalSafeText('Services', 1000), // comma separated string
 }).strict()
 
 export const paymentOrderSchema = z.object({

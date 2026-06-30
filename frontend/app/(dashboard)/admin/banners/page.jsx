@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState([]);
+  const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('pending'); // pending, active, expired
   const [form, setForm] = useState({ title: '', link: '', position: 'home_top', endDate: '' });
@@ -13,20 +14,43 @@ export default function AdminBannersPage() {
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
-    fetchBanners();
+    fetchBannersAndVendors();
   }, []);
 
-  const fetchBanners = async () => {
+  const fetchBannersAndVendors = async () => {
     try {
-      const res = await fetch('/api/admin/banners');
-      const data = await res.json();
-      if (data.success) {
-        setBanners(data.banners || []);
-      }
+      const [bannersRes, vendorsRes] = await Promise.all([
+        fetch('/api/admin/banners'),
+        fetch('/api/admin/vendors')
+      ]);
+      const bannersData = await bannersRes.json();
+      const vendorsData = await vendorsRes.json();
+      
+      if (bannersData.success) setBanners(bannersData.banners || []);
+      if (vendorsData.success) setVendors(vendorsData.vendors || []);
     } catch (error) {
-      toast.error('Failed to load banners');
+      toast.error('Failed to load data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const toggleVendorBannerStatus = async (vendorId, status) => {
+    try {
+      const res = await fetch(`/api/admin/vendors/${vendorId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bannerStatus: status })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Vendor banner access approved!');
+        setVendors(vendors.map(v => v._id === vendorId ? { ...v, bannerStatus: status } : v));
+      } else {
+        toast.error(data.message || 'Failed to update');
+      }
+    } catch (error) {
+      toast.error('Error updating vendor');
     }
   };
 
@@ -78,7 +102,7 @@ export default function AdminBannersPage() {
         toast.success("Banner published successfully");
         setForm({ title: '', link: '', position: 'home_top', endDate: '' });
         setImageUrl('');
-        fetchBanners();
+        fetchBannersAndVendors();
         setFilter('active');
       } else {
         toast.error(data.message || 'Failed to create banner');
@@ -100,11 +124,49 @@ export default function AdminBannersPage() {
     return true;
   });
 
+  const pendingVendors = vendors.filter(v => v.bannerStatus === 'pending');
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-slate-800">Manage Banners</h1>
       </div>
+
+      {pendingVendors.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border-2 border-amber-300 p-6 mb-8 overflow-hidden">
+          <h2 className="text-lg font-bold text-slate-900 mb-2">Pending Banner Access Requests</h2>
+          <p className="text-sm text-slate-600 mb-4">The following vendors have paid for banner access. Approve their request to allow them to upload.</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-slate-600">
+              <thead className="bg-slate-50 text-slate-500 uppercase font-semibold">
+                <tr>
+                  <th className="px-6 py-4">RegCode</th>
+                  <th className="px-6 py-4">Vendor Name</th>
+                  <th className="px-6 py-4">Category</th>
+                  <th className="px-6 py-4">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {pendingVendors.map(vendor => (
+                  <tr key={vendor._id} className="hover:bg-slate-50 transition">
+                    <td className="px-6 py-4 font-mono font-bold">{vendor.regCode || 'N/A'}</td>
+                    <td className="px-6 py-4 font-bold text-slate-900">{vendor.name}</td>
+                    <td className="px-6 py-4">{vendor.category}</td>
+                    <td className="px-6 py-4">
+                      <button 
+                        onClick={() => toggleVendorBannerStatus(vendor._id, 'approved')} 
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 transition text-white rounded-lg font-bold shadow-sm flex items-center gap-2"
+                      >
+                        <FiCheckCircle /> Approve Access
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
         <h2 className="text-lg font-bold text-slate-900 mb-4">Post New Banner</h2>

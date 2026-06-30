@@ -17,7 +17,7 @@ export default function VendorDashboard() {
   // Edit Profile States
   const [isEditing, setIsEditing] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
-  const [editForm, setEditForm] = useState({ name: '', businessName: '', address: '' });
+  const [editForm, setEditForm] = useState({ name: '', businessName: '', address: '', instagram: '', facebook: '', experience: '', workingHours: '', services: '' });
 
   const { user, setUser } = useAuth();
   
@@ -113,7 +113,12 @@ export default function VendorDashboard() {
       setEditForm({
         name: user?.name || '',
         businessName: vendorDetails?.name || '',
-        address: vendorDetails?.address || user?.address || ''
+        address: vendorDetails?.address || user?.address || '',
+        instagram: vendorDetails?.instagram || '',
+        facebook: vendorDetails?.facebook || '',
+        experience: vendorDetails?.experience || '',
+        workingHours: vendorDetails?.workingHours || '',
+        services: vendorDetails?.services?.join(', ') || ''
       });
     }
     setIsEditing(!isEditing);
@@ -127,6 +132,11 @@ export default function VendorDashboard() {
         businessName: editForm.businessName,
         address: editForm.address,
         businessAddress: editForm.address,
+        instagram: editForm.instagram,
+        facebook: editForm.facebook,
+        experience: editForm.experience,
+        workingHours: editForm.workingHours,
+        services: editForm.services,
         phone: user?.phone
       };
       
@@ -167,8 +177,8 @@ export default function VendorDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-[#fdfbf3] via-[#f4fce8] to-[#e8f5e9] py-10 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         {/* Header & Details Section */}
-        <div className="mb-8 grid gap-6 lg:grid-cols-[1fr_auto]">
-          <div className="rounded-3xl bg-white/60 p-6 shadow-sm backdrop-blur-xl border border-green-200/50 flex flex-col justify-between">
+        <div className="mb-8 grid gap-6 lg:grid-cols-[1fr_auto] items-start">
+          <div className="rounded-3xl bg-white/60 p-6 shadow-sm backdrop-blur-xl border border-green-200/50 flex flex-col">
             <div>
               <p className="text-sm font-bold uppercase tracking-widest text-green-600">Overview</p>
               <h1 className="mt-1 text-3xl font-extrabold text-slate-900">Welcome, {user?.name || 'Vendor'}</h1>
@@ -242,12 +252,12 @@ export default function VendorDashboard() {
             {loadingProfile ? (
               <div className="h-20 animate-pulse bg-slate-100 rounded-xl"></div>
             ) : (
-              <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
-                <div className={isEditing ? "col-span-2 sm:col-span-1" : ""}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+                <div>
                   <span className="block text-slate-500 font-semibold mb-1">Registration Code</span>
                   <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-1 rounded">{vendorDetails?.regCode || user?.regCode || 'N/A'}</span>
                 </div>
-                <div className={isEditing ? "col-span-2 sm:col-span-1" : ""}>
+                <div>
                   <span className="block text-slate-500 font-semibold mb-1">Owner Name</span>
                   {!isEditing ? (
                     <span className="font-bold text-slate-900">{user?.name}</span>
@@ -255,7 +265,7 @@ export default function VendorDashboard() {
                     <input type="text" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} className="w-full border border-slate-300 rounded px-2 py-1 focus:outline-indigo-500" />
                   )}
                 </div>
-                <div className={isEditing ? "col-span-2 sm:col-span-1" : ""}>
+                <div className="sm:col-span-2">
                   <span className="block text-slate-500 font-semibold mb-1">Business Name</span>
                   {!isEditing ? (
                     <span className="font-bold text-slate-900">{vendorDetails?.name || 'Please set in profile'}</span>
@@ -263,7 +273,7 @@ export default function VendorDashboard() {
                     <input type="text" value={editForm.businessName} onChange={e => setEditForm({...editForm, businessName: e.target.value})} className="w-full border border-slate-300 rounded px-2 py-1 focus:outline-indigo-500" />
                   )}
                 </div>
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <span className="block text-slate-500 font-semibold mb-1">Address</span>
                   {!isEditing ? (
                     <span className="font-bold text-slate-900">{vendorDetails?.address || user?.address || 'N/A'}</span>
@@ -271,15 +281,65 @@ export default function VendorDashboard() {
                     <input type="text" value={editForm.address} onChange={e => setEditForm({...editForm, address: e.target.value})} className="w-full border border-slate-300 rounded px-2 py-1 focus:outline-indigo-500" />
                   )}
                 </div>
-                <div className="col-span-2 sm:col-span-1">
+                <div>
+                  <span className="block text-slate-500 font-semibold mb-1">Instagram Link</span>
+                  {!isEditing ? (
+                    <span className="font-bold text-slate-900 break-all">
+                      {vendorDetails?.instagram ? <a href={vendorDetails.instagram} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">{vendorDetails.instagram}</a> : 'N/A'}
+                    </span>
+                  ) : (
+                    <input type="url" placeholder="https://instagram.com/..." value={editForm.instagram} onChange={e => setEditForm({...editForm, instagram: e.target.value})} className="w-full border border-slate-300 rounded px-2 py-1 focus:outline-indigo-500" />
+                  )}
+                </div>
+                <div>
+                  <span className="block text-slate-500 font-semibold mb-1">Facebook Link</span>
+                  {!isEditing ? (
+                    <span className="font-bold text-slate-900 break-all">
+                      {vendorDetails?.facebook ? <a href={vendorDetails.facebook} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">{vendorDetails.facebook}</a> : 'N/A'}
+                    </span>
+                  ) : (
+                    <input type="url" placeholder="https://facebook.com/..." value={editForm.facebook} onChange={e => setEditForm({...editForm, facebook: e.target.value})} className="w-full border border-slate-300 rounded px-2 py-1 focus:outline-indigo-500" />
+                  )}
+                </div>
+                <div>
+                  <span className="block text-slate-500 font-semibold mb-1">Experience</span>
+                  {!isEditing ? (
+                    <span className="font-bold text-slate-900">{vendorDetails?.experience || 'N/A'}</span>
+                  ) : (
+                    <input type="text" placeholder="e.g., 5+ years" value={editForm.experience} onChange={e => setEditForm({...editForm, experience: e.target.value})} className="w-full border border-slate-300 rounded px-2 py-1 focus:outline-indigo-500" />
+                  )}
+                </div>
+                <div>
+                  <span className="block text-slate-500 font-semibold mb-1">Working Hours</span>
+                  {!isEditing ? (
+                    <span className="font-bold text-slate-900">{vendorDetails?.workingHours || 'N/A'}</span>
+                  ) : (
+                    <input type="text" placeholder="e.g., Mon-Sat, 9AM-8PM" value={editForm.workingHours} onChange={e => setEditForm({...editForm, workingHours: e.target.value})} className="w-full border border-slate-300 rounded px-2 py-1 focus:outline-indigo-500" />
+                  )}
+                </div>
+                <div className="sm:col-span-2">
+                  <span className="block text-slate-500 font-semibold mb-1">Services Offered</span>
+                  {!isEditing ? (
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {vendorDetails?.services?.length > 0 ? (
+                        vendorDetails.services.map(s => <span key={s} className="bg-indigo-50 text-indigo-700 text-xs font-bold px-2 py-1 rounded">{s}</span>)
+                      ) : (
+                        <span className="font-bold text-slate-900">N/A</span>
+                      )}
+                    </div>
+                  ) : (
+                    <input type="text" placeholder="e.g., Plumbing, Wiring, Repair (comma separated)" value={editForm.services} onChange={e => setEditForm({...editForm, services: e.target.value})} className="w-full border border-slate-300 rounded px-2 py-1 focus:outline-indigo-500" />
+                  )}
+                </div>
+                <div>
                   <span className="block text-slate-500 font-semibold">Email</span>
                   <span className="font-bold text-slate-900 truncate block">{user?.email}</span>
                 </div>
-                <div className="col-span-2 sm:col-span-1">
+                <div>
                   <span className="block text-slate-500 font-semibold">Phone</span>
                   <span className="font-bold text-slate-900">{user?.phone}</span>
                 </div>
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <span className="block text-slate-500 font-semibold mt-1">User Subscription</span>
                   <span className={`font-bold ${subActive ? 'text-emerald-600' : 'text-slate-900'}`}>
                     {subActive ? `Active (${daysLeft} days remaining)` : 'No active subscription'}

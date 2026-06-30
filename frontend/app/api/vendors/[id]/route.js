@@ -5,8 +5,8 @@ import { getAuthenticatedUser } from '@/lib/security/auth'
 
 export async function GET(request, { params }) {
   try {
-    await connectDB()
-    const vendor = await Vendor.findById(params.id).populate('userId', 'name email')
+    const { id } = await params;
+    const vendor = await Vendor.findById(id).populate('userId', 'name email phone')
     if (!vendor) {
       return NextResponse.json({ success: false, message: 'Vendor not found' }, { status: 404 })
     }
@@ -27,7 +27,8 @@ export async function PUT(request, { params }) {
     const user = await getAuthenticatedUser(request)
     if (!user) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
-    const vendor = await Vendor.findById(params.id)
+    const { id } = await params;
+    const vendor = await Vendor.findById(id)
     if (!vendor) return NextResponse.json({ success: false, message: 'Vendor not found' }, { status: 404 })
 
     if (user.role !== 'admin' && String(vendor.userId) !== String(user._id)) {
@@ -35,7 +36,7 @@ export async function PUT(request, { params }) {
     }
 
     const updates = await request.json()
-    const updatedVendor = await Vendor.findByIdAndUpdate(params.id, updates, { new: true })
+    const updatedVendor = await Vendor.findByIdAndUpdate(id, updates, { new: true })
 
     return NextResponse.json({ success: true, vendor: updatedVendor, message: 'Vendor updated successfully' })
   } catch (error) {
@@ -49,7 +50,8 @@ export async function DELETE(request, { params }) {
     const user = await getAuthenticatedUser(request)
     if (!user || user.role !== 'admin') return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
-    await Vendor.findByIdAndDelete(params.id)
+    const { id } = await params;
+    await Vendor.findByIdAndDelete(id)
     return NextResponse.json({ success: true, message: 'Vendor deleted successfully' })
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 })

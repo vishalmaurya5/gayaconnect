@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FiGrid } from "react-icons/fi";
 import HeroSection from "@/components/ui/HeroSection";
 import TrustStrip from "@/components/ui/TrustStrip";
+import BannerSlider from "@/components/ui/BannerSlider";
 import CategoryGrid from "@/components/ui/CategoryGrid";
 import VendorSection from "@/components/ui/VendorSection";
 import OfferSection from "@/components/ui/OfferSection";
@@ -36,6 +37,11 @@ export default function HomePage() {
       <div className="relative z-20 -mt-8">
         <TrustStrip />
       </div>
+
+      {/* Main Banner Slider */}
+      <section className="max-w-[1440px] mx-auto px-5 lg:px-10 mt-12 relative z-10">
+        <BannerSlider position="home_top" />
+      </section>
 
       {/* Subscription Banner */}
       <section className="max-w-[1440px] mx-auto px-5 lg:px-10 mt-12 mb-20 relative z-10">
@@ -88,6 +94,11 @@ export default function HomePage() {
           </div>
           <CategoryGrid />
         </div>
+      </section>
+
+      {/* Middle Banner Slider */}
+      <section className="max-w-[1440px] mx-auto px-5 lg:px-10 mt-12 mb-12 relative z-10">
+        <BannerSlider position="home_middle" />
       </section>
 
       {/* Vendors Section */}

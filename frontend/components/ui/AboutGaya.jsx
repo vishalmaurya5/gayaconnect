@@ -18,9 +18,9 @@ export default function AboutGaya() {
       image: "/images/gaya/falgu_river.png"
     },
     {
-      title: "Barabar Caves",
-      desc: "The oldest surviving rock-cut caves in India dating from the Maurya Empire (322–185 BCE).",
-      image: "/images/gaya/barabar_caves.png"
+      title: "Mangla Gauri Temple",
+      desc: "One of the 18 Maha Shaktipeeths, this ancient and highly revered temple is dedicated to Goddess Shakti.",
+      image: "/images/gaya/mangla_gauri.png"
     }
   ];
 

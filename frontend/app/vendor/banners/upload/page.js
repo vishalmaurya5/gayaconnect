@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { FiImage, FiUploadCloud, FiLink, FiSend } from 'react-icons/fi'
+import { FiImage, FiUploadCloud, FiLink, FiSend, FiInfo } from 'react-icons/fi'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function UploadBannerPage() {
@@ -14,32 +14,70 @@ export default function UploadBannerPage() {
     title: '',
     description: '',
     linkUrl: '',
-    duration: '30',
+    position: 'home_top',
   })
   const [image, setImage] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
   const [submitting, setSubmitting] = useState(false)
 
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true)
+
   useEffect(() => {
     if (loading) return
-    if (!user) router.push('/login?type=vendor')
-    // If they don't have access, redirect them to the pricing page
-    if (user && !user.hasBannerPostAccess) router.push('/vendor/banners/pricing')
-  }, [loading, user])
+    if (!user) {
+      router.push('/login?type=vendor')
+      return
+    }
+    
+    // Check vendor status instead of user object
+    fetch('/api/profile')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.vendor?.bannerStatus === 'approved') {
+          setIsCheckingAccess(false)
+        } else {
+          toast.error('You do not have approved banner access.')
+          router.push('/vendor/banners/pricing')
+        }
+      })
+      .catch(() => {
+        router.push('/vendor/dashboard')
+      })
+  }, [loading, user, router])
 
   const handleImageChange = (e) => {
     const file = e.target.files[0]
     if (file) {
-      if (file.size > 3 * 1024 * 1024) {
-        toast.error('Image is too large. Max 3MB.')
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image is too large. Max 2MB.')
+        e.target.value = ''
         return
       }
-      setImage(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result)
+      
+      const objectUrl = URL.createObjectURL(file)
+      const img = new window.Image()
+      img.onload = () => {
+        if (img.width <= img.height) {
+          toast.error('Please upload a landscape image (width must be greater than height).')
+          e.target.value = ''
+          URL.revokeObjectURL(objectUrl)
+          return
+        }
+        
+        setImage(file)
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setImagePreview(reader.result)
+        }
+        reader.readAsDataURL(file)
+        URL.revokeObjectURL(objectUrl)
       }
-      reader.readAsDataURL(file)
+      img.onerror = () => {
+        toast.error('Invalid image file.')
+        e.target.value = ''
+        URL.revokeObjectURL(objectUrl)
+      }
+      img.src = objectUrl
     }
   }
 
@@ -77,7 +115,7 @@ export default function UploadBannerPage() {
     }
   }
 
-  if (loading) return <div className="container-custom py-10"><div className="h-72 animate-pulse rounded-2xl bg-slate-100" /></div>
+  if (loading || isCheckingAccess) return <div className="container-custom py-10"><div className="h-72 animate-pulse rounded-2xl bg-slate-100" /></div>
 
   return (
     <div className="min-h-screen bg-slate-50 py-10">
@@ -86,6 +124,19 @@ export default function UploadBannerPage() {
           <p className="text-sm font-bold uppercase tracking-widest text-emerald-600">Banner Management</p>
           <h1 className="mt-2 text-4xl font-extrabold text-slate-900 tracking-tight">Upload Your Banner</h1>
           <p className="mt-2 text-slate-600 text-lg">Submit your advertisement banner. It will go live once approved by an admin.</p>
+        </div>
+
+        {/* Design Guidelines Note */}
+        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl p-5 flex items-start gap-3 shadow-sm">
+          <FiInfo className="text-blue-600 mt-1 shrink-0 text-xl" />
+          <div>
+            <h4 className="text-sm font-bold text-blue-900 mb-1">Design Guidelines for Perfect Fit</h4>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• <strong>Optimal Size:</strong> 1200px Width × 400px Height (3:1 Ratio)</li>
+              <li>• <strong>Safe Zone:</strong> Keep important text and logos in the <strong>center</strong> of the image so they don't get cut off on mobile devices.</li>
+              <li>• <strong>Format:</strong> Only Landscape JPG/JPEG format allowed (Max 2MB).</li>
+            </ul>
+          </div>
         </div>
 
         <form onSubmit={submitBanner} className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
@@ -111,7 +162,7 @@ export default function UploadBannerPage() {
                         </span>
                         <p className="pl-1">or drag and drop</p>
                       </div>
-                      <p className="text-xs leading-5 text-slate-500">PNG, JPG, GIF up to 3MB</p>
+                      <p className="text-xs leading-5 text-slate-500 font-medium">Landscape format only, up to 2MB</p>
                     </>
                   )}
                 </div>
@@ -132,11 +183,12 @@ export default function UploadBannerPage() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-bold text-slate-700">Duration</label>
-              <select className="input-field rounded-xl bg-slate-50 border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })}>
-                <option value="30">30 Days</option>
-                <option value="15">15 Days</option>
-                <option value="7">7 Days</option>
+              <label className="mb-2 block text-sm font-bold text-slate-700">Position</label>
+              <select className="input-field rounded-xl bg-slate-50 border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })}>
+                <option value="home_top">Home Top</option>
+                <option value="home_middle">Home Middle</option>
+                <option value="category_top">Category Top</option>
+                <option value="community">Community</option>
               </select>
             </div>
             

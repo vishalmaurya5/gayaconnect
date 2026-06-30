@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db/mongodb';
 import Vendor from '@/lib/db/models/Vendor';
 import Banner from '@/lib/db/models/Banner';
 import { getAuthenticatedUser } from '@/lib/security/auth';
+import { validateImageDataUrl } from '@/lib/utils/imageUpload';
 
 export async function POST(request) {
   try {
@@ -23,10 +24,16 @@ export async function POST(request) {
     }
     
     const body = await request.json();
-    const { title, imageUrl, link } = body;
+    const { title, imageUrl, linkUrl, position } = body;
     
     if (!title || !imageUrl) {
       return NextResponse.json({ success: false, message: 'Title and Image URL are required' }, { status: 400 });
+    }
+    
+    try {
+      validateImageDataUrl(imageUrl, 'Banner Image', 2 * 1024 * 1024, '2 MB');
+    } catch (e) {
+      return NextResponse.json({ success: false, message: e.message }, { status: 400 });
     }
     
     // Create the active banner
@@ -34,11 +41,12 @@ export async function POST(request) {
       vendorId: vendor._id,
       title,
       imageUrl,
-      link,
+      link: linkUrl,
+      position: position || 'home_top',
       isActive: true,
       adminApproved: true,
       startDate: new Date(),
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days active
+      endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days active
     });
     
     // Reset banner status to none after posting

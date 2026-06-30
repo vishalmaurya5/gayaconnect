@@ -7,6 +7,7 @@ import Link from "next/link";
 import {
   MapPin, Star, Phone, MessageCircle, Shield, Clock,
   ArrowLeft, Lock, CheckCircle, Tag, Share2, Heart,
+  Instagram, Facebook
 } from "lucide-react";
 
 export default function VendorDetailPage() {
@@ -74,21 +75,26 @@ export default function VendorDetailPage() {
 
   // Demo data fallback
   const v = {
-    name:        vendor.name        || "Ravi Electrical Works",
-    category:    vendor.category    || "Electrician",
+    name:        vendor.name        || "Vendor Name",
+    category:    vendor.category    || "Uncategorized",
     area:        vendor.area        || "Gaya City",
-    rating:      vendor.rating      || 4.9,
-    reviewCount: vendor.reviewCount || 124,
-    phone:       vendor.phone       || "+91 98765 43210",
-    whatsapp:    vendor.whatsapp    || "+91 98765 43210",
-    description: vendor.description || "We provide professional electrical services across Gaya district. 10+ years of experience in residential and commercial wiring, inverter installation, switchboard repairs, and more.",
-    services:    vendor.services    || ["Home wiring", "Inverter installation", "Switchboard repair", "Fan & light fitting", "Electrical inspection", "MCB & fuse replacement"],
-    tags:        vendor.tags        || ["Wiring", "Inverter", "Switchboard", "Home visit", "Emergency service"],
-    workingHours:vendor.workingHours|| "Mon–Sat, 8:00 AM – 8:00 PM",
-    experience:  vendor.experience  || "10+ years",
+    rating:      vendor.rating      || 4.5,
+    reviewCount: vendor.reviewCount || 0,
+    phone:       vendor.userId?.phone || vendor.phone || "+91 00000 00000",
+    whatsapp:    vendor.userId?.phone || vendor.whatsapp || vendor.phone || "",
+    description: vendor.description || "No description provided by the vendor yet.",
+    services:    vendor.services    || [],
+    tags:        vendor.tags        || [],
+    workingHours:vendor.workingHours|| "Mon–Sun, 9:00 AM – 8:00 PM",
+    experience:  vendor.experience  || "New",
     verified:    vendor.verified    !== false,
-    emoji:       "⚡",
-    thumbBg:     "#EEF2FF",
+    instagram:   vendor.instagram   || "",
+    facebook:    vendor.facebook    || "",
+    emoji:       vendor.category?.toLowerCase().includes("food") ? "🍔" : 
+                 vendor.category?.toLowerCase().includes("electric") ? "⚡" : 
+                 vendor.category?.toLowerCase().includes("plumb") ? "🔧" : "🏪",
+    thumbBg:     vendor.category?.toLowerCase().includes("food") ? "#FFF3E0" : 
+                 vendor.category?.toLowerCase().includes("electric") ? "#EEF2FF" : "#F3F4F6",
     ...vendor,
   };
 
@@ -210,12 +216,16 @@ export default function VendorDetailPage() {
 
                 {activeTab === "services" && (
                   <div className="grid grid-cols-2 gap-2.5">
-                    {v.services?.map(s => (
-                      <div key={s} className="flex items-center gap-2.5 bg-gray-50 rounded-xl px-4 py-3">
-                        <CheckCircle size={15} className="text-emerald-500 flex-shrink-0" />
-                        <span className="text-[13.5px] text-gray-700">{s}</span>
-                      </div>
-                    ))}
+                    {v.services?.length > 0 ? (
+                      v.services.map(s => (
+                        <div key={s} className="flex items-center gap-2.5 bg-gray-50 rounded-xl px-4 py-3">
+                          <CheckCircle size={15} className="text-emerald-500 flex-shrink-0" />
+                          <span className="text-[13.5px] text-gray-700">{s}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-[13.5px] text-gray-500 col-span-2">No services listed.</p>
+                    )}
                   </div>
                 )}
 
@@ -304,21 +314,28 @@ export default function VendorDetailPage() {
                 className="flex items-center justify-center gap-2 w-full mt-3 border border-gray-200 text-gray-500 hover:text-gray-700 text-[13px] font-medium py-2.5 rounded-xl transition-colors">
                 <Share2 size={14} /> Share this vendor
               </button>
+
+              {/* Social Links */}
+              {(v.instagram || v.facebook) && (
+                <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-gray-100">
+                  {v.instagram && (
+                    <a href={v.instagram} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-700 bg-pink-50 p-2.5 rounded-xl transition-colors shadow-sm" title="Instagram">
+                      <Instagram size={20} />
+                    </a>
+                  )}
+                  {v.facebook && (
+                    <a href={v.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 bg-blue-50 p-2.5 rounded-xl transition-colors shadow-sm" title="Facebook">
+                      <Facebook size={20} />
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Nearby vendors suggestion */}
             <div className="bg-white border border-gray-200 rounded-2xl p-5">
               <h3 className="font-semibold text-gray-800 text-[14px] mb-3">Similar vendors nearby</h3>
-              {["Mishra Electricals", "Gaya Power Solutions", "Ram Electricals"].map(name => (
-                <div key={name} className="flex items-center gap-3 py-2.5 border-b border-gray-50 last:border-0 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors">
-                  <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center text-sm">⚡</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[13px] font-medium text-gray-800 truncate">{name}</div>
-                    <div className="text-[11.5px] text-gray-400">Gaya City</div>
-                  </div>
-                  <div className="text-[11.5px] text-amber-500">★ 4.7</div>
-                </div>
-              ))}
+              <p className="text-[12px] text-gray-500">More vendors in {v.category} will appear here soon.</p>
             </div>
           </div>
         </div>

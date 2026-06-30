@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db/mongodb'
-import Banner from '@/lib/db/models/Banner'
+import PopupAd from '@/lib/db/models/PopupAd'
 import { verifyAdminRequest } from '@/lib/utils/adminAuth'
 
 export async function PATCH(request, { params }) {
@@ -12,20 +12,18 @@ export async function PATCH(request, { params }) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
 
-    const { isActive, adminApproved } = await request.json()
+    const { isActive } = await request.json()
     
     const { id } = await params;
-    const banner = await Banner.findById(id)
-    if (!banner) {
-      return NextResponse.json({ success: false, message: 'Banner not found' }, { status: 404 })
+    const popup = await PopupAd.findById(id)
+    if (!popup) {
+      return NextResponse.json({ success: false, message: 'Popup not found' }, { status: 404 })
     }
 
-    if (isActive !== undefined) banner.isActive = isActive
-    if (adminApproved !== undefined) banner.adminApproved = adminApproved
+    if (isActive !== undefined) popup.isActive = isActive
+    await popup.save()
 
-    await banner.save()
-
-    return NextResponse.json({ success: true, banner })
+    return NextResponse.json({ success: true, popup })
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 })
   }
@@ -41,12 +39,12 @@ export async function DELETE(request, { params }) {
     }
 
     const { id } = await params;
-    const banner = await Banner.findByIdAndDelete(id)
-    if (!banner) {
-      return NextResponse.json({ success: false, message: 'Banner not found' }, { status: 404 })
+    const popup = await PopupAd.findByIdAndDelete(id)
+    if (!popup) {
+      return NextResponse.json({ success: false, message: 'Popup not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ success: true, message: 'Banner deleted' })
+    return NextResponse.json({ success: true, message: 'Popup deleted' })
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 })
   }

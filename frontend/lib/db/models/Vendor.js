@@ -13,6 +13,11 @@ const vendorSchema = new mongoose.Schema({
     type: { type: String, enum: ['Point'], default: 'Point' },
     coordinates: { type: [Number], default: [0, 0] }
   },
+  instagram: { type: String },
+  facebook: { type: String },
+  experience: { type: String },
+  workingHours: { type: String },
+  services: [{ type: String }],
   images: [{ type: String }],
   isPremium: { type: Boolean, default: false },
   isApproved: { type: Boolean, default: false },

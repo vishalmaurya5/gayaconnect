@@ -13,7 +13,8 @@ export async function PATCH(request, { params }) {
     }
 
     const updates = await request.json()
-    const offer = await Offer.findByIdAndUpdate(params.id, updates, { new: true })
+    const { id } = await params;
+    const offer = await Offer.findByIdAndUpdate(id, updates, { new: true })
     if (!offer) return NextResponse.json({ success: false, message: 'Offer not found' }, { status: 404 })
 
     await AuditLog.create({
@@ -38,14 +39,15 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
 
-    const offer = await Offer.findByIdAndDelete(params.id)
+    const { id } = await params;
+    const offer = await Offer.findByIdAndDelete(id)
     if (!offer) return NextResponse.json({ success: false, message: 'Offer not found' }, { status: 404 })
 
     await AuditLog.create({
       adminId: adminUser._id || 'admin',
       action: 'DELETE_OFFER',
       resource: 'Offer',
-      resourceId: params.id,
+      resourceId: id,
       details: { title: offer.title }
     })
 

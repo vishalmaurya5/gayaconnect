@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FiBriefcase, FiTag, FiMapPin, FiMessageCircle, FiPhone, FiInfo, FiX } from 'react-icons/fi';
-import ProtectedRoute from '@/components/common/ProtectedRoute';
 
 const ADMIN_PHONE = '+919117588242'; // From the contact page
 
@@ -43,8 +42,7 @@ export default function JobsAndSalesPage() {
   };
 
   return (
-    <ProtectedRoute>
-      <main className="min-h-screen bg-slate-50 pt-24 pb-16">
+    <main className="min-h-screen bg-slate-50 pt-24 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Header Section */}
@@ -284,6 +282,5 @@ export default function JobsAndSalesPage() {
       )}
 
       </main>
-    </ProtectedRoute>
   );
 }

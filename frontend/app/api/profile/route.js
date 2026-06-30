@@ -72,6 +72,13 @@ export async function PUT(request) {
         if (category) vendor.category = category
         if (subCategory) vendor.subCategory = subCategory
         if (businessAddress) vendor.address = businessAddress
+        if (parsed.data.instagram !== undefined) vendor.instagram = parsed.data.instagram
+        if (parsed.data.facebook !== undefined) vendor.facebook = parsed.data.facebook
+        if (parsed.data.experience !== undefined) vendor.experience = parsed.data.experience
+        if (parsed.data.workingHours !== undefined) vendor.workingHours = parsed.data.workingHours
+        if (parsed.data.services !== undefined) {
+          vendor.services = parsed.data.services.split(',').map(s => s.trim()).filter(Boolean)
+        }
         vendor.description = description || ''
         if (profileImage !== undefined) vendor.logo = user.profileImage || ''
         vendor.isApproved = true
@@ -84,6 +91,11 @@ export async function PUT(request) {
           subCategory: subCategory || user.subCategory || '',
           address: businessAddress || user.address || '',
           description: description || user.description || '',
+          instagram: parsed.data.instagram || '',
+          facebook: parsed.data.facebook || '',
+          experience: parsed.data.experience || '',
+          workingHours: parsed.data.workingHours || '',
+          services: parsed.data.services ? parsed.data.services.split(',').map(s => s.trim()).filter(Boolean) : [],
           logo: user.profileImage || '',
           isApproved: true
         })
