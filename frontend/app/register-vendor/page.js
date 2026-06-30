@@ -71,6 +71,7 @@ export default function RegisterVendorPage() {
 
     const res = await register({
       ...form,
+      address: form.businessAddress,
       category: finalCategory,
       subCategory: finalSubCategory,
       role: "vendor"

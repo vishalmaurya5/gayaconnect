@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db/mongodb';
 import Job from '@/lib/db/models/Job';
 import Vendor from '@/lib/db/models/Vendor';
 import { getAuthenticatedUser } from '@/lib/security/auth';
+import { validateImageDataUrl } from '@/lib/utils/imageUpload';
 
 export async function GET(request) {
   try {
@@ -52,7 +53,8 @@ export async function POST(request) {
       location: body.location,
       vendorId: vendorId,
       postedByAdmin: user.role === 'admin',
-      isActive: true
+      isActive: true,
+      image: body.image ? validateImageDataUrl(body.image, 'Sale image', 100 * 1024, '100 KB') : undefined
     });
     
     await job.save();

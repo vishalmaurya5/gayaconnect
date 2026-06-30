@@ -8,6 +8,10 @@ const paymentSchema = new mongoose.Schema({
   currency: { type: String, default: 'INR' },
   status: { type: String, enum: ['pending', 'success', 'failed'], default: 'pending' },
   purpose: { type: String, required: true },
+  type: { type: String },
+  plan: { type: String },
+  expiresAt: { type: Date },
+  meta: { type: mongoose.Schema.Types.Mixed },
   metadata: { type: mongoose.Schema.Types.Mixed },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }

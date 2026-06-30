@@ -41,6 +41,9 @@ export async function POST(request) {
       userData.gstNumber = gstNumber;
       userData.description = description;
       userData.verified = false;
+      
+      const regCode = 'GAYA-VND-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+      userData.regCode = regCode;
 
       // Check for vendor registration fee
       let chargeVendorRegistration = false;

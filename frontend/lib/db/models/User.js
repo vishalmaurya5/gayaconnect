@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
   subscriptionExpiry: { type: Date },
   subscriptionPlan: { type: String },
   // Vendor Fields
+  regCode: { type: String },
   businessName: { type: String },
   category: { type: String },
   subCategory: { type: String },

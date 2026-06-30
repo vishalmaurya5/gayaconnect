@@ -13,7 +13,16 @@ export default function ProfilePage() {
   const [user, setUser]       = useState(null);
   const [worker, setWorker]   = useState(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab]         = useState("profile");
+  
+  // Read initial tab from URL if present
+  const getInitialTab = () => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('tab') || 'profile';
+    }
+    return 'profile';
+  };
+  const [tab, setTab]         = useState(getInitialTab);
   const [editing, setEditing] = useState(false);
   const [form, setForm]       = useState({});
   const [saving, setSaving]   = useState(false);
@@ -589,16 +598,27 @@ export default function ProfilePage() {
                 
                 <div className="mt-4 flex items-center gap-3">
                   <label className="block text-[12px] font-semibold text-gray-500 uppercase tracking-wide">Available for Work</label>
-                  {editing ? (
-                     <div className={`w-10 h-6 rounded-full transition-colors cursor-pointer flex items-center px-0.5 ${form.workerAvailability ? "bg-emerald-500" : "bg-gray-300"}`}
-                          onClick={() => setForm(p => ({...p, workerAvailability: !p.workerAvailability}))}>
-                       <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${form.workerAvailability ? "translate-x-4" : "translate-x-0"}`} />
-                     </div>
-                  ) : (
-                    <span className={`text-[12px] font-bold px-2 py-1 rounded-md ${form.workerAvailability ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
-                      {form.workerAvailability ? "Yes, Available" : "Not Available"}
-                    </span>
-                  )}
+                  <div className={`w-10 h-6 rounded-full transition-colors cursor-pointer flex items-center px-0.5 ${form.workerAvailability ? "bg-emerald-500" : "bg-gray-300"}`}
+                       onClick={async () => {
+                         const newStatus = !form.workerAvailability;
+                         setForm(p => ({...p, workerAvailability: newStatus}));
+                         if (!editing) {
+                           try {
+                             await fetch("/api/profile", {
+                               method: "PUT",
+                               headers: { "Content-Type": "application/json" },
+                               body: JSON.stringify({ ...form, workerAvailability: newStatus }),
+                             });
+                           } catch (err) {
+                             setForm(p => ({...p, workerAvailability: !newStatus}));
+                           }
+                         }
+                       }}>
+                    <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${form.workerAvailability ? "translate-x-4" : "translate-x-0"}`} />
+                  </div>
+                  <span className={`text-[12px] font-bold px-2 py-1 rounded-md ${form.workerAvailability ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
+                    {form.workerAvailability ? "Yes, Available" : "Not Available"}
+                  </span>
                 </div>
               </div>
             )}

@@ -9,7 +9,7 @@ const FALLBACK_PRICES = {
   offer_7days:   3900,  // ₹39
   offer_30days:  19900, // ₹199
   offer_365days: 39900, // ₹399
-  banner:        99900, // ₹999
+  banner_post_monthly: 19900, // ₹199
 };
 
 export async function POST(request) {
@@ -43,7 +43,7 @@ export async function POST(request) {
     let baseAmount = FALLBACK_PRICES[planKey];
     if (planKey === 'user_monthly' && dynamicPricing.subscription) {
       baseAmount = dynamicPricing.subscription * 100;
-    } else if (planKey === 'banner' && dynamicPricing.banner) {
+    } else if (planKey === 'banner_post_monthly' && dynamicPricing.banner) {
       baseAmount = dynamicPricing.banner * 100;
     } else if (planKey === 'offer_7days' && dynamicPricing.offer7Days) {
       baseAmount = dynamicPricing.offer7Days * 100;
@@ -61,10 +61,13 @@ export async function POST(request) {
     // ── DUMMY MODE (dev / testing) ────────────────────────────────────────────
     if (process.env.DUMMY_RAZORPAY === "true" || process.env.NEXT_PUBLIC_USE_REAL_RAZORPAY === "false") {
       return NextResponse.json({
+        success:  true,
         isDummy:  true,
-        orderId:  `dummy_order_${Date.now()}`,
-        amount:   amountPaise,
-        currency: "INR",
+        order: {
+          id:  `dummy_order_${Date.now()}`,
+          amount:   amountPaise,
+          currency: "INR",
+        },
         plan,
         duration,
         offerData,
@@ -83,13 +86,13 @@ export async function POST(request) {
       offer_7days:   "GayaConnect — Offer post (7 days)",
       offer_30days:  "GayaConnect — Offer post (30 days)",
       offer_365days: "GayaConnect — Offer post (1 year)",
-      banner:        "GayaConnect — Banner advertisement",
+      banner_post_monthly: "GayaConnect — Weekly Banner advertisement",
     };
 
     const order = await razorpay.orders.create({
       amount:   amountPaise,
       currency: "INR",
-      receipt:  `gc_${planKey}_${user._id}_${Date.now()}`,
+      receipt:  `gc_${planKey}_${user._id}_${Date.now()}`.substring(0, 40),
       notes: {
         userId:   user._id.toString(),
         userEmail:user.email,
@@ -99,10 +102,14 @@ export async function POST(request) {
     });
 
     return NextResponse.json({
+      success:  true,
       isDummy:  false,
-      orderId:  order.id,
-      amount:   order.amount,
-      currency: order.currency,
+      keyId:    process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      order: {
+        id:       order.id,
+        amount:   order.amount,
+        currency: order.currency,
+      },
       plan,
       duration,
       description: planLabels[planKey] || "GayaConnect payment",

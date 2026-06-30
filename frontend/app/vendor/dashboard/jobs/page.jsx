@@ -15,7 +15,8 @@ export default function VendorJobsPage() {
     description: '',
     type: 'job',
     salaryOrPrice: '',
-    location: ''
+    location: '',
+    image: ''
   });
 
   useEffect(() => {
@@ -59,7 +60,7 @@ export default function VendorJobsPage() {
       const data = await res.json();
       if (data.success) {
         toast.success(form.type === 'job' ? 'Job posted successfully!' : 'Sale posted successfully!');
-        setForm({ title: '', description: '', type: 'job', salaryOrPrice: '', location: '' });
+        setForm({ title: '', description: '', type: 'job', salaryOrPrice: '', location: '', image: '' });
         fetchJobs();
       } else {
         toast.error(data.message || 'Failed to post');
@@ -69,6 +70,27 @@ export default function VendorJobsPage() {
     } finally {
       setPosting(false);
     }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
+      toast.error('Only JPG/JPEG formats are allowed');
+      return;
+    }
+
+    if (file.size > 100 * 1024) {
+      toast.error('Image must be less than 100KB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setForm({ ...form, image: event.target.result });
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleDelete = async (id) => {
@@ -147,6 +169,24 @@ export default function VendorJobsPage() {
                 <input type="text" value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="e.g. Gaya City" />
               </div>
 
+              {form.type === 'sale' && (
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Product Image (Optional)</label>
+                  <p className="text-xs text-slate-500 mb-2">Max size: 100KB. Formats: .jpg, .jpeg</p>
+                  <input 
+                    type="file" 
+                    accept="image/jpeg, image/jpg" 
+                    onChange={handleImageUpload} 
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+                  />
+                  {form.image && (
+                    <div className="mt-3">
+                      <img src={form.image} alt="Preview" className="h-32 object-cover rounded-lg border border-slate-200" />
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
                 <p className="text-xs text-blue-800 font-medium">
                   <strong>Note:</strong> To protect your privacy and ensure secure transactions, all interested parties will be directed to contact the Admin.
@@ -197,8 +237,12 @@ export default function VendorJobsPage() {
                         )}
                       </div>
                     </div>
-                    
                     <div className="flex sm:flex-col justify-end gap-2 shrink-0">
+                      {job.image && (
+                        <div className="mb-2">
+                          <img src={job.image} alt={job.title} className="h-16 w-16 object-cover rounded-lg border border-slate-200 shadow-sm" />
+                        </div>
+                      )}
                       <button onClick={() => handleDelete(job._id)} className="flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100">
                         <FiTrash2 /> Delete
                       </button>

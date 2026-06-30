@@ -18,8 +18,8 @@ export async function PATCH(request, { params }) {
     let updateData = {}
     if (hasAccess) {
       updateData.bannerPostPurchasedAt = new Date()
-      // Give 30 days access
-      updateData.bannerPostExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      // Give 7 days access
+      updateData.bannerPostExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     } else {
       updateData.bannerPostExpiresAt = null
     }

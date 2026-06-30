@@ -40,7 +40,7 @@ export default function BannerPricingPage() {
           'Content-Type': 'application/json',
           'x-use-dummy-razorpay': process.env.NEXT_PUBLIC_USE_REAL_RAZORPAY === 'true' ? 'false' : 'true',
         },
-        body: JSON.stringify({ provider: 'razorpay', planType: BANNER_POST_MONTHLY_PLAN }),
+        body: JSON.stringify({ provider: 'razorpay', plan: BANNER_POST_MONTHLY_PLAN }),
       })
       const orderData = await orderResponse.json()
       if (!orderData.success) throw new Error(orderData.message || 'Could not create payment order')
@@ -59,24 +59,26 @@ export default function BannerPricingPage() {
         amount: orderData.order.amount,
         currency: orderData.order.currency,
         name: 'Gaya Connect',
-        description: 'Monthly Banner Advertisement',
+        description: 'Weekly Banner Advertisement',
         order_id: orderData.order.id,
         handler: async (response) => {
           try {
             const verifyResponse = await fetch('/api/payments/verify', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ provider: 'razorpay', ...response }),
+              body: JSON.stringify({ provider: 'razorpay', plan: BANNER_POST_MONTHLY_PLAN, ...response }),
             })
             const verifyData = await verifyResponse.json()
             if (!verifyData.success) throw new Error(verifyData.message || 'Payment verification failed')
 
             toast.success('Payment successful! Redirecting to WhatsApp...')
             
-            // Redirect to WhatsApp
-            const supportWhatsapp = (process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || '917667328993').replace(/\D/g, '')
-            const message = `Hi, I have paid for banner advertisement.\nMy business: ${user.name}\nTransaction ID: ${verifyData.payment.transactionId || response.razorpay_payment_id}\nPlease activate my banner posting access.`
-            window.location.href = `https://wa.me/${supportWhatsapp}?text=${encodeURIComponent(message)}`
+            // Redirect to WhatsApp using the URL provided by the backend
+            if (verifyData.whatsappUrl) {
+              window.location.href = verifyData.whatsappUrl;
+            } else {
+              window.location.href = '/vendor/dashboard';
+            }
             
           } catch (error) {
             toast.error(error.message)
@@ -110,13 +112,13 @@ export default function BannerPricingPage() {
         <div className="bg-emerald-600 p-10 text-center">
           <FiImage className="mx-auto text-5xl text-emerald-100 mb-4" />
           <h1 className="text-3xl font-extrabold text-white">Homepage Banner Ad</h1>
-          <p className="mt-2 text-emerald-100 font-medium">Reach thousands of customers directly on the homepage.</p>
+          <p className="mt-2 text-emerald-100 font-medium">Reach thousands of customers directly on the homepage for a week.</p>
         </div>
         
         <div className="p-8">
           <div className="flex justify-center items-end gap-1 mb-8">
-            <span className="text-5xl font-extrabold text-slate-900">₹499</span>
-            <span className="text-lg text-slate-500 font-medium mb-1">/ month</span>
+            <span className="text-5xl font-extrabold text-slate-900">₹199</span>
+            <span className="text-lg text-slate-500 font-medium mb-1">/ week</span>
           </div>
 
           <ul className="space-y-4 mb-8">
@@ -143,7 +145,7 @@ export default function BannerPricingPage() {
             className="w-full py-4 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center gap-2 hover:bg-emerald-700 transition disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-emerald-600/30"
           >
             <FiCreditCard className="text-xl" />
-            {paying ? 'Opening Payment Gateway...' : 'Pay ₹499 & Request Access'}
+            {paying ? 'Opening Payment Gateway...' : 'Pay ₹199 & Request Access'}
           </button>
         </div>
       </div>

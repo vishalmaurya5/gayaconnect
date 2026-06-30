@@ -56,7 +56,7 @@ export default function UploadBannerPage() {
       // Since we don't know if /api/upload exists, we will simulate or use the existing one if available.
       // Usually, images can be sent as base64 and handled by the backend.
       
-      const response = await fetch('/api/banners', {
+      const response = await fetch('/api/vendor/banners', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

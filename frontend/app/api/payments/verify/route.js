@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/db/mongodb";
 import User             from "@/lib/db/models/User";
 import Offer            from "@/lib/db/models/Offer";
 import Payment          from "@/lib/db/models/Payment";
+import Vendor           from "@/lib/db/models/Vendor";
 import { getAuthenticatedUser as getLoggedInUser } from "@/lib/security/auth";
 
 const PLAN_DURATIONS = {
@@ -80,7 +81,7 @@ async function handlePlanActivation({ plan, duration, offerData, user, paymentId
       amount:    11,
       currency:  "INR",
       paymentId,
-      orderId:   orderId || null,
+      orderId:   orderId || paymentId,
       status:    "success",
       expiresAt: expiryDate,
     });
@@ -100,27 +101,42 @@ async function handlePlanActivation({ plan, duration, offerData, user, paymentId
     const expiresAt  = new Date(now);
     expiresAt.setDate(expiresAt.getDate() + days);
 
-    // Check max 5 active offers
+    let vendor = await Vendor.findOne({ userId: user._id });
+    if (!vendor && user.businessName && user.category) {
+      vendor = await Vendor.create({
+        userId: user._id,
+        name: user.businessName,
+        category: user.category,
+        subCategory: user.subCategory,
+        description: user.description,
+        address: user.address,
+        isApproved: false,
+      });
+    }
+    if (!vendor) {
+      return NextResponse.json({ error: "Complete your vendor profile before posting an offer." }, { status: 400 });
+    }
+
+    // Include old records that used the user id as vendorId.
     const activeCount = await Offer.countDocuments({
-      vendorId:  user._id,
+      vendorId:  { $in: [vendor._id, user._id] },
       isActive:  true,
-      expiresAt: { $gt: now },
+      $or: [{ validUntil: { $gt: now } }, { expiresAt: { $gt: now } }],
     });
     if (activeCount >= 5) {
       return NextResponse.json({ error: "You have reached the maximum of 5 active offers." }, { status: 400 });
     }
 
     const offer = await Offer.create({
-      vendorId:    user._id,
-      vendorName:  user.businessName || user.name,
+      vendorId:    vendor._id,
       title:       offerData.title,
       description: offerData.description,
-      discount:    offerData.discount,
+      discountText:offerData.discount,
       category:    offerData.category,
       terms:       offerData.terms || "",
       planType:    duration,
       isActive:    true,
-      expiresAt,
+      validUntil:  expiresAt,
       paymentId,
     });
 
@@ -132,10 +148,11 @@ async function handlePlanActivation({ plan, duration, offerData, user, paymentId
       amount:    price,
       currency:  "INR",
       paymentId,
-      orderId:   orderId || null,
+      orderId:   orderId || paymentId,
       status:    "success",
       expiresAt,
-      meta:      { offerId: offer._id },
+      meta:      { offerId: offer._id, duration },
+      metadata:  { offerId: offer._id, duration },
     });
 
     return NextResponse.json({
@@ -147,29 +164,29 @@ async function handlePlanActivation({ plan, duration, offerData, user, paymentId
   }
 
   // ── 3. BANNER ACCESS FEE ─────────────────────────────────────────────────
-  if (plan === "banner") {
+  if (plan === "banner" || plan === "banner_post_monthly") {
     // Record payment; admin activates the slot separately
     await Payment.create({
       userId:    user._id,
       purpose:   "banner_fee",
       type:      "banner_fee",
-      plan:      "banner",
-      amount:    999,
+      plan:      "banner_post_monthly",
+      amount:    199,
       currency:  "INR",
       paymentId,
-      orderId:   orderId || null,
+      orderId:   orderId || paymentId,
       status:    "success",
       meta:      { bannerPaid: true },
     });
 
     // Flag vendor as having paid for banner — admin toggle activates posting
     await User.findByIdAndUpdate(user._id, { bannerFeePaid: true, bannerPaymentId: paymentId });
+    await Vendor.findOneAndUpdate({ userId: user._id }, { bannerStatus: 'pending' });
 
     return NextResponse.json({
       success:  true,
-      message:  "Banner fee received! Please send your payment proof on WhatsApp. We will activate your banner slot within 2 hours.",
+      message:  "Banner fee received! Your request is pending admin approval.",
       redirect: `/vendor/dashboard?tab=banner&paid=1`,
-      whatsappUrl: `https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP}?text=Hi, I have paid the banner advertisement fee. My business: ${user.businessName || user.name}, Payment ID: ${paymentId}. Please activate my banner slot.`,
     });
   }
 

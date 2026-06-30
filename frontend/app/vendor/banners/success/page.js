@@ -8,7 +8,7 @@ export default function BannerSuccessPage() {
 
   useEffect(() => {
     if (user) {
-      const supportWhatsapp = (process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || '917667328993').replace(/\D/g, '')
+      const supportWhatsapp = (process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || '919117588242').replace(/\D/g, '')
       const message = `Hi, I have paid for banner advertisement.\nMy business: ${user.name}\nTransaction ID: DUMMY_PAYMENT\nPlease activate my banner posting access.`
       
       const timer = setTimeout(() => {

@@ -784,6 +784,11 @@ function UsersView({ users, onDelete, onRefresh }) {
 function VendorsView({ vendors, onUpdate, onDelete, onRefresh }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', businessName: '', category: '', address: '' })
   const [loading, setLoading] = useState(false)
+  const [searchCode, setSearchCode] = useState('')
+
+  const filteredVendors = vendors.filter(v => 
+    !searchCode || (v.regCode && v.regCode.toLowerCase().includes(searchCode.toLowerCase()))
+  )
 
   const handleCreate = async (e) => {
     e.preventDefault()
@@ -826,17 +831,32 @@ function VendorsView({ vendors, onUpdate, onDelete, onRefresh }) {
       </Panel>
       <Panel 
         title="Vendors"
-        action={<ExportButton filename="vendors_export" headers={['Business Name', 'Category', 'SubCategory', 'Approved', 'Premium', 'Joined']} data={vendors.map(v => [v.name, v.category, v.subCategory || '', v.isApproved ? 'Yes' : 'No', v.isPremium ? 'Yes' : 'No', new Date(v.createdAt).toLocaleDateString()])} />}
+        action={<ExportButton filename="vendors_export" headers={['RegCode', 'Business Name', 'Category', 'SubCategory', 'Approved', 'Premium', 'Joined']} data={filteredVendors.map(v => [v.regCode || '-', v.name, v.category, v.subCategory || '', v.isApproved ? 'Yes' : 'No', v.isPremium ? 'Yes' : 'No', new Date(v.createdAt).toLocaleDateString()])} />}
       >
+        <div className="mb-4">
+          <input 
+            type="text" 
+            placeholder="Search by Registration Code (e.g. GAYA-VND-XXXX)" 
+            value={searchCode} 
+            onChange={(e) => setSearchCode(e.target.value)} 
+            className="input-field max-w-sm"
+          />
+        </div>
         <Table
-          headers={['Business', 'Category', 'Subcategory', 'Approved', 'Premium', 'Actions']}
-          rows={vendors.map((vendor) => [
+          headers={['RegCode', 'Business', 'Category', 'Subcategory', 'Approved', 'Banner Status', 'Actions']}
+          rows={filteredVendors.map((vendor) => [
+            <span key={'reg'+vendor._id} className="font-mono text-sm bg-slate-100 px-2 py-1 rounded">{vendor.regCode || 'N/A'}</span>,
             vendor.name,
             vendor.category,
             vendor.subCategory || '-',
             vendor.isApproved ? 'Yes' : 'No',
-            vendor.isPremium ? 'Yes' : 'No',
+            <span key={'banner'+vendor._id} className={`text-xs font-bold px-2 py-1 rounded ${vendor.bannerStatus === 'approved' ? 'bg-green-100 text-green-700' : vendor.bannerStatus === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>
+              {vendor.bannerStatus?.toUpperCase() || 'NONE'}
+            </span>,
             <div key={vendor._id} className="flex gap-2">
+              {vendor.bannerStatus === 'pending' && (
+                <IconButton icon={FiImage} label="Approve Banner Request" onClick={() => onUpdate('vendors', vendor._id, { bannerStatus: 'approved' })} />
+              )}
               <IconButton icon={FiCheckCircle} label={vendor.isApproved ? 'Unapprove' : 'Approve'} onClick={() => onUpdate('vendors', vendor._id, { isApproved: !vendor.isApproved })} />
               <IconButton icon={FiEye} label={vendor.isPremium ? 'Normal' : 'Premium'} onClick={() => onUpdate('vendors', vendor._id, { isPremium: !vendor.isPremium })} />
               <IconButton icon={FiTrash2} label="Delete" onClick={() => onDelete(vendor._id)} danger />

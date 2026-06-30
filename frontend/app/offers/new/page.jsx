@@ -69,7 +69,14 @@ export default function NewOfferPage() {
 
       if (orderData.isDummy) {
         // Dev mode: dummy payment
-        router.push(`/dummy-razorpay?orderId=${orderData.orderId}&amount=${selectedPlan.price}&redirect=/offers`);
+        const returnTo = "/vendor/offers";
+        sessionStorage.setItem(`dummy-payment:${orderData.orderId}`, JSON.stringify({
+          plan: "offer_post",
+          duration: plan,
+          offerData: form,
+          returnTo,
+        }));
+        router.push(`/dummy-razorpay?orderId=${encodeURIComponent(orderData.orderId)}&amount=${orderData.amount}&returnTo=${encodeURIComponent(returnTo)}`);
         return;
       }
 

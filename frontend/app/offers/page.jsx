@@ -18,14 +18,78 @@ const DEMO_OFFERS = [
   { _id:"o8", avatar: "https://randomuser.me/api/portraits/men/99.jpg", discount:"BUY 1",unit:"GET 1",stripColor:"#0369A1",bgColor:"#EFF6FF", textColor:"#0369A1", vendor:"Kapda World",           area:"Gaya City",  category:"Shopping",       title:"Buy 1 get 1 free on all kurtas",            desc:"Buy any kurta and get one free. Valid on selected stock only. While stocks last.", businessDesc: "Gaya's biggest showroom for men's and women's ethnic wear.", phone: "7766554433", address: "Tower Chowk, Gaya", expiresAt:"2025-06-28", daysLeft:11, hot:true  },
 ];
 
+const OFFER_COLORS = [
+  { stripColor: "#4338CA", bgColor: "#EEF2FF", textColor: "#4338CA" },
+  { stripColor: "#0D9488", bgColor: "#F0FDFA", textColor: "#0D9488" },
+  { stripColor: "#D97706", bgColor: "#FFFBEB", textColor: "#D97706" },
+  { stripColor: "#BE123C", bgColor: "#FFF1F2", textColor: "#BE123C" },
+];
+
+function refreshedDemoOffer(offer) {
+  const expiresAt = new Date(Date.now() + offer.daysLeft * 86400000).toISOString();
+  return { ...offer, expiresAt };
+}
+
+function toOfferCard(offer, index) {
+  const vendor = offer.vendorId || {};
+  const rawExpiry = offer.validUntil || offer.expiresAt;
+  const expiryDate = rawExpiry ? new Date(rawExpiry) : null;
+  const hasValidExpiry = expiryDate && !Number.isNaN(expiryDate.getTime());
+  const expiresAt = hasValidExpiry ? expiryDate.toISOString() : null;
+  const daysLeft = hasValidExpiry
+    ? Math.max(0, Math.ceil((expiryDate.getTime() - Date.now()) / 86400000))
+    : null;
+
+  return {
+    ...offer,
+    ...OFFER_COLORS[index % OFFER_COLORS.length],
+    avatar: vendor.images?.[0],
+    discount: offer.discountText || offer.discount || "Special deal",
+    unit: "OFFER",
+    vendor: vendor.name || offer.vendorName || "Local vendor",
+    area: vendor.address?.split(",")[0] || "Gaya",
+    category: offer.category || vendor.category || "Other",
+    desc: offer.description || "Contact the vendor to learn more about this offer.",
+    businessDesc: vendor.description || `${vendor.name || "This vendor"} serves customers across Gaya district.`,
+    phone: vendor.userId?.phone || "",
+    address: vendor.address || "Gaya district",
+    expiresAt,
+    daysLeft,
+    hot: Boolean(offer.hot),
+  };
+}
+
+function validityLabel(offer) {
+  if (!offer.expiresAt || offer.daysLeft === null) return "Validity unavailable";
+  if (offer.daysLeft <= 0) return "Expired";
+  if (offer.daysLeft > 30) {
+    return `Valid until ${new Date(offer.expiresAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+  }
+  return `${offer.daysLeft} days left`;
+}
+
 export default function OffersPage() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [category, setCategory]         = useState("All");
   const [search, setSearch]             = useState("");
-  const [offers, setOffers]             = useState(DEMO_OFFERS);
+  const [offers, setOffers]             = useState(() => DEMO_OFFERS.map(refreshedDemoOffer));
+  const [loading, setLoading]           = useState(true);
+  const [loadError, setLoadError]       = useState("");
   const [selectedOffer, setSelectedOffer] = useState(null);
 
   useEffect(() => {
+    fetch("/api/offers")
+      .then(async r => {
+        const data = await r.json();
+        if (!r.ok || !data.success) throw new Error(data.message || "Could not load offers");
+        setOffers([
+          ...DEMO_OFFERS.map(refreshedDemoOffer),
+          ...(data.offers || []).map(toOfferCard),
+        ]);
+      })
+      .catch(error => setLoadError(error.message))
+      .finally(() => setLoading(false));
+
     fetch("/api/auth/me")
       .then(r => r.ok ? r.json() : null)
       .then(d => {
@@ -38,7 +102,7 @@ export default function OffersPage() {
   }, []);
 
   // Filter offers
-  const filtered = DEMO_OFFERS.filter(o => {
+  const filtered = offers.filter(o => {
     const matchCat    = category === "All" || o.category === category;
     const matchSearch = !search || o.title.toLowerCase().includes(search.toLowerCase()) || o.vendor.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
@@ -111,6 +175,14 @@ export default function OffersPage() {
           ))}
         </div>
 
+        {loading && (
+          <div className="py-20 text-center text-sm font-medium text-slate-500">Loading offers...</div>
+        )}
+
+        {!loading && loadError && (
+          <div className="mb-8 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{loadError}</div>
+        )}
+
         {/* Hot deals */}
         {hotOffers.length > 0 && (
           <div className="mb-10">
@@ -139,7 +211,7 @@ export default function OffersPage() {
           </div>
         )}
 
-        {filtered.length === 0 && (
+        {!loading && !loadError && filtered.length === 0 && (
           <div className="text-center py-20">
             <div className="text-5xl mb-4">🏷️</div>
             <h3 className="font-['Sora',sans-serif] text-xl font-bold text-gray-800 mb-2">No offers found</h3>
@@ -216,8 +288,8 @@ function OfferCard({ offer: o, isSubscribed, hot, onClick }) {
           <div className="flex items-center justify-between mt-auto pt-2">
             <div className="flex items-center gap-1.5 text-[12.5px] font-medium text-slate-400">
               <Clock size={14} className="text-slate-300" />
-              <span className={o.daysLeft <= 7 ? "text-red-500" : ""}>
-                {o.daysLeft <= 0 ? "Expired" : o.daysLeft > 30 ? new Date(o.expiresAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : `${o.daysLeft} days left`}
+              <span className={o.daysLeft !== null && o.daysLeft <= 7 ? "text-red-500" : ""}>
+                {validityLabel(o)}
               </span>
             </div>
             {isSubscribed ? (

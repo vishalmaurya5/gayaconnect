@@ -28,23 +28,31 @@ function DummyRazorpayContent() {
     setLoading(true)
 
     try {
+      let paymentPayload = {}
+      try {
+        paymentPayload = JSON.parse(sessionStorage.getItem(`dummy-payment:${orderId}`) || '{}')
+      } catch {}
+
       const response = await fetch('/api/payments/verify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          ...paymentPayload,
           razorpay_order_id: orderId,
           razorpay_payment_id: `dummy_payment_${Date.now()}`,
           razorpay_signature: 'dummy_signature',
+          isDummy: true,
         }),
       })
       const data = await response.json()
-      if (!data.success) throw new Error(data.message || 'Dummy payment failed')
+      if (!data.success) throw new Error(data.message || data.error || 'Dummy payment failed')
 
-      updateUser(data.user)
+      if (data.user) updateUser(data.user)
+      sessionStorage.removeItem(`dummy-payment:${orderId}`)
       toast.success('Dummy payment successful')
-      router.push(returnTo)
+      router.push(data.redirect || paymentPayload.returnTo || returnTo)
     } catch (error) {
       toast.error(error.message)
     } finally {

@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 
 const vendorSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  regCode: { type: String },
+  bannerStatus: { type: String, enum: ['none', 'pending', 'approved'], default: 'none' },
   name: { type: String, required: true },
   category: { type: String, required: true },
   subCategory: { type: String },

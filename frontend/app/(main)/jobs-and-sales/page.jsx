@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FiBriefcase, FiTag, FiMapPin, FiMessageCircle, FiPhone, FiInfo } from 'react-icons/fi';
+import { FiBriefcase, FiTag, FiMapPin, FiMessageCircle, FiPhone, FiInfo, FiX } from 'react-icons/fi';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 
 const ADMIN_PHONE = '+919117588242'; // From the contact page
@@ -11,6 +11,7 @@ export default function JobsAndSalesPage() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [selectedJob, setSelectedJob] = useState(null);
 
   useEffect(() => {
     fetchJobs();
@@ -84,10 +85,19 @@ export default function JobsAndSalesPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : jobs.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start">
             {jobs.map(job => (
-              <div key={job._id} className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 overflow-hidden flex flex-col h-full group">
-                <div className={`h-2 w-full ${job.type === 'job' ? 'bg-blue-500' : 'bg-green-500'}`}></div>
+              <div 
+                key={job._id} 
+                onClick={() => setSelectedJob(job)}
+                className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 overflow-hidden flex flex-col group cursor-pointer"
+              >
+                <div className={`h-2 w-full shrink-0 ${job.type === 'job' ? 'bg-blue-500' : 'bg-green-500'}`}></div>
+                {job.image && (
+                  <div className="w-full h-48 bg-slate-100 overflow-hidden border-b border-slate-100">
+                    <img src={job.image} alt={job.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  </div>
+                )}
                 <div className="p-6 flex-1 flex flex-col">
                   
                   {/* Badge & Date */}
@@ -107,7 +117,7 @@ export default function JobsAndSalesPage() {
                     {job.title}
                   </h3>
                   
-                  <p className="text-slate-600 text-sm mb-6 line-clamp-3 flex-1">
+                  <p className="text-slate-600 text-sm mb-6 line-clamp-3">
                     {job.description}
                   </p>
                   
@@ -118,7 +128,9 @@ export default function JobsAndSalesPage() {
                           {job.type === 'job' ? <FiBriefcase /> : <FiTag />}
                         </div>
                         {job.type === 'job' ? 'Salary: ' : 'Price: '} 
-                        <span className="text-slate-900">{job.salaryOrPrice}</span>
+                        <span className="text-slate-900">
+                          {/^[₹$£€]/.test(job.salaryOrPrice) || /rs/i.test(job.salaryOrPrice) ? job.salaryOrPrice : `₹ ${job.salaryOrPrice}`}
+                        </span>
                       </div>
                     )}
                     
@@ -132,7 +144,7 @@ export default function JobsAndSalesPage() {
                     )}
                   </div>
                   
-                  <div className="mt-auto">
+                  <div className="mt-4">
                     <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 flex items-start gap-2">
                       <FiInfo className="text-amber-600 mt-0.5 shrink-0" />
                       <p className="text-xs font-medium text-amber-800">
@@ -178,6 +190,99 @@ export default function JobsAndSalesPage() {
           </div>
         )}
       </div>
+
+      {/* Details Modal */}
+      {selectedJob && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedJob(null)}>
+          <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative" onClick={e => e.stopPropagation()}>
+            <button 
+              onClick={() => setSelectedJob(null)}
+              className="absolute top-4 right-4 p-2 bg-slate-100 text-slate-500 rounded-full hover:bg-slate-200 hover:text-slate-900 transition-colors z-10"
+            >
+              <FiX className="text-xl" />
+            </button>
+
+            <div className={`h-2 w-full ${selectedJob.type === 'job' ? 'bg-blue-500' : 'bg-green-500'}`}></div>
+            
+            {selectedJob.image && (
+              <div className="w-full bg-slate-100 border-b border-slate-100">
+                <img src={selectedJob.image} alt={selectedJob.title} className="w-full max-h-96 object-contain" />
+              </div>
+            )}
+
+            <div className="p-8">
+              <div className="flex items-center gap-3 mb-4">
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+                  selectedJob.type === 'job' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
+                }`}>
+                  {selectedJob.type === 'job' ? <FiBriefcase /> : <FiTag />}
+                  {selectedJob.type}
+                </span>
+                <span className="text-xs font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">
+                  {new Date(selectedJob.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-6">
+                {selectedJob.title}
+              </h2>
+
+              <div className="space-y-3 mb-8 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                {selectedJob.salaryOrPrice && (
+                  <div className="flex items-center gap-3 text-base font-bold text-slate-800">
+                    <div className={`p-2 rounded-lg ${selectedJob.type === 'job' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}`}>
+                      {selectedJob.type === 'job' ? <FiBriefcase /> : <FiTag />}
+                    </div>
+                    {selectedJob.type === 'job' ? 'Salary: ' : 'Price: '} 
+                    <span className="text-slate-900 text-lg">
+                      {/^[₹$£€]/.test(selectedJob.salaryOrPrice) || /rs/i.test(selectedJob.salaryOrPrice) ? selectedJob.salaryOrPrice : `₹ ${selectedJob.salaryOrPrice}`}
+                    </span>
+                  </div>
+                )}
+                
+                {selectedJob.location && (
+                  <div className="flex items-center gap-3 text-base font-semibold text-slate-600">
+                    <div className="p-2 rounded-lg bg-slate-200 text-slate-500">
+                      <FiMapPin />
+                    </div>
+                    {selectedJob.location}
+                  </div>
+                )}
+              </div>
+
+              <div className="mb-8">
+                <h4 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-3">Description</h4>
+                <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
+                  {selectedJob.description}
+                </p>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+                <FiInfo className="text-amber-600 mt-1 shrink-0 text-lg" />
+                <p className="text-sm font-medium text-amber-800 leading-relaxed">
+                  To ensure security, please contact the Gaya Connect admin to proceed with this listing.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); handleContact('whatsapp', selectedJob.title); }}
+                  className="w-full flex items-center justify-center gap-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold py-3.5 px-4 rounded-xl transition-colors shadow-sm"
+                >
+                  <FiMessageCircle className="text-lg" /> WhatsApp Admin
+                </button>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); handleContact('call', selectedJob.title); }}
+                  className="w-full flex items-center justify-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-3.5 px-4 rounded-xl transition-colors shadow-sm"
+                >
+                  <FiPhone className="text-lg" /> Call Admin
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       </main>
     </ProtectedRoute>
   );

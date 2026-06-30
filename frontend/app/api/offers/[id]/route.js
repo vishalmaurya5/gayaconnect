@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db/mongodb'
 import Offer from '@/lib/db/models/Offer'
+import Vendor from '@/lib/db/models/Vendor'
 import { getAuthenticatedUser } from '@/lib/security/auth'
 import { offerSchema, validationError } from '@/lib/security/validation'
 
@@ -14,7 +15,9 @@ async function getOwnedOffer(request, id) {
     return { error: NextResponse.json({ success: false, message: 'Only vendors can manage offers' }, { status: 403 }) }
   }
 
-  const offer = await Offer.findOne({ _id: id, vendorId: user._id })
+  const vendor = await Vendor.findOne({ userId: user._id }).select('_id')
+  const ownerIds = [user._id, vendor?._id].filter(Boolean)
+  const offer = await Offer.findOne({ _id: id, vendorId: { $in: ownerIds } })
   if (!offer) {
     return { error: NextResponse.json({ success: false, message: 'Offer not found' }, { status: 404 }) }
   }
@@ -25,8 +28,9 @@ async function getOwnedOffer(request, id) {
 export async function PUT(request, { params }) {
   try {
     await connectDB()
+    const { id } = await params;
 
-    const { offer, error } = await getOwnedOffer(request, params.id)
+    const { offer, error } = await getOwnedOffer(request, id)
     if (error) return error
 
     const parsed = offerSchema.safeParse(await request.json())
@@ -54,8 +58,9 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     await connectDB()
+    const { id } = await params;
 
-    const { offer, error } = await getOwnedOffer(request, params.id)
+    const { offer, error } = await getOwnedOffer(request, id)
     if (error) return error
 
     await offer.deleteOne()

@@ -42,11 +42,11 @@ export const PAYMENT_PLANS = {
     description: 'Yearly vendor offer posting access',
   },
   [BANNER_POST_MONTHLY_PLAN]: {
-    amount: 399,
-    days: 30,
+    amount: 199,
+    days: 7,
     roles: ['vendor'],
     receiptPrefix: 'banner_post',
-    description: 'Monthly homepage banner promotion',
+    description: 'Weekly homepage banner promotion',
   },
   [SUBSCRIPTION_MONTHLY_PLAN]: {
     amount: 11,

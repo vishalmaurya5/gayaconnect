@@ -86,6 +86,9 @@ export async function POST(request) {
       userData.businessName = businessName;
       userData.category = category;
       userData.address = address;
+      
+      const regCode = 'GAYA-VND-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+      userData.regCode = regCode;
     }
 
     const newUser = await User.create(userData);
@@ -93,6 +96,7 @@ export async function POST(request) {
     if (type === "vendor") {
       await Vendor.create({
         userId: newUser._id,
+        regCode: userData.regCode,
         name: businessName,
         category: category,
         address: address,

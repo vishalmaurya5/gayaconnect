@@ -64,8 +64,11 @@ export default function VendorOffersPage() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {offers.map((offer) => {
-              const isExpired = new Date(offer.expiresAt) < new Date();
-              const daysRemaining = calculateDaysRemaining(offer.expiresAt);
+              const expiresAt = offer.validUntil || offer.expiresAt;
+              const expiryDate = expiresAt ? new Date(expiresAt) : null;
+              const hasValidExpiry = expiryDate && !Number.isNaN(expiryDate.getTime());
+              const isExpired = hasValidExpiry ? expiryDate < new Date() : false;
+              const daysRemaining = hasValidExpiry ? calculateDaysRemaining(expiresAt) : null;
               const isActive = offer.isActive && !isExpired;
 
               return (
@@ -78,14 +81,14 @@ export default function VendorOffersPage() {
                       </span>
                       {isActive && (
                         <span className="flex items-center gap-1 text-sm font-semibold text-sky-600">
-                          <FiClock /> {daysRemaining} days left
+                          <FiClock /> {daysRemaining === null ? 'No expiry' : `${daysRemaining} days left`}
                         </span>
                       )}
                     </div>
                     <h3 className="text-xl font-extrabold text-slate-900 line-clamp-2">{offer.title}</h3>
                     <p className="mt-2 text-sm text-slate-600 line-clamp-3">{offer.description}</p>
                     <div className="mt-4 inline-block rounded-lg bg-sky-50 px-3 py-1.5 text-sm font-bold text-sky-700 border border-sky-100">
-                      Discount: {offer.discount}
+                      Discount: {offer.discountText || offer.discount || 'Special deal'}
                     </div>
                   </div>
                 </div>

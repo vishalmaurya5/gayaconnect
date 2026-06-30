@@ -56,6 +56,7 @@ export async function PUT(request) {
 
     user.name = name
     user.address = address || ''
+    if (businessName) user.businessName = businessName
 
     if (profileImage !== undefined) {
       user.profileImage = validateImageDataUrl(profileImage) || ''
@@ -73,7 +74,19 @@ export async function PUT(request) {
         if (businessAddress) vendor.address = businessAddress
         vendor.description = description || ''
         if (profileImage !== undefined) vendor.logo = user.profileImage || ''
+        vendor.isApproved = true
         await vendor.save()
+      } else {
+        vendor = await Vendor.create({
+          userId: user._id,
+          name: businessName || user.businessName || user.name,
+          category: category || user.category || 'Other',
+          subCategory: subCategory || user.subCategory || '',
+          address: businessAddress || user.address || '',
+          description: description || user.description || '',
+          logo: user.profileImage || '',
+          isApproved: true
+        })
       }
     }
 
