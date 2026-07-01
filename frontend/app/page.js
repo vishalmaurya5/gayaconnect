@@ -14,6 +14,7 @@ import Testimonials from "@/components/ui/Testimonials";
 import VendorCTA from "@/components/ui/VendorCTA";
 import PopupAd from "@/components/ui/PopupAd";
 import AboutGaya from "@/components/ui/AboutGaya";
+import FeaturesSection from "@/components/ui/FeaturesSection";
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomePage() {
@@ -74,6 +75,9 @@ export default function HomePage() {
 
       {/* About Gaya Section */}
       <AboutGaya />
+
+      {/* Features Section */}
+      <FeaturesSection />
 
       {/* Categories Section */}
       <section className="bg-transparent py-20 relative">

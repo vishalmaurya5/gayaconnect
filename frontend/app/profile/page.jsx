@@ -271,14 +271,14 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        <div className="flex gap-6">
+        <div className="flex flex-col md:flex-row gap-6">
           {/* Sidebar tabs */}
-          <div className="w-48 flex-shrink-0 space-y-1">
+          <div className="w-full md:w-48 flex-shrink-0 flex md:flex-col overflow-x-auto md:overflow-visible gap-2 md:gap-0 pb-2 md:pb-0 space-y-0 md:space-y-1 scrollbar-hide">
             {TABS.map(t => {
               const Icon = t.icon;
               return (
                 <button key={t.id} onClick={() => setTab(t.id)}
-                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-[13.5px] font-medium transition-all ${
+                  className={`w-auto md:w-full flex-shrink-0 flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-[13.5px] font-medium transition-all whitespace-nowrap ${
                     tab === t.id
                       ? "bg-indigo-50 text-indigo-700"
                       : "text-gray-500 hover:text-gray-800 hover:bg-white"

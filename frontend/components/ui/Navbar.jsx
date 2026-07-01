@@ -1,15 +1,24 @@
 'use client'
 
 import Link from "next/link"
-import { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useAuth } from '@/contexts/AuthContext'
 import { usePathname } from 'next/navigation'
 import { UserIcon } from '@heroicons/react/24/outline'
 
 export default function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const { user, logout, openSubscriptionModal } = useAuth()
   const pathname = usePathname()
+
+  useEffect(() => {
+    const handleScroll = () => {
+        setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   if (pathname?.startsWith('/admin')) return null;
 
@@ -25,55 +34,55 @@ export default function Navbar() {
       </div>
 
       {/* Main Navbar */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-5 md:px-10 h-16 flex items-center justify-between gap-4">
+      <nav className={`sticky top-0 w-full flex items-center justify-between px-4 lg:px-8 xl:px-12 transition-all duration-500 z-50 ${isScrolled ? "bg-white/90 shadow-md text-gray-700 backdrop-blur-lg py-3" : "bg-indigo-600 py-4 md:py-5"}`}>
+        
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-            <svg width="18" height="20" viewBox="0 0 20 22" fill="none">
+          <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors duration-300 ${isScrolled ? 'bg-indigo-600' : 'bg-white/10'}`}>
+            <svg width="20" height="22" viewBox="0 0 20 22" fill="none">
               <ellipse cx="10" cy="8" rx="7" ry="7" fill="white" opacity="0.9" />
               <polygon points="10,22 5,14 15,14" fill="white" opacity="0.7" />
-              <circle cx="10" cy="8" r="3" fill="#4338CA" />
-              <line x1="10" y1="8" x2="6" y2="5.5" stroke="#4338CA" strokeWidth="1.2" />
-              <line x1="10" y1="8" x2="14" y2="5.5" stroke="#4338CA" strokeWidth="1.2" />
-              <line x1="10" y1="8" x2="10" y2="11.5" stroke="#4338CA" strokeWidth="1.2" />
-              <circle cx="6" cy="5.5" r="1.5" fill="#4338CA" />
-              <circle cx="14" cy="5.5" r="1.5" fill="#4338CA" />
-              <circle cx="10" cy="11.5" r="1.5" fill="#4338CA" />
+              <circle cx="10" cy="8" r="3" fill={isScrolled ? "#4338CA" : "#4F46E5"} />
+              <line x1="10" y1="8" x2="6" y2="5.5" stroke={isScrolled ? "#4338CA" : "#4F46E5"} strokeWidth="1.2" />
+              <line x1="10" y1="8" x2="14" y2="5.5" stroke={isScrolled ? "#4338CA" : "#4F46E5"} strokeWidth="1.2" />
+              <line x1="10" y1="8" x2="10" y2="11.5" stroke={isScrolled ? "#4338CA" : "#4F46E5"} strokeWidth="1.2" />
+              <circle cx="6" cy="5.5" r="1.5" fill={isScrolled ? "#4338CA" : "#4F46E5"} />
+              <circle cx="14" cy="5.5" r="1.5" fill={isScrolled ? "#4338CA" : "#4F46E5"} />
+              <circle cx="10" cy="11.5" r="1.5" fill={isScrolled ? "#4338CA" : "#4F46E5"} />
             </svg>
           </div>
           <div>
-            <div className="font-sora font-bold text-lg leading-tight">
-              <span className="text-indigo-600">Gaya</span>
-              <span className="text-teal-600">Connect</span>
+            <div className={`font-sora font-extrabold text-[19px] leading-tight transition-colors duration-300 ${isScrolled ? 'text-indigo-600' : 'text-white'}`}>
+              Gaya<span className={isScrolled ? 'text-teal-600' : 'text-teal-300'}>Connect</span>
             </div>
-            <div className="text-[10px] text-gray-400 uppercase tracking-wide">
+            <div className={`text-[10px] uppercase tracking-wider font-semibold ${isScrolled ? 'text-slate-400' : 'text-indigo-200'}`}>
               Gaya District · Bihar
             </div>
           </div>
         </Link>
 
-        {/* Desktop nav links */}
-        <div className="hidden md:flex items-center gap-1">
-          <NavLink href="/" active>Home</NavLink>
-          <NavLink href="/vendors">Vendors</NavLink>
-          <NavLink href="/offers">Offers <span className="ml-1 bg-teal-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">New</span></NavLink>
-          <NavLink href="/services">Services</NavLink>
-          <NavLink href="/labour">Local Workforce</NavLink>
-          <NavLink href="/vehicles">Rent Vehicles <span className="ml-1 bg-teal-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">New</span></NavLink>
-          <NavLink href="/jobs-and-sales">Jobs & Sales <span className="ml-1 bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">New</span></NavLink>
-          <NavLink href="/about">About</NavLink>
+        {/* Desktop Nav */}
+        <div className="hidden xl:flex items-center gap-3 lg:gap-6">
+          <NavLink href="/" isScrolled={isScrolled}>Home</NavLink>
+          <NavLink href="/vendors" isScrolled={isScrolled}>Vendors</NavLink>
+          <NavLink href="/offers" isScrolled={isScrolled}>Offers <span className={`ml-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${isScrolled ? 'bg-teal-600 text-white' : 'bg-white text-teal-600'}`}>New</span></NavLink>
+          <NavLink href="/services" isScrolled={isScrolled}>Services</NavLink>
+          <NavLink href="/labour" isScrolled={isScrolled}>Local Workforce</NavLink>
+          <NavLink href="/vehicles" isScrolled={isScrolled}>Rent Vehicles <span className={`ml-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${isScrolled ? 'bg-teal-600 text-white' : 'bg-white text-teal-600'}`}>New</span></NavLink>
+          <NavLink href="/jobs-and-sales" isScrolled={isScrolled}>Jobs & Sales</NavLink>
+          <NavLink href="/about" isScrolled={isScrolled}>About</NavLink>
         </div>
 
-        {/* Desktop actions */}
-        <div className="hidden md:flex items-center gap-2">
+        {/* Desktop Right */}
+        <div className="hidden xl:flex items-center gap-4">
           {user ? (
             <div className="flex items-center gap-4">
               <Link
                 href={user.role === 'admin' ? '/admin' : user.role === 'vendor' ? '/vendor/dashboard' : '/profile'}
-                className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                className={`flex items-center gap-2 text-sm font-medium transition-colors ${isScrolled ? 'text-gray-700 hover:text-indigo-600' : 'text-white hover:text-white/80'}`}
               >
-                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center border border-indigo-200">
-                  <span className="text-sm font-bold text-indigo-700">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${isScrolled ? 'bg-indigo-100 border-indigo-200' : 'bg-white/20 border-white/30'}`}>
+                  <span className={`text-sm font-bold ${isScrolled ? 'text-indigo-700' : 'text-white'}`}>
                     {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                   </span>
                 </div>
@@ -81,7 +90,7 @@ export default function Navbar() {
               </Link>
               <button
                 onClick={logout}
-                className="text-sm font-medium text-red-600 border border-red-200 rounded-lg px-4 py-1.5 hover:bg-red-50 transition"
+                className={`text-sm font-bold border rounded-full px-5 py-2 transition-all duration-300 ${isScrolled ? 'border-red-200 text-red-600 hover:bg-red-50' : 'border-white/30 text-white hover:bg-white/10 hover:border-white/50'}`}
               >
                 Logout
               </button>
@@ -90,106 +99,110 @@ export default function Navbar() {
             <>
               <Link 
                 href="/login" 
-                className="text-sm font-medium text-gray-600 border border-gray-300 rounded-lg px-4 py-1.5 hover:border-indigo-600 hover:text-indigo-600 transition inline-block"
+                className={`text-sm font-bold border rounded-full px-6 py-2.5 transition-all duration-300 ${isScrolled ? 'border-gray-300 text-gray-700 hover:border-indigo-600 hover:text-indigo-600' : 'border-white/30 text-white hover:border-white'}`}
               >
                 Login
               </Link>
               <button 
                 onClick={openSubscriptionModal}
-                className="bg-indigo-600 text-white text-sm font-semibold rounded-lg px-5 py-1.5 flex items-center gap-1.5 hover:bg-indigo-700 transition"
+                className={`text-sm font-bold rounded-full px-6 py-2.5 flex items-center gap-1.5 transition-all duration-300 ${isScrolled ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md' : 'bg-white text-indigo-700 hover:bg-indigo-50 shadow-md'}`}
               >
                 Subscribe
-                <span className="bg-white/20 rounded px-1.5 py-0.5 text-xs">₹11/mo</span>
+                <span className={`${isScrolled ? 'bg-white/20' : 'bg-indigo-600/10 text-indigo-800'} rounded px-1.5 py-0.5 text-xs`}>₹11/mo</span>
               </button>
             </>
           )}
         </div>
 
-        {/* Mobile menu button */}
-        <button
-          className="md:hidden text-gray-700"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {mobileMenuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
-      </nav>
-
-      {/* Mobile menu panel */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200 p-4 space-y-2">
-          <MobileNavLink href="/" onClick={() => setMobileMenuOpen(false)}>Home</MobileNavLink>
-          <MobileNavLink href="/vendors" onClick={() => setMobileMenuOpen(false)}>Vendors</MobileNavLink>
-          <MobileNavLink href="/offers" onClick={() => setMobileMenuOpen(false)}>Offers</MobileNavLink>
-          <MobileNavLink href="/services" onClick={() => setMobileMenuOpen(false)}>Services</MobileNavLink>
-          <MobileNavLink href="/labour" onClick={() => setMobileMenuOpen(false)}>Local Workforce</MobileNavLink>
-          <MobileNavLink href="/vehicles" onClick={() => setMobileMenuOpen(false)}>Rent Vehicles</MobileNavLink>
-          <MobileNavLink href="/jobs-and-sales" onClick={() => setMobileMenuOpen(false)}>Jobs & Sales</MobileNavLink>
-          <MobileNavLink href="/about" onClick={() => setMobileMenuOpen(false)}>About</MobileNavLink>
-          <div className="pt-3 flex flex-col gap-2 border-t border-gray-100 mt-2">
-            {user ? (
-              <>
-                <Link
-                  href={user.role === 'admin' ? '/admin' : user.role === 'vendor' ? '/vendor/dashboard' : '/profile'}
-                  className="w-full text-center text-sm font-medium text-gray-700 border border-gray-300 rounded-lg py-2 flex items-center justify-center gap-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <UserIcon className="h-4 w-4" />
-                  Profile ({user.name})
-                </Link>
-                <button
-                  onClick={() => {
-                    logout()
-                    setMobileMenuOpen(false)
-                  }}
-                  className="w-full text-center text-sm font-medium text-red-600 border border-red-200 rounded-lg py-2 hover:bg-red-50"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link 
-                  href="/login" 
-                  className="block w-full text-center text-sm font-medium text-gray-600 border border-gray-300 rounded-lg py-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Login
-                </Link>
-                <button 
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    openSubscriptionModal();
-                  }}
-                  className="block w-full text-center bg-indigo-600 text-white font-semibold rounded-lg py-2"
-                >
-                  Subscribe ₹11/mo
-                </button>
-              </>
-            )}
-          </div>
+        {/* Mobile Menu Button */}
+        <div className="flex items-center gap-3 xl:hidden">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 -mr-2">
+            <svg className={`h-6 w-6 cursor-pointer transition-colors ${isScrolled ? "text-gray-800" : "text-white"}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="4" y1="12" x2="20" y2="12" />
+                <line x1="4" y1="18" x2="20" y2="18" />
+            </svg>
+          </button>
         </div>
-      )}
+
+        {/* Mobile Menu */}
+        <div className={`fixed top-0 left-0 w-full h-screen bg-white text-base flex flex-col xl:hidden items-center justify-center gap-6 font-medium text-gray-800 transition-all duration-500 z-50 ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
+            <button className="absolute top-6 right-6 p-2" onClick={() => setIsMenuOpen(false)}>
+                <svg className="h-7 w-7 text-gray-800" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+
+            <MobileNavLink href="/" onClick={() => setIsMenuOpen(false)}>Home</MobileNavLink>
+            <MobileNavLink href="/vendors" onClick={() => setIsMenuOpen(false)}>Vendors</MobileNavLink>
+            <MobileNavLink href="/offers" onClick={() => setIsMenuOpen(false)}>Offers</MobileNavLink>
+            <MobileNavLink href="/services" onClick={() => setIsMenuOpen(false)}>Services</MobileNavLink>
+            <MobileNavLink href="/labour" onClick={() => setIsMenuOpen(false)}>Local Workforce</MobileNavLink>
+            <MobileNavLink href="/vehicles" onClick={() => setIsMenuOpen(false)}>Rent Vehicles</MobileNavLink>
+            <MobileNavLink href="/jobs-and-sales" onClick={() => setIsMenuOpen(false)}>Jobs & Sales</MobileNavLink>
+            <MobileNavLink href="/about" onClick={() => setIsMenuOpen(false)}>About</MobileNavLink>
+
+            <div className="flex flex-col gap-4 mt-4 w-full max-w-[200px]">
+              {user ? (
+                <>
+                  <Link
+                    href={user.role === 'admin' ? '/admin' : user.role === 'vendor' ? '/vendor/dashboard' : '/profile'}
+                    className="w-full text-center text-[15px] font-bold text-indigo-700 border border-indigo-200 bg-indigo-50 rounded-full py-3 flex items-center justify-center gap-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <UserIcon className="h-5 w-5" />
+                    Profile ({user.name})
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout()
+                      setIsMenuOpen(false)
+                    }}
+                    className="w-full text-center text-[15px] font-bold text-red-600 border border-red-200 rounded-full py-3 hover:bg-red-50"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    href="/login" 
+                    className="block w-full text-center text-[15px] font-bold text-gray-700 border border-gray-300 rounded-full py-3"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <button 
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      openSubscriptionModal();
+                    }}
+                    className="block w-full text-center bg-indigo-600 text-white font-bold rounded-full py-3 shadow-md"
+                  >
+                    Subscribe ₹11/mo
+                  </button>
+                </>
+              )}
+            </div>
+        </div>
+      </nav>
     </>
   )
 }
 
-function NavLink({ href, children, active = false }) {
+function NavLink({ href, children, isScrolled }) {
   return (
     <Link
       href={href}
-      className={`text-sm font-medium px-3 py-1.5 rounded-md transition ${
-        active
-          ? "text-indigo-600 bg-indigo-50"
-          : "text-gray-600 hover:text-indigo-600 hover:bg-indigo-50"
+      className={`group flex flex-col gap-0.5 text-[14px] font-medium transition-colors ${
+        isScrolled ? "text-gray-700 hover:text-indigo-600" : "text-white/90 hover:text-white"
       }`}
     >
-      {children}
+      <div className="flex items-center">
+          {children}
+      </div>
+      <div className={`${isScrolled ? "bg-indigo-600" : "bg-white"} h-[2px] w-0 group-hover:w-full transition-all duration-300 rounded-full`} />
     </Link>
   )
 }
@@ -199,7 +212,7 @@ function MobileNavLink({ href, onClick, children }) {
     <Link
       href={href}
       onClick={onClick}
-      className="block py-2 text-gray-700 hover:text-indigo-600"
+      className="block py-2 text-[18px] font-bold text-gray-800 hover:text-indigo-600 transition-colors"
     >
       {children}
     </Link>
