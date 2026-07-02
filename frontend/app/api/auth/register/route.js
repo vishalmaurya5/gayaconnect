@@ -4,6 +4,7 @@ import Razorpay from "razorpay";
 import { connectDB } from "@/lib/db/mongodb";
 import User from "@/lib/db/models/User";
 import Setting from "@/lib/db/models/Setting";
+import Vendor from "@/lib/db/models/Vendor";
 
 export async function POST(request) {
   try {
@@ -25,12 +26,16 @@ export async function POST(request) {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const prefix = role === "vendor" ? 'GAYA-VND-' : 'GAYA-USR-';
+    const regCode = prefix + Math.random().toString(36).substr(2, 6).toUpperCase();
+
     const userData = {
       name,
       email,
       phone,
       password: hashedPassword,
       role: role === "vendor" ? "vendor" : "user",
+      regCode,
     };
 
     if (role === "vendor") {
@@ -41,9 +46,6 @@ export async function POST(request) {
       userData.gstNumber = gstNumber;
       userData.description = description;
       userData.verified = false;
-      
-      const regCode = 'GAYA-VND-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-      userData.regCode = regCode;
 
       // Check for vendor registration fee
       let chargeVendorRegistration = false;
@@ -84,6 +86,19 @@ export async function POST(request) {
     }
 
     const newUser = await User.create(userData);
+
+    if (role === "vendor") {
+      await Vendor.create({
+        userId: newUser._id,
+        regCode: regCode,
+        name: businessName || name,
+        category: category || 'Other',
+        subCategory: subCategory || '',
+        address: address || '',
+        description: description || '',
+        isApproved: true
+      });
+    }
 
     // Auto-link any existing labour profile with this phone number
     try {

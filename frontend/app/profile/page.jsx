@@ -8,6 +8,7 @@ import {
   CheckCircle, Clock, AlertTriangle, Phone, Mail,
   MapPin, Shield, Bell, Trash2, Save, Truck, Car, Briefcase
 } from "lucide-react";
+import SubscriptionModal from '@/components/subscription/SubscriptionModal';
 
 export default function ProfilePage() {
   const [user, setUser]       = useState(null);
@@ -33,6 +34,7 @@ export default function ProfilePage() {
   const [vehForm, setVehForm] = useState({ vehicleName: '', vehicleModel: '', vehicleNumber: '', dlNumber: '', isCommercial: true, liabilityAccepted: false });
   const [postingVeh, setPostingVeh] = useState(false);
   const [callHistory, setCallHistory] = useState([]);
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/profile")
@@ -52,10 +54,10 @@ export default function ProfilePage() {
             phone:       d.user.phone || "",
             address:     d.user.address || "",
             // vendor fields
-            businessName: d.vendor?.name || "",
-            category:    d.vendor?.category || "",
-            description: d.vendor?.description || "",
-            businessAddress: d.vendor?.address || "",
+            businessName: d.vendor?.name || d.user.businessName || "",
+            category:    d.vendor?.category || d.user.category || "",
+            description: d.vendor?.description || d.user.description || "",
+            businessAddress: d.vendor?.address || d.user.address || "",
             // worker fields
             workerName: d.worker?.name || "",
             workerRole: d.worker?.role || "",
@@ -416,10 +418,10 @@ export default function ProfilePage() {
                     ))}
                   </div>
 
-                  <Link href="/pricing"
+                  <button onClick={() => setIsSubModalOpen(true)}
                     className="block w-full mt-6 bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[14.5px] py-3.5 rounded-xl transition-colors no-underline text-center">
-                    {subActive ? "Renew subscription" : "Subscribe for ₹11/month"}
-                  </Link>
+                    {subActive ? "Renew subscription" : "Subscribe to Premium"}
+                  </button>
                 </div>
 
                 {/* Payment history */}
@@ -697,6 +699,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+      <SubscriptionModal isOpen={isSubModalOpen} onClose={() => setIsSubModalOpen(false)} />
     </main>
   );
 }

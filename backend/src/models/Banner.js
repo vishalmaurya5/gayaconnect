@@ -6,6 +6,7 @@ const bannerSchema = new mongoose.Schema({
   imageUrl: { type: String, required: true },
   link: { type: String },
   position: { type: String, enum: ['home_top', 'home_middle', 'category_top', 'community'], default: 'home_top' },
+  targetCategory: { type: String },
   isActive: { type: Boolean, default: false },
   adminApproved: { type: Boolean, default: false },
   startDate: { type: Date, default: Date.now },

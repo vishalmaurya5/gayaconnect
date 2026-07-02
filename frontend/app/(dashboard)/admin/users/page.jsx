@@ -1,15 +1,66 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FiEdit2, FiTrash2, FiClock, FiCheckCircle, FiXCircle } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiClock, FiCheckCircle, FiXCircle, FiX } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { useForm } from 'react-hook-form';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
   const [creating, setCreating] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [updating, setUpdating] = useState(false);
+
+  const { register: regCreate, handleSubmit: handleCreateSubmit, reset: resetCreate } = useForm({
+    defaultValues: { name: '', email: '', phone: '', password: '' }
+  });
+
+  const { register: regEdit, handleSubmit: handleEditSubmit, reset: resetEdit } = useForm();
+
+  const openEditModal = (user) => {
+    setEditingUser(user);
+    resetEdit({
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      password: '',
+      role: user.role || 'user',
+      subscriptionActive: !!user.subscriptionActive ? 'true' : 'false',
+      subscriptionExpiry: user.subscriptionExpiry ? new Date(user.subscriptionExpiry).toISOString().split('T')[0] : ''
+    });
+  };
+
+  const closeEditModal = () => {
+    setEditingUser(null);
+  };
+
+  const onUpdate = async (data) => {
+    setUpdating(true);
+    try {
+      const payload = { ...data, subscriptionActive: data.subscriptionActive === 'true' };
+      if (!payload.password) delete payload.password; // Don't send blank password
+
+      const res = await fetch(`/api/admin/users/${editingUser._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const resData = await res.json();
+      if (resData.success) {
+        toast.success('User updated successfully');
+        setUsers(users.map(u => u._id === editingUser._id ? resData.user : u));
+        closeEditModal();
+      } else {
+        toast.error(resData.message || 'Failed to update user');
+      }
+    } catch (error) {
+      toast.error('Error updating user');
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   useEffect(() => {
     fetchUsers(filter);
@@ -84,19 +135,18 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
+  const onCreate = async (data) => {
     setCreating(true);
     try {
       const res = await fetch('/api/admin/create-account', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'user', ...form })
+        body: JSON.stringify({ type: 'user', ...data })
       });
       const json = await res.json();
       if (json.success) {
         toast.success('User created successfully');
-        setForm({ name: '', email: '', phone: '', password: '' });
+        resetCreate();
         fetchUsers(filter);
       } else {
         toast.error(json.message || 'Failed to create user');
@@ -118,22 +168,22 @@ export default function AdminUsersPage() {
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <h2 className="text-lg font-bold text-slate-900 mb-4">Add New User</h2>
-        <form onSubmit={handleCreate} className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+        <form onSubmit={handleCreateSubmit(onCreate)} className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Name</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+            <input {...regCreate('name', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
-            <input required type="email" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
+            <input {...regCreate('email', { required: true })} type="email" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
+            <input {...regCreate('phone', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Temporary Password</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.password} onChange={e => setForm({...form, password: e.target.value})} />
+            <input {...regCreate('password', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
           </div>
           <button type="submit" disabled={creating} className="sm:col-span-2 md:col-span-4 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition-colors disabled:opacity-50">
             {creating ? 'Creating...' : 'Create User'}
@@ -196,6 +246,9 @@ export default function AdminUsersPage() {
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 space-x-2 whitespace-nowrap">
+                        <button onClick={() => openEditModal(user)} className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition inline-flex items-center gap-1" title="Edit Full Profile">
+                          <FiEdit2 /> Edit
+                        </button>
                         {!user.isDeleted ? (
                           <button onClick={() => extendSub(user._id)} className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 font-semibold hover:bg-blue-100 transition inline-flex items-center gap-1" title="Extend 30 Days">
                             <FiClock /> +30 Days
@@ -217,6 +270,68 @@ export default function AdminUsersPage() {
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <h3 className="text-xl font-bold text-slate-900">Edit User Profile</h3>
+              <button onClick={closeEditModal} className="text-slate-400 hover:text-slate-600"><FiX className="text-xl" /></button>
+            </div>
+            <div className="p-6 overflow-y-auto">
+              <form id="editUserForm" onSubmit={handleEditSubmit(onUpdate)} className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Name</label>
+                  <input {...regEdit('name', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
+                  <input {...regEdit('email', { required: true })} type="email" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
+                  <input {...regEdit('phone', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">New Password <span className="text-slate-400 font-normal">(Leave blank to keep)</span></label>
+                  <input {...regEdit('password')} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Role</label>
+                  <select {...regEdit('role', { required: true })} className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                    <option value="user">User</option>
+                    <option value="vendor">Vendor</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <div className="sm:col-span-2 border-t border-slate-100 pt-5 mt-2">
+                  <h4 className="text-sm font-bold text-slate-800 mb-4 uppercase tracking-wider">Subscription Details</h4>
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Subscription Active</label>
+                      <select {...regEdit('subscriptionActive')} className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Expiry Date</label>
+                      <input {...regEdit('subscriptionExpiry')} type="date" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+              <button onClick={closeEditModal} className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 transition">Cancel</button>
+              <button type="submit" form="editUserForm" disabled={updating} className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition disabled:opacity-50">
+                {updating ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
           </div>
         </div>
       )}

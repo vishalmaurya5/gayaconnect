@@ -7,9 +7,10 @@ import toast from 'react-hot-toast';
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState([]);
   const [vendors, setVendors] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('pending'); // pending, active, expired
-  const [form, setForm] = useState({ title: '', link: '', position: 'home_top', endDate: '' });
+  const [form, setForm] = useState({ title: '', link: '', position: 'home_top', targetCategory: '', endDate: '' });
   const [imageUrl, setImageUrl] = useState('');
   const [creating, setCreating] = useState(false);
 
@@ -19,15 +20,18 @@ export default function AdminBannersPage() {
 
   const fetchBannersAndVendors = async () => {
     try {
-      const [bannersRes, vendorsRes] = await Promise.all([
+      const [bannersRes, vendorsRes, categoriesRes] = await Promise.all([
         fetch('/api/admin/banners'),
-        fetch('/api/admin/vendors')
+        fetch('/api/admin/vendors'),
+        fetch('/api/categories')
       ]);
       const bannersData = await bannersRes.json();
       const vendorsData = await vendorsRes.json();
+      const categoriesData = await categoriesRes.json();
       
       if (bannersData.success) setBanners(bannersData.banners || []);
       if (vendorsData.success) setVendors(vendorsData.vendors || []);
+      if (categoriesData.success) setCategories(categoriesData.categories || []);
     } catch (error) {
       toast.error('Failed to load data');
     } finally {
@@ -90,17 +94,26 @@ export default function AdminBannersPage() {
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!imageUrl) return toast.error("Please upload a banner image");
+    
+    // Prevent submitting without a category if category_top is selected
+    if (form.position === 'category_top' && !form.targetCategory) {
+      return toast.error("Please select a target category");
+    }
+
     setCreating(true);
     try {
+      const payload = { ...form, imageUrl };
+      if (form.position !== 'category_top') payload.targetCategory = '';
+      
       const res = await fetch('/api/admin/banners', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, imageUrl })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (data.success) {
         toast.success("Banner published successfully");
-        setForm({ title: '', link: '', position: 'home_top', endDate: '' });
+        setForm({ title: '', link: '', position: 'home_top', targetCategory: '', endDate: '' });
         setImageUrl('');
         fetchBannersAndVendors();
         setFilter('active');
@@ -200,7 +213,20 @@ export default function AdminBannersPage() {
               <option value="community">Community</option>
             </select>
           </div>
-          <div>
+          
+          {form.position === 'category_top' && (
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Target Category</label>
+              <select className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500" value={form.targetCategory} onChange={e => setForm({...form, targetCategory: e.target.value})} required>
+                <option value="">Select Category</option>
+                {categories.map((c) => (
+                  <option key={c._id} value={c.name}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <div className={form.position === 'category_top' ? "md:col-span-4" : ""}>
             <label className="block text-sm font-semibold text-slate-700 mb-1">End Date (Optional)</label>
             <input type="date" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} />
           </div>

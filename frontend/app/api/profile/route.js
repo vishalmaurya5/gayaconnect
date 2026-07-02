@@ -86,6 +86,7 @@ export async function PUT(request) {
       } else {
         vendor = await Vendor.create({
           userId: user._id,
+          regCode: user.regCode || '',
           name: businessName || user.businessName || user.name,
           category: category || user.category || 'Other',
           subCategory: subCategory || user.subCategory || '',

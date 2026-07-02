@@ -14,9 +14,9 @@ export async function POST(request) {
   try {
     await connectDB();
     const data = await request.json();
-    const { ownerId, ownerName, phone, vehicleName, vehicleModel, vehicleNumber, dlNumber, isCommercial, liabilityAccepted } = data;
+    const { ownerId, ownerName, phone, categoryId, vehicleName, vehicleModel, vehicleNumber, dlNumber, isCommercial, liabilityAccepted } = data;
 
-    if (!ownerId || !vehicleName || !vehicleNumber || !dlNumber || !liabilityAccepted) {
+    if (!ownerId || !categoryId || !vehicleName || !vehicleNumber || !dlNumber || !liabilityAccepted) {
       return NextResponse.json({ error: 'Missing required fields or liability not accepted' }, { status: 400 });
     }
 
@@ -51,6 +51,7 @@ export async function POST(request) {
       ownerName: ownerName || user.name,
       phone: phone || user.phone,
       vehicleName,
+      categoryId,
       vehicleModel,
       vehicleNumber,
       dlNumber,

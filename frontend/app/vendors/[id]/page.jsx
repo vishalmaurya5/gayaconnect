@@ -116,11 +116,11 @@ export default function VendorDetailPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-3 gap-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
           {/* ── LEFT: Main info ── */}
-          <div className="col-span-2 space-y-5">
+          <div className="md:col-span-2 space-y-5">
 
             {/* Hero card */}
             <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
@@ -140,7 +140,7 @@ export default function VendorDetailPage() {
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div>
                     <h1 className="font-['Sora',sans-serif] text-[22px] font-bold text-gray-900 mb-1">{v.name}</h1>
-                    <div className="flex items-center gap-3 text-[13.5px] text-gray-500">
+                    <div className="flex items-center gap-3 text-[13.5px] text-gray-500 flex-wrap">
                       <span className="bg-indigo-50 text-indigo-700 font-semibold px-2.5 py-0.5 rounded-full text-[12px]">{v.category}</span>
                       <span className="flex items-center gap-1"><MapPin size={13} />{v.area}</span>
                     </div>
@@ -152,7 +152,7 @@ export default function VendorDetailPage() {
                 </div>
 
                 {/* Rating row */}
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex flex-wrap items-center gap-4 mb-4">
                   <div className="flex items-center gap-1.5">
                     <div className="flex">
                       {[1,2,3,4,5].map(s => (
@@ -198,7 +198,7 @@ export default function VendorDetailPage() {
                 {activeTab === "about" && (
                   <div>
                     <p className="text-[14px] text-gray-600 leading-relaxed mb-5">{v.description}</p>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {[
                         { label:"Experience", value: v.experience },
                         { label:"Area served", value: v.area },
@@ -215,7 +215,7 @@ export default function VendorDetailPage() {
                 )}
 
                 {activeTab === "services" && (
-                  <div className="grid grid-cols-2 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {v.services?.length > 0 ? (
                       v.services.map(s => (
                         <div key={s} className="flex items-center gap-2.5 bg-gray-50 rounded-xl px-4 py-3">

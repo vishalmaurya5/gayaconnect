@@ -11,10 +11,12 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
     const vendorId = searchParams.get('vendorId');
+    const location = searchParams.get('location');
 
     const query = { isActive: true };
     if (type && type !== 'all') query.type = type;
     if (vendorId) query.vendorId = vendorId;
+    if (location) query.location = { $regex: location, $options: 'i' };
 
     const jobs = await Job.find(query)
       .populate('vendorId', 'name category address location')

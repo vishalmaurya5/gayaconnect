@@ -1,14 +1,64 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FiCheckCircle, FiXCircle, FiTrash2, FiEdit2 } from 'react-icons/fi';
+import { FiCheckCircle, FiXCircle, FiTrash2, FiEdit2, FiX } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { useForm } from 'react-hook-form';
 
 export default function AdminVendorsPage() {
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', businessName: '', category: '', address: '' });
   const [creating, setCreating] = useState(false);
+  const [editingVendor, setEditingVendor] = useState(null);
+  const [updating, setUpdating] = useState(false);
+
+  const { register: regCreate, handleSubmit: handleCreateSubmit, reset: resetCreate } = useForm({
+    defaultValues: { name: '', email: '', phone: '', password: '', businessName: '', category: '', address: '' }
+  });
+
+  const { register: regEdit, handleSubmit: handleEditSubmit, reset: resetEdit } = useForm();
+
+  const openEditModal = (vendor) => {
+    setEditingVendor(vendor);
+    resetEdit({
+      name: vendor.name || '',
+      email: vendor.email || '',
+      phone: vendor.phone || '',
+      businessName: vendor.businessName || '',
+      category: vendor.category || '',
+      address: vendor.address || '',
+      description: vendor.description || '',
+      location: vendor.location || '',
+      whatsapp: vendor.whatsapp || ''
+    });
+  };
+
+  const closeEditModal = () => {
+    setEditingVendor(null);
+  };
+
+  const onUpdate = async (data) => {
+    setUpdating(true);
+    try {
+      const res = await fetch(`/api/admin/vendors/${editingVendor._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const resData = await res.json();
+      if (resData.success) {
+        toast.success('Vendor updated successfully');
+        setVendors(vendors.map(v => v._id === editingVendor._id ? resData.vendor : v));
+        closeEditModal();
+      } else {
+        toast.error(resData.message || 'Failed to update vendor');
+      }
+    } catch (error) {
+      toast.error('Error updating vendor');
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   useEffect(() => {
     fetchVendors();
@@ -63,19 +113,18 @@ export default function AdminVendorsPage() {
     }
   };
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
+  const onCreate = async (data) => {
     setCreating(true);
     try {
       const res = await fetch('/api/admin/create-account', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'vendor', ...form })
+        body: JSON.stringify({ type: 'vendor', ...data })
       });
       const json = await res.json();
       if (json.success) {
         toast.success('Vendor created successfully');
-        setForm({ name: '', email: '', phone: '', password: '', businessName: '', category: '', address: '' });
+        resetCreate();
         fetchVendors();
       } else {
         toast.error(json.message || 'Failed to create vendor');
@@ -95,34 +144,34 @@ export default function AdminVendorsPage() {
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <h2 className="text-lg font-bold text-slate-900 mb-4">Add New Vendor</h2>
-        <form onSubmit={handleCreate} className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+        <form onSubmit={handleCreateSubmit(onCreate)} className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Owner Name</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+            <input {...regCreate('name', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
-            <input required type="email" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
+            <input {...regCreate('email', { required: true })} type="email" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
+            <input {...regCreate('phone', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Temporary Password</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.password} onChange={e => setForm({...form, password: e.target.value})} />
+            <input {...regCreate('password', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Business Name</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.businessName} onChange={e => setForm({...form, businessName: e.target.value})} />
+            <input {...regCreate('businessName', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Category</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.category} onChange={e => setForm({...form, category: e.target.value})} />
+            <input {...regCreate('category', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
           </div>
           <div className="sm:col-span-2">
             <label className="block text-sm font-semibold text-slate-700 mb-1">Business Address</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
+            <input {...regCreate('address', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
           </div>
           <button type="submit" disabled={creating} className="sm:col-span-2 md:col-span-4 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition-colors disabled:opacity-50">
             {creating ? 'Creating...' : 'Create Vendor'}
@@ -176,6 +225,9 @@ export default function AdminVendorsPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 space-x-2 whitespace-nowrap">
+                      <button onClick={() => openEditModal(vendor)} className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition inline-flex items-center gap-1" title="Edit Full Profile">
+                        <FiEdit2 /> Edit
+                      </button>
                       <button 
                         onClick={() => toggleApproval(vendor._id, vendor.isApproved)} 
                         className={`px-3 py-1.5 rounded-lg font-semibold text-white transition ${vendor.isApproved ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'}`}
@@ -193,6 +245,64 @@ export default function AdminVendorsPage() {
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editingVendor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <h3 className="text-xl font-bold text-slate-900">Edit Vendor Profile</h3>
+              <button onClick={closeEditModal} className="text-slate-400 hover:text-slate-600"><FiX className="text-xl" /></button>
+            </div>
+            <div className="p-6 overflow-y-auto">
+              <form id="editVendorForm" onSubmit={handleEditSubmit(onUpdate)} className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Owner Name</label>
+                  <input {...regEdit('name', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Business Name</label>
+                  <input {...regEdit('businessName', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
+                  <input {...regEdit('email', { required: true })} type="email" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
+                  <input {...regEdit('phone', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">WhatsApp</label>
+                  <input {...regEdit('whatsapp')} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Category</label>
+                  <input {...regEdit('category', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Location</label>
+                  <input {...regEdit('location')} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Full Address</label>
+                  <input {...regEdit('address')} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Description</label>
+                  <textarea {...regEdit('description')} rows="3" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"></textarea>
+                </div>
+              </form>
+            </div>
+            <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+              <button onClick={closeEditModal} className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 transition">Cancel</button>
+              <button type="submit" form="editVendorForm" disabled={updating} className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition disabled:opacity-50">
+                {updating ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
           </div>
         </div>
       )}

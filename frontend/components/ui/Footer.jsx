@@ -98,15 +98,15 @@ export default function Footer() {
                         <span className="bg-white/20 rounded px-2 py-0.5 text-xs">₹11 / mo</span>
                       </button>
 
-                      <div className="flex gap-5 md:gap-6 order-1 md:order-2 pt-4">
-                          <a href="tel:+919117588242" className="text-neutral-600 hover:text-emerald-500 transition-colors">
-                              <FiPhone size={20} />
+                      <div className="flex flex-col gap-3 order-1 md:order-2 pt-4">
+                          <a href="tel:+919117588242" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
+                              <FiPhone size={18} /> <span className="text-sm font-medium">+91 91175 88242</span>
                           </a>
-                          <a href="tel:+918544491413" className="text-neutral-600 hover:text-emerald-500 transition-colors">
-                              <FiPhone size={20} />
+                          <a href="tel:+918544491413" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
+                              <FiPhone size={18} /> <span className="text-sm font-medium">+91 85444 91413</span>
                           </a>
-                          <a href="mailto:support@gayaconnect.in" className="text-neutral-600 hover:text-emerald-500 transition-colors">
-                              <FiMail size={20} />
+                          <a href="mailto:support@gayaconnect.in" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
+                              <FiMail size={18} /> <span className="text-sm font-medium">support@gayaconnect.in</span>
                           </a>
                       </div>
                   </div>

@@ -9,6 +9,10 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const ownerId = searchParams.get('ownerId');
+    const categoryId = searchParams.get('categoryId');
+    const location = searchParams.get('location');
+    const vehicleName = searchParams.get('vehicleName');
+    const matchMode = searchParams.get('match_mode') || 'all'; // 'all' (AND) or 'any' (OR)
 
     let query = {};
     
@@ -25,8 +29,33 @@ export async function GET(request) {
       if (!status) delete query.status; 
     }
 
-    // Sort by newest first
-    const vehicles = await Vehicle.find(query).sort({ createdAt: -1 });
+    // Remove DB-level category/vehicleName filters to avoid missing location-only matches in OR mode.
+    // We will do all search filtering in JS since location requires a populated field.
+    // Sort by newest first and populate owner details (for location/address)
+    let vehicles = await Vehicle.find(query)
+      .populate('ownerId', 'name phone address')
+      .populate('categoryId', 'name')
+      .sort({ createdAt: -1 });
+
+    // JS Filtering approach to handle populated fields properly
+    if (categoryId || vehicleName || location) {
+       vehicles = vehicles.filter(v => {
+         const matchCat = categoryId ? (v.categoryId?._id?.toString() === categoryId) : false;
+         const matchName = vehicleName ? (v.vehicleName?.toLowerCase().includes(vehicleName.toLowerCase())) : false;
+         const matchLoc = location ? (v.ownerId?.address?.toLowerCase().includes(location.toLowerCase())) : false;
+
+         if (matchMode === 'any') {
+           // Match ANY provided filters
+           return (categoryId && matchCat) || (vehicleName && matchName) || (location && matchLoc);
+         } else {
+           // Match ALL provided filters
+           if (categoryId && !matchCat) return false;
+           if (vehicleName && !matchName) return false;
+           if (location && !matchLoc) return false;
+           return true;
+         }
+       });
+    }
 
     return NextResponse.json({ success: true, vehicles });
   } catch (error) {

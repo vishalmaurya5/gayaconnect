@@ -10,17 +10,24 @@ export default function JobsAndSalesPage() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [locationInput, setLocationInput] = useState('');
   const [selectedJob, setSelectedJob] = useState(null);
 
   useEffect(() => {
-    fetchJobs();
-  }, [filter]);
+    const timer = setTimeout(() => {
+      fetchJobs();
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [filter, locationInput]);
 
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      const url = filter === 'all' ? '/api/jobs' : `/api/jobs?type=${filter}`;
-      const res = await fetch(url);
+      const url = new URL('/api/jobs', window.location.origin);
+      if (filter !== 'all') url.searchParams.append('type', filter);
+      if (locationInput) url.searchParams.append('location', locationInput);
+      
+      const res = await fetch(url.toString());
       const data = await res.json();
       if (data.success) {
         setJobs(data.jobs);
@@ -54,26 +61,44 @@ export default function JobsAndSalesPage() {
             Discover the latest job opportunities and exclusive items for sale directly from our verified local vendors.
           </p>
           
-          {/* Filters */}
-          <div className="inline-flex bg-white rounded-xl shadow-sm p-1.5 border border-slate-200">
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === 'all' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
-            >
-              All Listings
-            </button>
-            <button
-              onClick={() => setFilter('job')}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === 'job' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
-            >
-              Jobs
-            </button>
-            <button
-              onClick={() => setFilter('sale')}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === 'sale' ? 'bg-green-600 text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
-            >
-              Sales
-            </button>
+          {/* Filters & Search */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+            <div className="inline-flex bg-white rounded-xl shadow-sm p-1.5 border border-slate-200">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === 'all' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
+              >
+                All Listings
+              </button>
+              <button
+                onClick={() => setFilter('job')}
+                className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === 'job' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
+              >
+                Jobs
+              </button>
+              <button
+                onClick={() => setFilter('sale')}
+                className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === 'sale' ? 'bg-green-600 text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
+              >
+                Sales
+              </button>
+            </div>
+
+            <form onSubmit={(e) => { e.preventDefault(); fetchJobs(); }} className="flex w-full max-w-sm bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100 transition-all">
+              <div className="px-3 flex items-center text-slate-400 bg-slate-50 border-r border-slate-100">
+                <FiMapPin />
+              </div>
+              <input 
+                type="text" 
+                placeholder="Search by address or area..." 
+                value={locationInput}
+                onChange={(e) => setLocationInput(e.target.value)}
+                className="w-full px-3 py-2.5 text-sm outline-none font-medium text-slate-700 placeholder:text-slate-400"
+              />
+              <button type="submit" className="px-5 bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-colors">
+                Search
+              </button>
+            </form>
           </div>
         </div>
 

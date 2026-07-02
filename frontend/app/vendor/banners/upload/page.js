@@ -15,7 +15,9 @@ export default function UploadBannerPage() {
     description: '',
     linkUrl: '',
     position: 'home_top',
+    targetCategory: '',
   })
+  const [categories, setCategories] = useState([])
   const [image, setImage] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
   const [submitting, setSubmitting] = useState(false)
@@ -43,6 +45,16 @@ export default function UploadBannerPage() {
       .catch(() => {
         router.push('/vendor/dashboard')
       })
+      
+    // Fetch categories
+    fetch('/api/categories')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setCategories(data.categories || [])
+        }
+      })
+      .catch(err => console.error("Failed to load categories", err))
   }, [loading, user, router])
 
   const handleImageChange = (e) => {
@@ -88,19 +100,20 @@ export default function UploadBannerPage() {
       return
     }
 
+    if (form.position === 'category_top' && !form.targetCategory) {
+      toast.error('Please select a target category')
+      return
+    }
+
     setSubmitting(true)
     try {
-      // 1. Upload image to cloudinary (using an existing api/upload route or a new one)
-      // Since we don't know if /api/upload exists, we will simulate or use the existing one if available.
-      // Usually, images can be sent as base64 and handled by the backend.
-      
+      const payload = { ...form, imageUrl: imagePreview };
+      if (form.position !== 'category_top') payload.targetCategory = '';
+
       const response = await fetch('/api/vendor/banners', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          imageUrl: imagePreview // sending as base64 string
-        }),
+        body: JSON.stringify(payload),
       })
 
       const data = await response.json()
@@ -191,6 +204,19 @@ export default function UploadBannerPage() {
                 <option value="community">Community</option>
               </select>
             </div>
+            
+            {form.position === 'category_top' && (
+              <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+                <label className="mb-2 block text-sm font-bold text-slate-700">Target Category</label>
+                <select className="input-field rounded-xl bg-slate-50 border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" value={form.targetCategory} onChange={(e) => setForm({ ...form, targetCategory: e.target.value })} required>
+                  <option value="">Select Category</option>
+                  {categories.map((c) => (
+                    <option key={c._id} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
+                <p className="mt-1.5 text-xs text-slate-500">Your banner will only be displayed on this specific category's page.</p>
+              </div>
+            )}
             
             <div>
               <label className="mb-2 block text-sm font-bold text-slate-700">Description (Optional)</label>

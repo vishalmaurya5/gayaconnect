@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db/mongodb'
 import { verifyAdminRequest } from '@/lib/utils/adminAuth'
 import User from '@/lib/db/models/User'
 import AuditLog from '@/lib/db/models/AuditLog'
+import bcryptjs from 'bcryptjs'
 
 export async function PATCH(request, props) {
   try {
@@ -35,10 +36,17 @@ export async function PATCH(request, props) {
         details: { days }
       })
     } else {
-      if (updates.name) user.name = updates.name
-      if (updates.email) user.email = updates.email
-      if (updates.phone) user.phone = updates.phone
+      if (updates.name !== undefined) user.name = updates.name
+      if (updates.email !== undefined) user.email = updates.email
+      if (updates.phone !== undefined) user.phone = updates.phone
       if (updates.isDeleted !== undefined) user.isDeleted = updates.isDeleted
+      if (updates.role !== undefined) user.role = updates.role
+      if (updates.subscriptionActive !== undefined) user.subscriptionActive = updates.subscriptionActive
+      if (updates.subscriptionExpiry !== undefined) user.subscriptionExpiry = updates.subscriptionExpiry ? new Date(updates.subscriptionExpiry) : null
+      
+      if (updates.password) {
+        user.password = await bcryptjs.hash(updates.password, 10)
+      }
       
       await AuditLog.create({
         adminId: adminUser._id || 'admin',

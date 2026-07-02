@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+export const dynamic = 'force-dynamic';
 import { connectDB } from '@/lib/db/mongodb'
 import Vendor from '@/lib/db/models/Vendor'
 
@@ -9,7 +10,7 @@ export async function GET(request) {
     const category = searchParams.get('category')
     const search = searchParams.get('search')
 
-    const query = { isApproved: true }
+    const query = { isDeleted: false }
     if (category) query.category = category
     if (search) {
       query.$or = [

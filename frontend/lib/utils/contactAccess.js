@@ -146,6 +146,11 @@ export function toAuthUser(user) {
     subscriptionExpiry: user.subscriptionExpiry || null,
     subscriptionPlan: user.subscriptionPlan || 'none',
     isSubscribed: isUserSubscribed(user),
+    businessName: user.businessName || '',
+    category: user.category || '',
+    subCategory: user.subCategory || '',
+    description: user.description || '',
+    regCode: user.regCode || '',
   }
 }
 

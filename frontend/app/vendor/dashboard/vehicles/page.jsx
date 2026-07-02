@@ -8,11 +8,16 @@ import Script from 'next/script';
 
 export default function VendorVehiclesPage() {
   const [vehicles, setVehicles] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [postingVeh, setPostingVeh] = useState(false);
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [customCategoryName, setCustomCategoryName] = useState('');
+  const [addingCategory, setAddingCategory] = useState(false);
   const { user } = useAuth();
   
   const [vehForm, setVehForm] = useState({ 
+    categoryId: '',
     vehicleName: '', 
     vehicleModel: '', 
     vehicleNumber: '', 
@@ -24,8 +29,21 @@ export default function VendorVehiclesPage() {
   useEffect(() => {
     if (user?.id) {
       fetchVehicles();
+      fetchCategories();
     }
   }, [user?.id]);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch('/api/categories');
+      const data = await res.json();
+      if (data.success) {
+        setCategories(data.categories);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchVehicles = async () => {
     try {
@@ -41,8 +59,46 @@ export default function VendorVehiclesPage() {
     }
   };
 
+  const handleAddCustomCategory = async () => {
+    if (!customCategoryName.trim()) return toast.error('Category name required');
+    setAddingCategory(true);
+    try {
+      const res = await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: customCategoryName,
+          created_by: user.id,
+          created_by_role: user.role
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(data.message || 'Category added');
+        
+        // Add to list if not already there, sort alphabetically
+        let newCategories = [...categories];
+        if (!newCategories.find(c => c._id === data.category._id)) {
+          newCategories.push(data.category);
+          newCategories.sort((a, b) => a.name.localeCompare(b.name));
+        }
+        setCategories(newCategories);
+        setVehForm({ ...vehForm, categoryId: data.category._id });
+        setIsCustomCategory(false);
+        setCustomCategoryName('');
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error('Failed to add category');
+    } finally {
+      setAddingCategory(false);
+    }
+  };
+
   const handlePostVehicle = async (e) => {
     e.preventDefault();
+    if (!vehForm.categoryId) return toast.error("Please select a category.");
     if (!vehForm.liabilityAccepted) return toast.error("You must accept liability for commercial vehicle usage.");
     setPostingVeh(true);
     try {
@@ -80,7 +136,7 @@ export default function VendorVehiclesPage() {
             });
             if (verifyRes.ok) {
               toast.success("Vehicle posted successfully! Pending admin approval.");
-              setVehForm({ vehicleName: '', vehicleModel: '', vehicleNumber: '', dlNumber: '', isCommercial: true, liabilityAccepted: false });
+              setVehForm({ categoryId: '', vehicleName: '', vehicleModel: '', vehicleNumber: '', dlNumber: '', isCommercial: true, liabilityAccepted: false });
               fetchVehicles();
             } else {
               toast.error("Payment verification failed.");
@@ -100,6 +156,29 @@ export default function VendorVehiclesPage() {
       toast.error(err.message || "Failed to initiate payment");
     } finally {
       setPostingVeh(false);
+    }
+  };
+
+  const handleToggleAvailability = async (id, currentStatus) => {
+    const newStatus = currentStatus === 'available' ? 'booked' : 'available';
+    try {
+      const res = await fetch(`/api/vehicles/${id}/availability`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ availability_status: newStatus })
+      });
+      const data = await res.json().catch(() => null);
+      
+      if (res.ok && data?.success) {
+        toast.success(`Vehicle marked as ${newStatus}`);
+        setVehicles(vehicles.map(v => v._id === id ? { ...v, availability_status: newStatus } : v));
+      } else {
+        toast.error(data?.message || data?.error || `Failed: HTTP ${res.status}`);
+        console.error('Toggle Error:', data);
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error('Network error. Failed to update status.');
     }
   };
 
@@ -141,6 +220,37 @@ export default function VendorVehiclesPage() {
                 <FiPlus /> Post Vehicle for Rent
               </h2>
               <form onSubmit={handlePostVehicle} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Category</label>
+                  {!isCustomCategory ? (
+                    <select required value={vehForm.categoryId} onChange={(e) => {
+                      if (e.target.value === 'ADD_NEW') {
+                        setIsCustomCategory(true);
+                      } else {
+                        setVehForm({...vehForm, categoryId: e.target.value});
+                      }
+                    }} className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500">
+                      <option value="">Select a category...</option>
+                      {categories.map(c => (
+                        <option key={c._id} value={c._id}>
+                          {c.name} {c.approved ? '' : '(Pending Review)'}
+                        </option>
+                      ))}
+                      <option value="ADD_NEW" className="font-bold text-orange-600">➕ Add New Category</option>
+                    </select>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input type="text" value={customCategoryName} onChange={e => setCustomCategoryName(e.target.value)} placeholder="Type new category name..." className="flex-1 rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
+                      <button type="button" onClick={handleAddCustomCategory} disabled={addingCategory} className="bg-orange-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold disabled:opacity-70 shrink-0">
+                        {addingCategory ? 'Adding...' : 'Add'}
+                      </button>
+                      <button type="button" onClick={() => setIsCustomCategory(false)} className="bg-slate-200 text-slate-700 px-4 py-2.5 rounded-lg text-sm font-bold shrink-0 hover:bg-slate-300 transition">
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1">Vehicle Name</label>
                   <input required type="text" value={vehForm.vehicleName} onChange={e => setVehForm({...vehForm, vehicleName: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" placeholder="e.g. Maruti Swift Dzire" />
@@ -201,10 +311,27 @@ export default function VendorVehiclesPage() {
                         </div>
                         <h3 className="font-bold text-lg text-slate-900">{v.vehicleName} <span className="font-normal text-slate-500">({v.vehicleModel})</span></h3>
                         <p className="text-sm font-mono text-slate-600 mt-1">{v.vehicleNumber}</p>
+                        <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+                           <div className="flex items-center gap-2">
+                             <div className={`w-2 h-2 rounded-full ${(!v.availability_status || v.availability_status === 'available') ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-400'}`}></div>
+                             <span className={`text-sm font-bold ${(!v.availability_status || v.availability_status === 'available') ? 'text-emerald-700' : 'text-slate-500'}`}>
+                               {(!v.availability_status || v.availability_status === 'available') ? 'Available for Rent' : 'Currently Booked'}
+                             </span>
+                           </div>
+                           <button 
+                             onClick={() => handleToggleAvailability(v._id, v.availability_status || 'available')}
+                             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${(!v.availability_status || v.availability_status === 'available') ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                             role="switch"
+                             aria-checked={!v.availability_status || v.availability_status === 'available'}
+                           >
+                             <span className="sr-only">Toggle availability</span>
+                             <span className={`pointer-events-none absolute left-0.5 inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${(!v.availability_status || v.availability_status === 'available') ? 'translate-x-5' : 'translate-x-0'}`} />
+                           </button>
+                        </div>
                       </div>
                       
                       <div className="flex sm:flex-col justify-end gap-2 shrink-0">
-                        <button onClick={() => handleDelete(v._id)} className="flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100">
+                        <button onClick={() => handleDelete(v._id)} className="flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 p-2 sm:px-3 sm:py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100 h-fit">
                           <FiTrash2 /> Delete
                         </button>
                       </div>

@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { connectDB } from '@/lib/db/mongodb';
 import Subscription from '@/lib/db/models/Subscription';
 import User from '@/lib/db/models/User';
+import Payment from '@/lib/db/models/Payment';
 
 export async function POST(request) {
   try {
@@ -55,6 +56,18 @@ export async function POST(request) {
       subscriptionActive: true,
       subscriptionPlan: subscription.planId,
       subscriptionExpiry: endDate
+    });
+
+    // Create Payment Record for History
+    await Payment.create({
+      userId: subscription.userId,
+      orderId: razorpay_order_id,
+      paymentId: razorpay_payment_id,
+      amount: subscription.amount,
+      status: 'success',
+      purpose: 'user_monthly',
+      plan: subscription.planId,
+      expiresAt: endDate
     });
 
     return NextResponse.json({ success: true, message: 'Payment verified successfully' });

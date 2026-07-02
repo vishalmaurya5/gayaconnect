@@ -64,7 +64,9 @@ async function handlePlanActivation({ plan, duration, offerData, user, paymentId
 
   // ── 1. USER MONTHLY SUBSCRIPTION ─────────────────────────────────────────
   if (plan === "user_monthly") {
-    const expiryDate = new Date(now);
+    const expiryDate = user.subscriptionActive && user.subscriptionExpiry && new Date(user.subscriptionExpiry) > now 
+      ? new Date(user.subscriptionExpiry) 
+      : new Date(now);
     expiryDate.setDate(expiryDate.getDate() + 30);
 
     await User.findByIdAndUpdate(user._id, {
@@ -105,6 +107,7 @@ async function handlePlanActivation({ plan, duration, offerData, user, paymentId
     if (!vendor && user.businessName && user.category) {
       vendor = await Vendor.create({
         userId: user._id,
+        regCode: user.regCode || '',
         name: user.businessName,
         category: user.category,
         subCategory: user.subCategory,

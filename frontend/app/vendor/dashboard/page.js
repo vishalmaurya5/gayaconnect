@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FiTrendingUp, FiCheckCircle, FiDollarSign, FiClock, FiSettings, FiImage, FiGift, FiBriefcase, FiTrash2, FiTag, FiCreditCard, FiTruck, FiEdit2, FiSave, FiX } from 'react-icons/fi';
 import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
+import SubscriptionModal from '@/components/subscription/SubscriptionModal';
 
 export default function VendorDashboard() {
   const [bookings, setBookings] = useState([]);
@@ -13,6 +14,7 @@ export default function VendorDashboard() {
   const [transactions, setTransactions] = useState([]);
   const [vendorDetails, setVendorDetails] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
   
   // Edit Profile States
   const [isEditing, setIsEditing] = useState(false);
@@ -112,7 +114,7 @@ export default function VendorDashboard() {
     if (!isEditing) {
       setEditForm({
         name: user?.name || '',
-        businessName: vendorDetails?.name || '',
+        businessName: vendorDetails?.name || user?.businessName || '',
         address: vendorDetails?.address || user?.address || '',
         instagram: vendorDetails?.instagram || '',
         facebook: vendorDetails?.facebook || '',
@@ -198,9 +200,9 @@ export default function VendorDashboard() {
                   <FiCheckCircle /> Subscribed ({daysLeft} days)
                 </div>
               ) : (
-                <Link href="/subscription" className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 px-5 py-2.5 font-bold text-white shadow-md transition hover:scale-105 hover:shadow-lg">
+                <button onClick={() => setIsSubModalOpen(true)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 px-5 py-2.5 font-bold text-white shadow-md transition hover:scale-105 hover:shadow-lg">
                   <FiDollarSign /> Subscription
-                </Link>
+                </button>
               )}
               
               {(() => {
@@ -268,7 +270,7 @@ export default function VendorDashboard() {
                 <div className="sm:col-span-2">
                   <span className="block text-slate-500 font-semibold mb-1">Business Name</span>
                   {!isEditing ? (
-                    <span className="font-bold text-slate-900">{vendorDetails?.name || 'Please set in profile'}</span>
+                    <span className="font-bold text-slate-900">{vendorDetails?.name || user?.businessName || 'Please set in profile'}</span>
                   ) : (
                     <input type="text" value={editForm.businessName} onChange={e => setEditForm({...editForm, businessName: e.target.value})} className="w-full border border-slate-300 rounded px-2 py-1 focus:outline-indigo-500" />
                   )}
@@ -521,6 +523,7 @@ export default function VendorDashboard() {
         </div>
 
       </div>
+      <SubscriptionModal isOpen={isSubModalOpen} onClose={() => setIsSubModalOpen(false)} />
     </div>
   );
 }

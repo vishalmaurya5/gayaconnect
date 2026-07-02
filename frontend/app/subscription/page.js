@@ -34,10 +34,6 @@ export default function SubscriptionPage() {
   useEffect(() => {
     if (loading) return
     if (!user) router.push('/login?redirect=/subscription')
-    if (user?.subscriptionActive && new Date(user?.subscriptionExpiry) > new Date()) {
-      toast.success('You are already subscribed!')
-      router.push('/vendors')
-    }
   }, [loading, user])
 
   const handlePayment = async () => {

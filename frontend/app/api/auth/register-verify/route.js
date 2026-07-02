@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { connectDB } from "@/lib/db/mongodb";
 import User from "@/lib/db/models/User";
 import Payment from "@/lib/db/models/Payment";
+import Vendor from "@/lib/db/models/Vendor";
 
 export async function POST(request) {
   try {
@@ -35,6 +36,18 @@ export async function POST(request) {
 
     // Create user
     const newUser = await User.create(sanitizedUserData);
+
+    // Create vendor
+    await Vendor.create({
+      userId: newUser._id,
+      regCode: newUser.regCode,
+      name: newUser.businessName || newUser.name,
+      category: newUser.category || 'Other',
+      subCategory: newUser.subCategory || '',
+      address: newUser.address || '',
+      description: newUser.description || '',
+      isApproved: true
+    });
 
     // Record Payment
     await Payment.create({
