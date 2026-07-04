@@ -108,6 +108,7 @@ async function handlePlanActivation({ plan, duration, offerData, user, paymentId
       vendor = await Vendor.create({
         userId: user._id,
         regCode: user.regCode || '',
+        email: user.email,
         name: user.businessName,
         category: user.category,
         subCategory: user.subCategory,

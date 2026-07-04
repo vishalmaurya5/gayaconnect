@@ -99,10 +99,10 @@ export default function ServicesPage() {
 
       {/* Main Content Area */}
       <div className="container-custom max-w-[1536px] px-5 lg:px-10 mx-auto -mt-10 relative z-20">
-        <div className="grid gap-8 lg:grid-cols-[300px_1fr] xl:grid-cols-[320px_1fr]">
+        <div className="grid gap-6 lg:gap-8 lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr]">
           
-          {/* Sidebar: Categories */}
-          <aside className="bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 h-fit sticky top-24">
+          {/* Sidebar: Categories (Desktop Only) */}
+          <aside className="hidden lg:block bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 h-fit sticky top-24">
             <h2 className="font-sora font-extrabold text-xl text-slate-900 mb-6 flex items-center gap-2">
               <FiGrid className="text-indigo-600" /> Categories
             </h2>
@@ -131,94 +131,116 @@ export default function ServicesPage() {
           </aside>
 
           {/* Main Feed: Subcategories & Vendors */}
-          <main>
+          <main className="w-full max-w-full overflow-hidden">
             {/* Search & Dynamic Subcategory Pills */}
-            <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 mb-8">
+            <div className="bg-white rounded-2xl lg:rounded-3xl shadow-sm lg:shadow-xl shadow-slate-200/40 border border-slate-100 p-4 lg:p-6 mb-6 lg:mb-8">
               
               {/* Search Bar */}
               <form onSubmit={handleSearchSubmit} className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl p-1.5 mb-5 transition-all focus-within:bg-white focus-within:border-indigo-400 focus-within:shadow-md focus-within:shadow-indigo-500/10">
-                <div className="pl-4 pr-2 text-slate-400">
-                  <FiSearch className="w-5 h-5" />
+                <div className="pl-3 sm:pl-4 pr-1 sm:pr-2 text-slate-400">
+                  <FiSearch className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <input
                   type="text"
-                  className="flex-1 bg-transparent border-none text-slate-800 px-2 py-3 focus:ring-0 placeholder:text-slate-400 outline-none font-medium text-base"
-                  placeholder="Search by shop name, category, location, or service..."
+                  className="flex-1 bg-transparent border-none text-slate-800 px-2 py-2.5 sm:py-3 focus:ring-0 placeholder:text-slate-400 outline-none font-medium text-sm sm:text-base w-full min-w-0"
+                  placeholder="Search professionals, shops..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
-                <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-bold transition-all shadow-sm flex items-center gap-2">
-                  Search <span className="hidden sm:inline">Now</span>
+                <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base transition-all shadow-sm flex items-center gap-2 whitespace-nowrap">
+                  <span className="hidden sm:inline">Search Now</span>
+                  <span className="sm:hidden">Search</span>
                 </button>
               </form>
 
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-sora font-bold text-sm text-slate-500 uppercase tracking-wider">
+              {/* Mobile Categories (Hidden on Desktop) */}
+              <div className="lg:hidden mb-5 -mx-4 px-4 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <div className="flex gap-2 w-max pb-1">
+                  {serviceCategories.map((category) => (
+                    <button
+                      key={category.name}
+                      onClick={() => selectCategory(category.name)}
+                      className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all border ${
+                        selectedCategory === category.name
+                          ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      {category.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="font-sora font-bold text-xs sm:text-sm text-slate-500 uppercase tracking-wider">
                   {selectedCategory ? `${selectedCategory} Sub-categories` : 'Popular Filters'}
                 </h3>
                 {(selectedCategory || selectedSubcategory || search) && (
                   <button 
                     onClick={() => { setSelectedCategory(''); setSelectedSubcategory(''); setSearch(''); fetchVendors(); }}
-                    className="text-xs font-bold text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-full transition-colors"
+                    className="text-[10px] sm:text-xs font-bold text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-full transition-colors whitespace-nowrap ml-2"
                   >
-                    Clear All Filters
+                    Clear All
                   </button>
                 )}
               </div>
               
-              <div className="flex flex-wrap gap-2">
-                {activeCategory ? (
-                  activeCategory.subcategories.map((subcategory) => (
-                    <button
-                      key={subcategory}
-                      onClick={() => setSelectedSubcategory(subcategory === selectedSubcategory ? '' : subcategory)}
-                      className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all border ${
-                        selectedSubcategory === subcategory
-                          ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-sm'
-                          : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600'
-                      }`}
-                    >
-                      {subcategory}
-                    </button>
-                  ))
-                ) : (
-                  <p className="text-sm font-medium text-slate-500 py-2">
-                    Please select a main category from the sidebar to view its specific sub-categories and refine your search.
-                  </p>
-                )}
+              <div className="flex sm:flex-wrap gap-2 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] -mx-4 px-4 sm:mx-0 sm:px-0">
+                <div className="flex sm:flex-wrap gap-2 w-max sm:w-auto">
+                  {activeCategory ? (
+                    activeCategory.subcategories.map((subcategory) => (
+                      <button
+                        key={subcategory}
+                        onClick={() => setSelectedSubcategory(subcategory === selectedSubcategory ? '' : subcategory)}
+                        className={`px-4 py-2 rounded-full text-xs sm:text-[13px] font-bold transition-all border whitespace-nowrap ${
+                          selectedSubcategory === subcategory
+                            ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-sm'
+                            : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600'
+                        }`}
+                      >
+                        {subcategory}
+                      </button>
+                    ))
+                  ) : (
+                    <p className="text-xs sm:text-sm font-medium text-slate-500 py-1 sm:py-2 whitespace-normal">
+                      Select a category to view its specific sub-categories and refine your search.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Vendor Grid */}
-            <div className="mb-6 flex items-center justify-between px-2">
-              <h2 className="text-2xl font-sora font-extrabold text-slate-900">
-                {search ? `Results for "${search}"` : selectedSubcategory ? selectedSubcategory : selectedCategory ? `${selectedCategory} Vendors` : 'All Vendors'}
+            <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center justify-between px-1 sm:px-2 gap-2 sm:gap-0">
+              <h2 className="text-lg sm:text-2xl font-sora font-extrabold text-slate-900 truncate">
+                {search ? `Results for "${search}"` : selectedSubcategory ? selectedSubcategory : selectedCategory ? `${selectedCategory}` : 'All Vendors'}
               </h2>
-              <span className="text-sm font-bold text-slate-500 bg-slate-200/70 px-4 py-1.5 rounded-full border border-slate-200">
+              <span className="text-xs sm:text-sm font-bold text-slate-500 bg-slate-200/70 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-slate-200 self-start sm:self-auto">
                 {vendors.length} {vendors.length === 1 ? 'Result' : 'Results'}
               </span>
             </div>
 
             {loading ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                {[...Array(6)].map((_, index) => <div key={index} className="h-[340px] animate-pulse rounded-3xl bg-slate-200/60 border border-slate-100" />)}
+              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                {[...Array(6)].map((_, index) => <div key={index} className="h-[320px] sm:h-[340px] animate-pulse rounded-2xl sm:rounded-3xl bg-slate-200/60 border border-slate-100" />)}
               </div>
             ) : vendors.length ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                 {vendors.map((vendor) => <VendorCard key={vendor._id} vendor={vendor} />)}
               </div>
             ) : (
-              <div className="rounded-3xl border-2 border-dashed border-slate-200 bg-white p-16 text-center shadow-sm mt-4">
-                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <FiBriefcase className="text-4xl text-slate-300" />
+              <div className="rounded-2xl sm:rounded-3xl border-2 border-dashed border-slate-200 bg-white p-8 sm:p-16 text-center shadow-sm mt-4">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                  <FiBriefcase className="text-3xl sm:text-4xl text-slate-300" />
                 </div>
-                <h3 className="text-2xl font-sora font-bold text-slate-800 mb-2">No vendors found</h3>
-                <p className="text-slate-500 font-medium max-w-md mx-auto">
-                  We couldn't find any professionals matching your current filters or search terms. Try clearing them and searching again.
+                <h3 className="text-xl sm:text-2xl font-sora font-bold text-slate-800 mb-2">No vendors found</h3>
+                <p className="text-sm sm:text-base text-slate-500 font-medium max-w-md mx-auto">
+                  We couldn't find any professionals matching your current filters. Try clearing them and searching again.
                 </p>
                 <button 
                   onClick={() => { setSelectedCategory(''); setSelectedSubcategory(''); setSearch(''); fetchVendors(); }}
-                  className="mt-6 text-indigo-600 font-bold hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-6 py-2.5 rounded-full transition-colors inline-flex items-center gap-2"
+                  className="mt-6 text-indigo-600 font-bold hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-5 sm:px-6 py-2 sm:py-2.5 rounded-full transition-colors inline-flex items-center gap-2 text-sm sm:text-base"
                 >
                   View All Vendors <FiArrowRight />
                 </button>

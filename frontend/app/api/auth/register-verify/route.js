@@ -41,6 +41,7 @@ export async function POST(request) {
     await Vendor.create({
       userId: newUser._id,
       regCode: newUser.regCode,
+      email: newUser.email,
       name: newUser.businessName || newUser.name,
       category: newUser.category || 'Other',
       subCategory: newUser.subCategory || '',

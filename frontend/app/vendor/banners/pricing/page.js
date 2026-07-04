@@ -73,11 +73,11 @@ export default function BannerPricingPage() {
 
             toast.success('Payment successful! Redirecting to WhatsApp...')
             
-            // Redirect to WhatsApp using the URL provided by the backend
+            // Redirect to the success page which handles the WhatsApp redirect properly
             if (verifyData.whatsappUrl) {
               window.location.href = verifyData.whatsappUrl;
             } else {
-              window.location.href = '/vendor/dashboard';
+              window.location.href = `/vendor/banners/success?paymentId=${response.razorpay_payment_id}`;
             }
             
           } catch (error) {

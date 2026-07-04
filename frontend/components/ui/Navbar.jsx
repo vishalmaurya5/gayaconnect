@@ -34,7 +34,7 @@ export default function Navbar() {
       </div>
 
       {/* Main Navbar */}
-      <nav className={`sticky top-0 w-full flex items-center justify-between px-4 lg:px-8 xl:px-12 transition-all duration-500 z-50 ${isScrolled ? "bg-white/90 shadow-md text-gray-700 backdrop-blur-lg py-3" : "bg-indigo-600 py-4 md:py-5"}`}>
+      <nav className={`sticky top-0 w-full flex items-center justify-between px-4 lg:px-8 xl:px-12 transition-all duration-500 z-50 ${isScrolled ? "bg-white/80 shadow-sm text-gray-700 backdrop-blur-xl border-b border-gray-200/60 py-3" : "bg-indigo-600 border-b border-white/30 shadow-[0_2px_20px_rgba(255,255,255,0.3)] py-4 md:py-5"}`}>
         
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">

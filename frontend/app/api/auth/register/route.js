@@ -19,7 +19,17 @@ export async function POST(request) {
     // Check existing
     const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
     if (existingUser) {
-      return NextResponse.json({ error: "Email or Phone is already registered" }, { status: 400 });
+      if (existingUser.role === 'vendor') {
+        const existingVendor = await Vendor.findOne({ userId: existingUser._id });
+        if (!existingVendor) {
+          // Clean up orphaned user from previous failed attempts so they can try again
+          await User.findByIdAndDelete(existingUser._id);
+        } else {
+          return NextResponse.json({ error: "Email or Phone is already registered" }, { status: 400 });
+        }
+      } else {
+        return NextResponse.json({ error: "Email or Phone is already registered" }, { status: 400 });
+      }
     }
 
     // Hash password with bcrypt before saving
@@ -61,27 +71,32 @@ export async function POST(request) {
       }
 
       if (chargeVendorRegistration) {
-        // Create Razorpay Order
-        const razorpay = new Razorpay({
-          key_id: process.env.RAZORPAY_KEY_ID,
-          key_secret: process.env.RAZORPAY_KEY_SECRET,
-        });
+        // Skip payment if keys are missing or dummy mode is active
+        if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET || process.env.DUMMY_RAZORPAY === "true" || process.env.NEXT_PUBLIC_USE_REAL_RAZORPAY === "false") {
+          chargeVendorRegistration = false;
+        } else {
+          // Create Razorpay Order
+          const razorpay = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET,
+          });
 
-        const order = await razorpay.orders.create({
-          amount: vendorRegistrationFee * 100, // in paise
-          currency: "INR",
-          receipt: `rcpt_vreg_${Date.now()}`,
-        });
+          const order = await razorpay.orders.create({
+            amount: vendorRegistrationFee * 100, // in paise
+            currency: "INR",
+            receipt: `rcpt_vreg_${Date.now()}`,
+          });
 
-        return NextResponse.json({
-          success: false,
-          paymentRequired: true,
-          orderId: order.id,
-          amount: order.amount,
-          currency: order.currency,
-          keyId: process.env.RAZORPAY_KEY_ID,
-          userData // Return user data so frontend can pass it to verify endpoint
-        });
+          return NextResponse.json({
+            success: false,
+            paymentRequired: true,
+            orderId: order.id,
+            amount: order.amount,
+            currency: order.currency,
+            keyId: process.env.RAZORPAY_KEY_ID,
+            userData // Return user data so frontend can pass it to verify endpoint
+          });
+        }
       }
     }
 
@@ -91,6 +106,7 @@ export async function POST(request) {
       await Vendor.create({
         userId: newUser._id,
         regCode: regCode,
+        email: email,
         name: businessName || name,
         category: category || 'Other',
         subCategory: subCategory || '',
@@ -118,6 +134,6 @@ export async function POST(request) {
 
   } catch (error) {
     console.error("Register Error:", error);
-    return NextResponse.json({ error: "Server error during registration" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Server error during registration" }, { status: 500 });
   }
 }

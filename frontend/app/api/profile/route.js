@@ -51,7 +51,7 @@ export async function PUT(request) {
     const { 
       name, address, profileImage, 
       businessName, category, subCategory, businessAddress, description,
-      workerName, workerRole, workerCategory, workerArea, workerDailyRate, workerHourlyRate, workerAvailability, workerSkills
+      workerName, workerRole, workerCategory, workerArea, workerDailyRate, workerHourlyRate, workerAvailability, workerSkills, workerPhone
     } = parsed.data
 
     user.name = name
@@ -112,7 +112,14 @@ export async function PUT(request) {
       if (workerDailyRate !== undefined && workerDailyRate !== '') worker.dailyRate = Number(workerDailyRate);
       if (workerHourlyRate !== undefined && workerHourlyRate !== '') worker.hourlyRate = Number(workerHourlyRate);
       if (workerAvailability !== undefined) worker.availability = workerAvailability;
-      if (workerSkills !== undefined) worker.skills = workerSkills;
+      if (workerSkills !== undefined) {
+        if (typeof workerSkills === 'string') {
+          worker.skills = workerSkills.split(',').map(s=>s.trim()).filter(Boolean);
+        } else {
+          worker.skills = workerSkills;
+        }
+      }
+      if (workerPhone !== undefined && workerPhone !== '') worker.phone = workerPhone;
       if (profileImage !== undefined) worker.photo = user.profileImage || '';
       await worker.save()
     }

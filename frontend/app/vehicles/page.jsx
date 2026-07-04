@@ -294,7 +294,7 @@ function VehicleCard({ vehicle, isSubscribed }) {
                </div>
                <div className="flex flex-col min-w-0">
                  <span className="text-[#CBAA7B] text-[7px] xl:text-[8px] font-bold tracking-widest uppercase mb-0.5 truncate">CALL NOW</span>
-                 <span className="text-white text-xs xl:text-sm font-bold tracking-wide leading-none truncate">{vehicle.ownerId?.phone || vehicle.phone}</span>
+                 <span className="text-white text-xs xl:text-sm font-bold tracking-wide leading-none truncate">Contact Owner</span>
                </div>
             </div>
             <div className="w-6 h-6 xl:w-8 xl:h-8 rounded-full border border-dashed border-[#CBAA7B]/50 flex items-center justify-center shrink-0">

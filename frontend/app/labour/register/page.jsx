@@ -20,6 +20,7 @@ export default function LabourRegisterPage() {
     dailyRate: '',
     onCall: false,
     photo: '',
+    skills: '',
     availability: true
   });
 
@@ -63,6 +64,7 @@ export default function LabourRegisterPage() {
         body: JSON.stringify({ 
           ...form, 
           category: finalCategory,
+          skills: form.skills ? form.skills.split(',').map(s=>s.trim()) : [],
           dailyRate: form.onCall ? null : form.dailyRate 
         })
       });
@@ -200,6 +202,17 @@ export default function LabourRegisterPage() {
                   onChange={(e) => setForm({...form, area: e.target.value})}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
                   placeholder="e.g. AP Colony"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Skill / Specialization (Optional)</label>
+                <input 
+                  type="text" 
+                  value={form.skills}
+                  onChange={(e) => setForm({...form, skills: e.target.value})}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
+                  placeholder="e.g. Tile work, Wiring"
                 />
               </div>
 
