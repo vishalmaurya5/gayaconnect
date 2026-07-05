@@ -20,6 +20,9 @@ const userSchema = new mongoose.Schema({
   description: { type: String },
   verified: { type: Boolean, default: false },
   isDeleted: { type: Boolean, default: false },
+  // Password reset (forgot-password flow) — stored hashed, never returned by default
+  resetPasswordToken: { type: String, select: false },
+  resetPasswordExpire: { type: Date, select: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

@@ -1,13 +1,6 @@
-import crypto from 'crypto'
 import { NextResponse } from 'next/server'
-import { clearAdminCookie, getAdminCredentials, setAdminCookie, verifyAdminRequest } from '@/lib/utils/adminAuth'
+import { clearAdminCookie, getAdminCredentials, setAdminCookie, verifyAdminPassword, verifyAdminRequest } from '@/lib/utils/adminAuth'
 import { enforceRateLimit } from '@/lib/security/rateLimit'
-
-function equalText(left, right) {
-  const a = Buffer.from(String(left))
-  const b = Buffer.from(String(right))
-  return a.length === b.length && crypto.timingSafeEqual(a, b)
-}
 
 export async function GET(request) {
   const admin = verifyAdminRequest(request)
@@ -23,15 +16,16 @@ export async function POST(request) {
   if (limited) return limited
 
   const { userId = '', password = '' } = await request.json().catch(() => ({}))
-  const credentials = getAdminCredentials()
 
-  if (!credentials.password || !equalText(userId, credentials.userId) || !equalText(password, credentials.password)) {
+  const ok = await verifyAdminPassword(userId, password)
+  if (!ok) {
     return NextResponse.json({ success: false, message: 'Invalid admin credentials' }, { status: 401 })
   }
 
+  const { userId: adminUserId } = getAdminCredentials()
   return setAdminCookie(NextResponse.json({
     success: true,
-    admin: { userId: credentials.userId, role: 'admin' },
+    admin: { userId: adminUserId, role: 'admin' },
   }))
 }
 

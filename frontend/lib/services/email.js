@@ -36,3 +36,25 @@ export async function sendVerificationEmail(user, token) {
     html: `<p>Welcome to Gaya Connect.</p><p><a href="${verificationUrl}">Verify your email address</a></p><p>This link expires in 24 hours.</p>`,
   })
 }
+
+export async function sendPasswordResetEmail(user, token) {
+  const baseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+  const resetUrl = `${baseUrl}/reset-password/${token}`
+  const transport = mailTransport()
+
+  if (!transport) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Email delivery is not configured')
+    }
+    console.info(`Password reset URL for ${user.email}: ${resetUrl}`)
+    return
+  }
+
+  await transport.sendMail({
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to: user.email,
+    subject: 'Reset your Gaya Connect password',
+    text: `We received a request to reset your Gaya Connect password. Open this link to set a new password: ${resetUrl}. This link expires in 30 minutes. If you didn't request this, you can safely ignore this email.`,
+    html: `<p>We received a request to reset your Gaya Connect password.</p><p><a href="${resetUrl}">Reset your password</a></p><p>This link expires in 30 minutes. If you didn't request this, you can safely ignore this email.</p>`,
+  })
+}

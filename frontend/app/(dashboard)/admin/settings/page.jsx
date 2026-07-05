@@ -17,6 +17,9 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [pwSaving, setPwSaving] = useState(false);
+
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -53,6 +56,39 @@ export default function AdminSettingsPage() {
       toast.error('Error saving settings');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const changeAdminPassword = async () => {
+    if (pwForm.newPassword.length < 8) {
+      toast.error('New password must be at least 8 characters');
+      return;
+    }
+    if (pwForm.newPassword !== pwForm.confirmPassword) {
+      toast.error('New passwords do not match');
+      return;
+    }
+    setPwSaving(true);
+    try {
+      const res = await fetch('/api/admin/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: pwForm.currentPassword,
+          newPassword: pwForm.newPassword,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success('Admin password updated');
+        setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        toast.error(data.message || 'Failed to update password');
+      }
+    } catch (error) {
+      toast.error('Error updating password');
+    } finally {
+      setPwSaving(false);
     }
   };
 
@@ -162,6 +198,54 @@ export default function AdminSettingsPage() {
             className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-md disabled:opacity-50"
           >
             {saving ? 'Saving...' : 'Save Settings'}
+          </button>
+        </div>
+      </div>
+
+      {/* Admin Password */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h2 className="text-lg font-bold text-slate-900 mb-1">Admin Password</h2>
+        <p className="text-sm text-slate-500 mb-6">Change the password used to sign in to this admin panel.</p>
+
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Current Password</label>
+            <input
+              type="password"
+              autoComplete="current-password"
+              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition"
+              value={pwForm.currentPassword}
+              onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">New Password</label>
+            <input
+              type="password"
+              autoComplete="new-password"
+              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition"
+              value={pwForm.newPassword}
+              onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })}
+            />
+            <p className="text-xs text-slate-400 mt-1">At least 8 characters.</p>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Confirm New Password</label>
+            <input
+              type="password"
+              autoComplete="new-password"
+              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition"
+              value={pwForm.confirmPassword}
+              onChange={(e) => setPwForm({ ...pwForm, confirmPassword: e.target.value })}
+            />
+          </div>
+
+          <button
+            onClick={changeAdminPassword}
+            disabled={pwSaving}
+            className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition-all shadow-md disabled:opacity-50"
+          >
+            {pwSaving ? 'Updating...' : 'Update Admin Password'}
           </button>
         </div>
       </div>

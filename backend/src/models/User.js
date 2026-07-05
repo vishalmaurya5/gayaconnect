@@ -28,12 +28,12 @@ const userSchema = new mongoose.Schema({
 });
 
 // Hash password only when it is set/changed. Always keep updatedAt fresh.
-userSchema.pre('save', async function (next) {
+// Async hook: no `next` — Mongoose awaits the returned promise.
+userSchema.pre('save', async function () {
   this.updatedAt = Date.now();
-  if (!this.isModified('password') || !this.password) return next();
+  if (!this.isModified('password') || !this.password) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
 // Password compare — expose both names so all callers work.

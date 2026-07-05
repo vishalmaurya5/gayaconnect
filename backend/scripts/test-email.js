@@ -47,7 +47,7 @@ const _pw = process.env.SMTP_PASS || '';
 console.log(`User  : ${process.env.SMTP_USER}`);
 console.log(`From  : ${process.env.SMTP_FROM || process.env.SMTP_USER}`);
 console.log(`To    : ${to}`);
-console.log(`Pass  : loaded ${_pw.length} chars, ends with '#': ${_pw.endsWith('#')}  (should be 14 & true)`);
+console.log(`Pass  : loaded ${_pw.length} chars (from .env)`);
 
 let sent = false;
 for (const port of portsToTry) {

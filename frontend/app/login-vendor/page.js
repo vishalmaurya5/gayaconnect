@@ -84,7 +84,7 @@ export default function VendorLoginPage() {
             <div>
               <div className="flex justify-between items-center mb-1.5">
                 <label className="block text-sm font-semibold text-gray-700">Password</label>
-                <Link href="#" className="text-xs font-semibold text-indigo-600 hover:text-indigo-700">
+                <Link href="/forgot-password" className="text-xs font-semibold text-indigo-600 hover:text-indigo-700">
                   Forgot password?
                 </Link>
               </div>
