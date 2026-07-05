@@ -11,6 +11,8 @@ import VendorDetailPage from './legacy-pages/user/VendorDetailPage';
 import BookingPage from './legacy-pages/user/BookingPage';
 import LoginPage from './legacy-pages/user/LoginPage';
 import RegisterPage from './legacy-pages/user/RegisterPage';
+import ForgotPasswordPage from './legacy-pages/user/ForgotPasswordPage';
+import ResetPasswordPage from './legacy-pages/user/ResetPasswordPage';
 import CommunityPage from './legacy-pages/user/CommunityPage';
 
 import VendorDashboard from './legacy-pages/vendor/VendorDashboard';
@@ -52,6 +54,8 @@ export default function App() {
             <Route path="/community" element={<ProtectedRoute roles={['user', 'admin']}><CommunityPage /></ProtectedRoute>} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
             <Route path="/vendor/dashboard" element={<ProtectedRoute roles={['vendor', 'admin']}><VendorDashboard /></ProtectedRoute>} />
             <Route path="/vendor/profile" element={<ProtectedRoute roles={['vendor', 'admin']}><VendorProfile /></ProtectedRoute>} />

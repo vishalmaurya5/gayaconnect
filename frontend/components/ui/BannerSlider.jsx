@@ -13,25 +13,17 @@ export default function BannerSlider({ position = 'home_top' }) {
   }, [])
 
   const fetchBanners = async () => {
-    const welcomeBanner = {
-      _id: 'welcome-dummy',
-      title: 'Welcome to Gaya Connect!',
-      description: 'Thank you for joining us. Whether you are a user or a vendor, we are thrilled to have you here!',
-      imageUrl: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=1600&q=80',
-      link: '/register',
-    }
-
     try {
       const res = await fetch(`/api/banners?position=${position}`)
       const data = await res.json()
       if (data.success && data.banners && data.banners.length > 0) {
         setBanners(data.banners)
       } else {
-        setBanners([welcomeBanner])
+        setBanners([])
       }
     } catch (error) {
       console.error('Error fetching banners:', error)
-      setBanners([welcomeBanner])
+      setBanners([])
     }
   }
 
@@ -50,12 +42,9 @@ export default function BannerSlider({ position = 'home_top' }) {
     return () => clearInterval(timer)
   }, [banners.length])
 
+  // Koi approved banner nahi to kuch nahi dikhana
   if (banners.length === 0) {
-    return (
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl h-64 flex items-center justify-center">
-        <p className="text-white text-xl">Special Offers Coming Soon!</p>
-      </div>
-    )
+    return null
   }
 
   const activeBanner = banners[activeIndex]

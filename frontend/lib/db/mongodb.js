@@ -13,6 +13,7 @@ if (!cached) {
 }
 
 export async function connectDB() {
+  // Return existing connection immediately
   if (cached.conn) {
     return cached.conn;
   }
@@ -20,21 +21,24 @@ export async function connectDB() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      serverSelectionTimeoutMS: 8000,  // Fail fast — 8s instead of 52s
+      connectTimeoutMS: 8000,
+      socketTimeoutMS: 30000,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('MongoDB successfully connected.');
-      return mongoose;
-    }).catch(error => {
-      console.error('Error connecting to MongoDB:', error);
-      throw error;
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
+      console.log('✅ MongoDB connected (frontend)');
+      return m;
     });
   }
-  
+
   try {
     cached.conn = await cached.promise;
   } catch (e) {
+    // Reset so next request retries fresh
     cached.promise = null;
+    cached.conn = null;
+    console.error('❌ MongoDB connection failed:', e.message);
     throw e;
   }
 

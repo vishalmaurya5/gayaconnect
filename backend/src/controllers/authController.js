@@ -45,16 +45,27 @@ export const refresh = asyncHandler(async (req, res) => {
 });
 
 export const forgotPassword = asyncHandler(async (req, res) => {
+  // Generic response regardless of whether the email exists — prevents user enumeration.
+  const genericMessage = { message: 'If an account exists for that email, a reset link has been sent.' };
+
   const user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(404).json({ message: 'User not found' });
+  if (!user) return res.json(genericMessage);
 
   const resetToken = user.getResetPasswordToken();
   await user.save();
 
   const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-  await sendEmail({ to: user.email, subject: 'Reset password', html: `<p>Reset link: <a href="${resetUrl}">${resetUrl}</a></p>` });
+  try {
+    await sendEmail({ to: user.email, subject: 'Reset password', html: `<p>Reset link: <a href="${resetUrl}">${resetUrl}</a></p>` });
+  } catch (err) {
+    // Roll back the token so a failed send doesn't leave a dangling reset window.
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+    return res.status(502).json({ message: 'Could not send reset email. Please try again later.' });
+  }
 
-  res.json({ message: 'Reset email sent' });
+  res.json(genericMessage);
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {

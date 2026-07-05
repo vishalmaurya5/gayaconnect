@@ -19,7 +19,8 @@ export default function LoginPage() {
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.remember} onChange={(e) => setForm({ ...form, remember: e.target.checked })} /> Remember me</label>
         <button onClick={() => dispatch(login(form))} disabled={loading} className="w-full bg-blue-600 text-white py-2 rounded">{loading ? 'Signing in...' : 'Login'}</button>
       </div>
-      <p className="text-sm mt-4">No account? <Link className="text-blue-600" to="/register">Register</Link></p>
+      <p className="text-sm mt-3"><Link className="text-blue-600" to="/forgot-password">Forgot password?</Link></p>
+      <p className="text-sm mt-1">No account? <Link className="text-blue-600" to="/register">Register</Link></p>
     </div>
   );
 }
