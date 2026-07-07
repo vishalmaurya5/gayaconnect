@@ -15,15 +15,22 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'Missing payment verification details' }, { status: 400 });
     }
 
-    // Generate expected signature
-    const secret = process.env.RAZORPAY_KEY_SECRET;
-    const generated_signature = crypto
-      .createHmac('sha256', secret)
-      .update(razorpay_order_id + '|' + razorpay_payment_id)
-      .digest('hex');
+    // Check for Dummy Mode
+    const isDummy = razorpay_order_id.startsWith('dummy_');
 
-    if (generated_signature !== razorpay_signature) {
-      return NextResponse.json({ success: false, message: 'Payment verification failed' }, { status: 400 });
+    if (!isDummy) {
+      // Generate expected signature
+      const secret = process.env.RAZORPAY_KEY_SECRET;
+      const generated_signature = crypto
+        .createHmac('sha256', secret)
+        .update(razorpay_order_id + '|' + razorpay_payment_id)
+        .digest('hex');
+
+      if (generated_signature !== razorpay_signature) {
+        return NextResponse.json({ success: false, message: 'Payment verification failed' }, { status: 400 });
+      }
+    } else if (razorpay_signature !== 'dummy_sig') {
+      return NextResponse.json({ success: false, message: 'Dummy Payment verification failed' }, { status: 400 });
     }
 
     // Payment is verified, find the pending subscription

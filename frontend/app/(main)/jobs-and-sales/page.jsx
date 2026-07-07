@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FiBriefcase, FiTag, FiMapPin, FiMessageCircle, FiPhone, FiInfo, FiX } from 'react-icons/fi';
+import { FiBriefcase, FiTag, FiMapPin, FiMessageCircle, FiPhone, FiInfo, FiX, FiGrid } from 'react-icons/fi';
+import { JOB_SALE_CATEGORIES } from '@/lib/utils/jobSaleCategories';
 
 const ADMIN_PHONE = '+919117588242'; // From the contact page
 
@@ -10,6 +11,7 @@ export default function JobsAndSalesPage() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [locationInput, setLocationInput] = useState('');
   const [selectedJob, setSelectedJob] = useState(null);
 
@@ -18,13 +20,14 @@ export default function JobsAndSalesPage() {
       fetchJobs();
     }, 400);
     return () => clearTimeout(timer);
-  }, [filter, locationInput]);
+  }, [filter, categoryFilter, locationInput]);
 
   const fetchJobs = async () => {
     setLoading(true);
     try {
       const url = new URL('/api/jobs', window.location.origin);
       if (filter !== 'all') url.searchParams.append('type', filter);
+      if (categoryFilter !== 'all') url.searchParams.append('category', categoryFilter);
       if (locationInput) url.searchParams.append('location', locationInput);
       
       const res = await fetch(url.toString());
@@ -62,43 +65,63 @@ export default function JobsAndSalesPage() {
           </p>
           
           {/* Filters & Search */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-            <div className="inline-flex bg-white rounded-xl shadow-sm p-1.5 border border-slate-200">
+          <div className="flex flex-col xl:flex-row flex-wrap items-center justify-center gap-4 w-full">
+            {/* Tabs */}
+            <div className="flex w-full sm:w-auto bg-white rounded-xl shadow-sm p-1.5 border border-slate-200 overflow-x-auto">
               <button
                 onClick={() => setFilter('all')}
-                className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === 'all' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
+                className={`flex-1 sm:flex-none whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === 'all' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
               >
                 All Listings
               </button>
               <button
                 onClick={() => setFilter('job')}
-                className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === 'job' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
+                className={`flex-1 sm:flex-none whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === 'job' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
               >
                 Jobs
               </button>
               <button
                 onClick={() => setFilter('sale')}
-                className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === 'sale' ? 'bg-green-600 text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
+                className={`flex-1 sm:flex-none whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${filter === 'sale' ? 'bg-green-600 text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
               >
                 Sales
               </button>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); fetchJobs(); }} className="flex w-full max-w-sm bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100 transition-all">
-              <div className="px-3 flex items-center text-slate-400 bg-slate-50 border-r border-slate-100">
-                <FiMapPin />
+            {/* Inputs Container */}
+            <div className="flex flex-col sm:flex-row flex-1 xl:flex-none w-full xl:w-auto gap-4">
+              <form onSubmit={(e) => { e.preventDefault(); fetchJobs(); }} className="flex flex-1 xl:w-[320px] bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100 transition-all">
+                <div className="px-3 flex items-center text-slate-400 bg-slate-50 border-r border-slate-100">
+                  <FiMapPin />
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Search by address or area..." 
+                  value={locationInput}
+                  onChange={(e) => setLocationInput(e.target.value)}
+                  className="w-full px-3 py-2.5 text-sm outline-none font-medium text-slate-700 placeholder:text-slate-400 min-w-0"
+                />
+                <button type="submit" className="px-4 sm:px-5 bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-colors whitespace-nowrap">
+                  Search
+                </button>
+              </form>
+
+              <div className="flex w-full sm:w-56 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100 transition-all shrink-0">
+                <div className="px-3 flex items-center text-slate-400 bg-slate-50 border-r border-slate-100">
+                  <FiGrid />
+                </div>
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="w-full px-3 py-2.5 text-sm outline-none font-medium text-slate-700 bg-white cursor-pointer min-w-0"
+                >
+                  <option value="all">All Categories</option>
+                  {JOB_SALE_CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
               </div>
-              <input 
-                type="text" 
-                placeholder="Search by address or area..." 
-                value={locationInput}
-                onChange={(e) => setLocationInput(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm outline-none font-medium text-slate-700 placeholder:text-slate-400"
-              />
-              <button type="submit" className="px-5 bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-colors">
-                Search
-              </button>
-            </form>
+            </div>
           </div>
         </div>
 
@@ -125,12 +148,19 @@ export default function JobsAndSalesPage() {
                   
                   {/* Badge & Date */}
                   <div className="flex justify-between items-start mb-4">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
-                      job.type === 'job' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
-                    }`}>
-                      {job.type === 'job' ? <FiBriefcase /> : <FiTag />}
-                      {job.type}
-                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+                        job.type === 'job' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
+                      }`}>
+                        {job.type === 'job' ? <FiBriefcase /> : <FiTag />}
+                        {job.type}
+                      </span>
+                      {job.category && (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                          {job.category}
+                        </span>
+                      )}
+                    </div>
                     <span className="text-xs font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">
                       {new Date(job.createdAt).toLocaleDateString()}
                     </span>
@@ -234,13 +264,20 @@ export default function JobsAndSalesPage() {
             )}
 
             <div className="p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
-                  selectedJob.type === 'job' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
-                }`}>
-                  {selectedJob.type === 'job' ? <FiBriefcase /> : <FiTag />}
-                  {selectedJob.type}
-                </span>
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex flex-wrap gap-2">
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+                    selectedJob.type === 'job' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
+                  }`}>
+                    {selectedJob.type === 'job' ? <FiBriefcase /> : <FiTag />}
+                    {selectedJob.type}
+                  </span>
+                  {selectedJob.category && (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                      {selectedJob.category}
+                    </span>
+                  )}
+                </div>
                 <span className="text-xs font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">
                   {new Date(selectedJob.createdAt).toLocaleDateString()}
                 </span>

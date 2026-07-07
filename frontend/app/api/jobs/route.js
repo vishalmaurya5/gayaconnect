@@ -4,6 +4,7 @@ import Job from '@/lib/db/models/Job';
 import Vendor from '@/lib/db/models/Vendor';
 import { getAuthenticatedUser } from '@/lib/security/auth';
 import { validateImageDataUrl } from '@/lib/utils/imageUpload';
+import { isValidJobSaleCategory, DEFAULT_JOB_SALE_CATEGORY } from '@/lib/utils/jobSaleCategories';
 
 export async function GET(request) {
   try {
@@ -12,11 +13,13 @@ export async function GET(request) {
     const type = searchParams.get('type');
     const vendorId = searchParams.get('vendorId');
     const location = searchParams.get('location');
+    const category = searchParams.get('category');
 
     const query = { isActive: true };
     if (type && type !== 'all') query.type = type;
     if (vendorId) query.vendorId = vendorId;
     if (location) query.location = { $regex: location, $options: 'i' };
+    if (category && category !== 'all') query.category = category;
 
     const jobs = await Job.find(query)
       .populate('vendorId', 'name category address location')
@@ -51,6 +54,7 @@ export async function POST(request) {
       title: body.title,
       description: body.description,
       type: body.type, // 'job' or 'sale'
+      category: isValidJobSaleCategory(body.category) ? body.category : DEFAULT_JOB_SALE_CATEGORY,
       salaryOrPrice: body.salaryOrPrice,
       location: body.location,
       vendorId: vendorId,

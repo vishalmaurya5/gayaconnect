@@ -189,8 +189,7 @@ async function handlePlanActivation({ plan, duration, offerData, user, paymentId
 
     return NextResponse.json({
       success:  true,
-      message:  "Banner fee received! Your request is pending admin approval.",
-      redirect: `/vendor/dashboard?tab=banner&paid=1`,
+      message:  "Banner fee received! Your request is pending admin approval."
     });
   }
 

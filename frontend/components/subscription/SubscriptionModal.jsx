@@ -52,6 +52,28 @@ export default function SubscriptionModal({ isOpen, onClose }) {
         throw new Error(data.message);
       }
 
+      if (data.isDummy) {
+        // Skip Razorpay modal, directly verify
+        const verifyRes = await fetch('/api/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            razorpay_order_id: data.orderId,
+            razorpay_payment_id: `dummy_pay_${Date.now()}`,
+            razorpay_signature: "dummy_sig"
+          })
+        });
+        const verifyData = await verifyRes.json();
+        if (verifyData.success) {
+          toast.success('Subscription activated successfully (Dummy Mode)!');
+          onClose();
+          window.location.reload();
+        } else {
+          toast.error('Payment verification failed');
+        }
+        return;
+      }
+
       // Initialize Razorpay
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,

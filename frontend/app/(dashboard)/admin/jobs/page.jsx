@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { FiBriefcase, FiTag, FiTrash2, FiPlus } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { JOB_SALE_CATEGORIES } from '@/lib/utils/jobSaleCategories';
 
 export default function AdminJobsPage() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ title: '', description: '', type: 'job', salaryOrPrice: '', location: '' });
+  const [form, setForm] = useState({ title: '', description: '', type: 'job', category: '', salaryOrPrice: '', location: '' });
   const [posting, setPosting] = useState(false);
 
   useEffect(() => {
@@ -31,6 +32,10 @@ export default function AdminJobsPage() {
 
   const handlePost = async (e) => {
     e.preventDefault();
+    if (!form.category) {
+      toast.error('Please select a category');
+      return;
+    }
     setPosting(true);
     try {
       const res = await fetch('/api/jobs', {
@@ -41,7 +46,7 @@ export default function AdminJobsPage() {
       const data = await res.json();
       if (data.success) {
         toast.success('Posted successfully');
-        setForm({ title: '', description: '', type: 'job', salaryOrPrice: '', location: '' });
+        setForm({ title: '', description: '', type: 'job', category: '', salaryOrPrice: '', location: '' });
         fetchJobs();
       } else {
         toast.error(data.message || 'Failed to post');
@@ -90,11 +95,21 @@ export default function AdminJobsPage() {
           </div>
 
           <div className="sm:col-span-1 md:col-span-1">
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Category</label>
+            <select required value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
+              <option value="" disabled>Select category</option>
+              {JOB_SALE_CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="sm:col-span-1 md:col-span-1">
             <label className="block text-sm font-semibold text-slate-700 mb-1">{form.type === 'job' ? 'Salary' : 'Price'}</label>
             <input type="text" value={form.salaryOrPrice} onChange={e => setForm({...form, salaryOrPrice: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Optional" />
           </div>
 
-          <div className="sm:col-span-2 md:col-span-2">
+          <div className="sm:col-span-1 md:col-span-1">
             <label className="block text-sm font-semibold text-slate-700 mb-1">Location</label>
             <input type="text" value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Location" />
           </div>
@@ -122,6 +137,7 @@ export default function AdminJobsPage() {
               <thead className="bg-slate-50 text-slate-500 uppercase font-semibold">
                 <tr>
                   <th className="px-6 py-4">Type</th>
+                  <th className="px-6 py-4">Category</th>
                   <th className="px-6 py-4">Title & Desc</th>
                   <th className="px-6 py-4">Salary/Price</th>
                   <th className="px-6 py-4">Posted By</th>
@@ -134,6 +150,11 @@ export default function AdminJobsPage() {
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold uppercase ${job.type === 'job' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
                         {job.type === 'job' ? <FiBriefcase /> : <FiTag />} {job.type}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="inline-block px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-600">
+                        {job.category || '—'}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -159,7 +180,7 @@ export default function AdminJobsPage() {
                 ))}
                 {jobs.length === 0 && (
                   <tr>
-                    <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
+                    <td colSpan="6" className="px-6 py-8 text-center text-slate-500">
                       No jobs or sales found.
                     </td>
                   </tr>

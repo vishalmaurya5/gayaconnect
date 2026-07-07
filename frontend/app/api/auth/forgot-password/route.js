@@ -9,26 +9,30 @@ export async function POST(request) {
   const limited = enforceRateLimit(request, "forgot-password", { limit: 5, windowMs: 15 * 60 * 1000 });
   if (limited) return limited;
 
-  // Generic response so we never reveal whether an email is registered (no user enumeration).
-  const generic = NextResponse.json({
-    success: true,
-    message: "If an account exists for that email, a reset link has been sent.",
-  });
-
   try {
     await connectDB();
-    const { email = "" } = await request.json().catch(() => ({}));
-    const typed = String(email).trim();
+    const { identifier = "" } = await request.json().catch(() => ({}));
+    const typed = String(identifier).trim();
     const normalized = typed.toLowerCase();
 
-    if (!normalized) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    if (!typed) {
+      return NextResponse.json({ error: "Mobile number or Email is required" }, { status: 400 });
     }
 
     const user = await User.findOne({
-      email: { $in: [typed, normalized] },
+      $or: [
+        { email: { $in: [typed, normalized] } },
+        { phone: typed }
+      ],
       isDeleted: { $ne: true },
     });
+    
+    // Generic response so we never reveal whether an account is registered (no user enumeration).
+    const generic = NextResponse.json({
+      success: true,
+      message: "If an account exists with this detail, a reset link has been sent to the registered email address.",
+    });
+
     if (!user) return generic;
 
     const rawToken = crypto.randomBytes(32).toString("hex");

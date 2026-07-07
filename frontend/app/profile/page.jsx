@@ -251,13 +251,13 @@ export default function ProfilePage() {
     : 0;
 
   const TABS = [
-    { id:"profile",      label:"Profile",         icon:User        },
-    { id:"subscription", label:"Subscription",     icon:CreditCard  },
-    ...(isVendor ? [{ id:"vendor", label:"My listing", icon:Store }] : []),
-    ...(worker ? [{ id:"worker", label:"Worker Profile", icon:Briefcase }] : []),
-    { id:"vehicles",     label:"My Vehicles",      icon:Car         },
-    { id:"calls",        label:"Call History",     icon:Phone       },
-    { id:"settings",     label:"Settings",         icon:Shield      },
+    { id:"profile",      label:"Profile",        shortLabel:"Profile",     icon:User        },
+    { id:"subscription", label:"Subscription",   shortLabel:"Premium",     icon:CreditCard  },
+    ...(isVendor ? [{ id:"vendor", label:"My listing", shortLabel:"Vendor", icon:Store }] : []),
+    ...(worker ? [{ id:"worker", label:"Worker Profile", shortLabel:"Worker", icon:Briefcase }] : []),
+    { id:"vehicles",     label:"My Vehicles",    shortLabel:"Vehicles",    icon:Car         },
+    { id:"calls",        label:"Call History",   shortLabel:"Calls",       icon:Phone       },
+    { id:"settings",     label:"Settings",       shortLabel:"Settings",    icon:Shield      },
   ];
 
   return (
@@ -344,7 +344,7 @@ export default function ProfilePage() {
                     <Icon size={22} className={isActive ? "fill-indigo-50/50" : ""} />
                   </div>
                   <span className={`text-[10px] font-bold tracking-wide transition-all ${isActive ? "opacity-100" : "opacity-70 font-medium"}`}>
-                    {t.label.split(' ')[0]}
+                    {t.shortLabel}
                   </span>
                 </button>
               );

@@ -64,19 +64,17 @@ export default function VendorLoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mobile Number</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mobile Number or Email</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <UserIcon size={18} className="text-gray-400" />
                 </div>
                 <input
-                  type="tel"
+                  type="text"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
-                  placeholder="e.g., 9876543210"
-                  pattern="[0-9]{10}"
-                  maxLength="10"
+                  placeholder="e.g., 9876543210 or vendor@example.com"
                 />
               </div>
             </div>

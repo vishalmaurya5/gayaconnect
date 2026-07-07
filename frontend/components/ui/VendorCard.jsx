@@ -19,7 +19,7 @@ export default function VendorCard({ vendor }) {
   return (
     <div className="relative bg-white rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 overflow-hidden group">
       {/* Image Section */}
-      <div className={`relative h-56 overflow-hidden ${!isSubscriptionActive ? 'blur-[2px]' : ''}`}>
+      <div className="relative h-56 overflow-hidden">
         <div className="absolute inset-0 bg-slate-900/10 z-10 group-hover:bg-transparent transition-colors duration-500" />
         <img
           src={vendor.images?.[0] || 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800'}
@@ -40,7 +40,7 @@ export default function VendorCard({ vendor }) {
       </div>
 
       {/* Content */}
-      <div className={`p-5 ${!isSubscriptionActive ? 'blur-[2px]' : ''}`}>
+      <div className="p-5">
         <div className="flex justify-between items-start mb-1">
           <Link href={`/vendors/${vendor._id}`} className="flex-1 pr-3">
             <h3 className="font-extrabold text-xl text-slate-800 hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
@@ -55,48 +55,53 @@ export default function VendorCard({ vendor }) {
 
         <p className="text-blue-600 text-xs font-bold uppercase tracking-wider mb-3">{vendor.category}</p>
 
-        <div className="flex items-start gap-2 text-slate-500 text-sm mb-5">
-          <FiMapPin className="text-slate-400 shrink-0 mt-0.5" />
-          <span className="line-clamp-2 font-medium">{vendor.address}</span>
-        </div>
+        <div className="relative mt-2">
+          {/* Locked Overlay */}
+          {!isSubscriptionActive && (
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/40 backdrop-blur-md rounded-2xl p-4 border border-white/60 shadow-sm">
+              <FiLock className="w-6 h-6 text-indigo-600 mb-2" />
+              <h4 className="font-bold text-sm text-slate-900 text-center">Premium Only</h4>
+              <p className="text-[11px] text-slate-600 text-center mb-3 leading-tight">Unlock contacts & details</p>
+              <button 
+                onClick={() => router.push('/profile?tab=subscription')}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md w-full"
+              >
+                Unlock for ₹11
+              </button>
+            </div>
+          )}
 
-        <div className="grid grid-cols-3 gap-2 pt-4 border-t border-slate-100">
-          <a
-            href={`tel:${phoneNumber}`}
-            className="flex items-center justify-center gap-1.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-100 hover:border-transparent py-2 rounded-xl text-[13px] font-bold transition-all duration-300 shadow-sm"
-          >
-            <FiPhone /> Call
-          </a>
-          <a
-            href={`https://wa.me/91${phoneNumber.replace(/\D/g, '')}?text=Hi, I found your business on Gaya Connect.`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 bg-emerald-50 hover:bg-emerald-500 text-emerald-700 hover:text-white border border-emerald-100 hover:border-transparent py-2 rounded-xl text-[13px] font-bold transition-all duration-300 shadow-sm"
-          >
-            <FaWhatsapp /> Chat
-          </a>
-          <Link
-            href={`/vendors/${vendor._id}`}
-            className="flex items-center justify-center gap-1.5 bg-slate-50 hover:bg-blue-600 text-slate-700 hover:text-white border border-slate-200 hover:border-transparent py-2 rounded-xl text-[13px] font-bold transition-all duration-300 shadow-sm"
-          >
-            Details
-          </Link>
+          <div className={!isSubscriptionActive ? "opacity-30 blur-sm pointer-events-none transition-all select-none" : ""}>
+            <div className="flex items-start gap-2 text-slate-500 text-sm mb-5 min-h-[40px]">
+              <FiMapPin className="text-slate-400 shrink-0 mt-0.5" />
+              <span className="line-clamp-2 font-medium">{vendor.address}</span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 pt-4 border-t border-slate-100">
+              <a
+                href={`tel:${phoneNumber}`}
+                className="flex items-center justify-center gap-1.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-100 hover:border-transparent py-2 rounded-xl text-[13px] font-bold transition-all duration-300 shadow-sm"
+              >
+                <FiPhone /> Call
+              </a>
+              <a
+                href={`https://wa.me/91${phoneNumber.replace(/\D/g, '')}?text=Hi, I found your business on Gaya Connect.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 bg-emerald-50 hover:bg-emerald-500 text-emerald-700 hover:text-white border border-emerald-100 hover:border-transparent py-2 rounded-xl text-[13px] font-bold transition-all duration-300 shadow-sm"
+              >
+                <FaWhatsapp /> Chat
+              </a>
+              <Link
+                href={`/vendors/${vendor._id}`}
+                className="flex items-center justify-center gap-1.5 bg-slate-50 hover:bg-blue-600 text-slate-700 hover:text-white border border-slate-200 hover:border-transparent py-2 rounded-xl text-[13px] font-bold transition-all duration-300 shadow-sm"
+              >
+                Details
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
-
-      {!isSubscriptionActive && (
-        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm rounded-3xl">
-          <FiLock className="w-8 h-8 text-slate-800 mb-3" />
-          <h4 className="font-bold text-lg text-slate-900">Subscription Required</h4>
-          <p className="text-sm text-slate-600 mb-4 px-6 text-center">Unlock vendor contact details, offers & local workforce.</p>
-          <button 
-            onClick={() => router.push('/profile')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-semibold transition-all shadow-lg hover:shadow-blue-500/30"
-          >
-            Renew ₹11/month
-          </button>
-        </div>
-      )}
     </div>
   )
 }

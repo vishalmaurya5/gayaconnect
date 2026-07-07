@@ -194,10 +194,26 @@ export default function VendorDetailPage() {
                 ))}
               </div>
 
-              <div className="p-6">
-                {activeTab === "about" && (
-                  <div>
-                    <p className="text-[14px] text-gray-600 leading-relaxed mb-5">{v.description}</p>
+              <div className="p-6 relative">
+                {!isSubscribed && (
+                  <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/40 backdrop-blur-md rounded-b-2xl p-6 border border-white/60 shadow-sm text-center">
+                    <Lock className="w-10 h-10 text-indigo-600 mb-3" />
+                    <h4 className="font-bold text-xl text-slate-900 mb-2">Premium Content</h4>
+                    <p className="text-sm text-slate-600 mb-5 max-w-sm mx-auto">
+                      Get full access to vendor addresses, services, descriptions, and customer reviews.
+                    </p>
+                    <Link href="/profile?tab=subscription"
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-indigo-500/30 inline-block no-underline"
+                    >
+                      Unlock Profile for ₹11
+                    </Link>
+                  </div>
+                )}
+                
+                <div className={!isSubscribed ? "opacity-30 blur-md pointer-events-none transition-all select-none" : ""}>
+                  {activeTab === "about" && (
+                    <div>
+                      <p className="text-[14px] text-gray-600 leading-relaxed mb-5">{v.description}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {[
                         { label:"Experience", value: v.experience },
@@ -255,6 +271,7 @@ export default function VendorDetailPage() {
                     ))}
                   </div>
                 )}
+                </div>
               </div>
             </div>
           </div>
@@ -300,8 +317,8 @@ export default function VendorDetailPage() {
                     <p className="text-[13px] text-indigo-800 font-medium mb-3">
                       Subscribe to view contact details and connect directly
                     </p>
-                    <Link href="/pricing"
-                      className="block w-full bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[14px] py-3 rounded-xl transition-colors no-underline">
+                    <Link href="/profile?tab=subscription"
+                      className="block w-full bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[14px] py-3 rounded-xl transition-colors no-underline text-center">
                       Subscribe — ₹11/month
                     </Link>
                   </div>

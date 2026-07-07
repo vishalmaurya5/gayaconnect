@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import VendorCard from '@/components/ui/VendorCard';
-import { FiSearch } from 'react-icons/fi';
+import { FiSearch, FiMapPin, FiFilter } from 'react-icons/fi';
 import { SERVICE_CATEGORIES } from '@/lib/utils/serviceCategories';
 
 const categories = ['all', ...SERVICE_CATEGORIES.map((category) => category.name)];
@@ -47,37 +47,88 @@ function VendorsContent() {
   };
 
   return (
-    <div className="container-custom py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">Browse Vendors</h1>
-      <p className="text-gray-600 mb-8">Discover trusted local businesses in Gaya</p>
+    <div className="container-custom py-8 md:py-12">
+      <div className="text-center max-w-2xl mx-auto mb-10">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Discover Local Experts</h1>
+        <p className="text-slate-500 text-lg">Find trusted professionals and businesses in your area</p>
+      </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-        <form onSubmit={(e) => { e.preventDefault(); fetchVendors(); }} className="flex flex-col md:flex-row gap-3">
-          <div className="flex-1 relative">
-            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input type="text" placeholder="Search by name or keyword..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full border border-gray-300 rounded-lg p-2 pl-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" />
+      <div className="relative z-10 max-w-5xl mx-auto mb-10">
+        <form 
+          onSubmit={(e) => { e.preventDefault(); fetchVendors(); }} 
+          className="flex flex-col md:flex-row items-center bg-white rounded-3xl md:rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 p-2 md:p-1.5 gap-2 md:gap-0 transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
+        >
+          {/* Search Keyword */}
+          <div className="flex-1 w-full relative flex items-center px-4 py-3 md:py-2 border-b md:border-b-0 md:border-r border-slate-100 group">
+            <FiSearch className="text-slate-400 text-xl shrink-0 mr-3 group-focus-within:text-indigo-600 transition-colors" />
+            <div className="w-full">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">What</label>
+              <input 
+                type="text" 
+                placeholder="Services, business, keywords" 
+                value={search} 
+                onChange={(e) => setSearch(e.target.value)} 
+                className="w-full bg-transparent border-none p-0 focus:ring-0 text-sm md:text-base font-semibold text-slate-800 placeholder:text-slate-300 outline-none" 
+              />
+            </div>
           </div>
-          <div className="flex-1 relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">📍</span>
-            <input type="text" placeholder="Search by area or location..." value={area} onChange={(e) => setArea(e.target.value)} className="w-full border border-gray-300 rounded-lg p-2 pl-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" />
+
+          {/* Location */}
+          <div className="flex-1 w-full relative flex items-center px-4 py-3 md:py-2 border-b md:border-b-0 md:border-r border-slate-100 group">
+            <FiMapPin className="text-slate-400 text-xl shrink-0 mr-3 group-focus-within:text-indigo-600 transition-colors" />
+            <div className="w-full">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Where</label>
+              <input 
+                type="text" 
+                placeholder="City, neighborhood, zip" 
+                value={area} 
+                onChange={(e) => setArea(e.target.value)} 
+                className="w-full bg-transparent border-none p-0 focus:ring-0 text-sm md:text-base font-semibold text-slate-800 placeholder:text-slate-300 outline-none" 
+              />
+            </div>
           </div>
-          <select 
-            className="w-full md:w-48 border border-gray-300 rounded-lg p-2 bg-white cursor-pointer focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
+
+          {/* Sort Dropdown */}
+          <div className="w-full md:w-auto relative flex items-center px-4 py-3 md:py-2 group">
+            <FiFilter className="text-slate-400 text-xl shrink-0 mr-3 md:hidden group-focus-within:text-indigo-600 transition-colors" />
+            <div className="w-full md:w-40">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Sort By</label>
+              <select 
+                className="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold text-slate-700 cursor-pointer outline-none"
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+              >
+                <option value="recommended">Recommended</option>
+                <option value="rating_desc">Highest Rated</option>
+                <option value="name_asc">Name (A-Z)</option>
+                <option value="name_desc">Name (Z-A)</option>
+                <option value="newest">Newest First</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Search Button */}
+          <button 
+            type="submit" 
+            className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl md:rounded-full px-8 py-4 md:py-3.5 font-bold transition-all shadow-md hover:shadow-indigo-500/30 flex items-center justify-center gap-2"
           >
-            <option value="recommended">Recommended</option>
-            <option value="rating_desc">Highest Rated</option>
-            <option value="name_asc">Name (A-Z)</option>
-            <option value="name_desc">Name (Z-A)</option>
-            <option value="newest">Newest First</option>
-          </select>
-          <button type="submit" className="bg-blue-600 text-white px-8 py-2 rounded-lg font-semibold hover:bg-blue-700 transition whitespace-nowrap">Filter</button>
+            <FiSearch className="md:hidden text-lg" />
+            Search
+          </button>
         </form>
-        <div className="flex flex-wrap gap-2 mt-4">
+        
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
           {categories.map((cat) => (
-            <button key={cat} onClick={() => setCategory(cat)} className={`px-4 py-2 rounded-full text-sm font-medium transition ${category === cat ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-              {cat === 'all' ? 'All' : cat}
+            <button 
+              key={cat} 
+              onClick={() => setCategory(cat)} 
+              className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                category === cat 
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20 scale-105' 
+                  : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 hover:border-slate-300'
+              }`}
+            >
+              {cat === 'all' ? 'All Categories' : cat}
             </button>
           ))}
         </div>

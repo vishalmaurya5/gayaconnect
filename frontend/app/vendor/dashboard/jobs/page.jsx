@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { FiBriefcase, FiPlus, FiTrash2, FiTag } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { JOB_SALE_CATEGORIES } from '@/lib/utils/jobSaleCategories';
 
 export default function VendorJobsPage() {
   const [jobs, setJobs] = useState([]);
@@ -14,6 +15,7 @@ export default function VendorJobsPage() {
     title: '',
     description: '',
     type: 'job',
+    category: '',
     salaryOrPrice: '',
     location: '',
     image: ''
@@ -50,6 +52,10 @@ export default function VendorJobsPage() {
 
   const handlePost = async (e) => {
     e.preventDefault();
+    if (!form.category) {
+      toast.error('Please select a category');
+      return;
+    }
     setPosting(true);
     try {
       const res = await fetch('/api/jobs', {
@@ -60,7 +66,7 @@ export default function VendorJobsPage() {
       const data = await res.json();
       if (data.success) {
         toast.success(form.type === 'job' ? 'Job posted successfully!' : 'Sale posted successfully!');
-        setForm({ title: '', description: '', type: 'job', salaryOrPrice: '', location: '', image: '' });
+        setForm({ title: '', description: '', type: 'job', category: '', salaryOrPrice: '', location: '', image: '' });
         fetchJobs();
       } else {
         toast.error(data.message || 'Failed to post');
@@ -155,6 +161,16 @@ export default function VendorJobsPage() {
               </div>
 
               <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Category</label>
+                <select required value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
+                  <option value="" disabled>Select a category</option>
+                  {JOB_SALE_CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1">Description</label>
                 <textarea required rows="3" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Provide details..."></textarea>
               </div>
@@ -217,10 +233,15 @@ export default function VendorJobsPage() {
                 {jobs.map(job => (
                   <div key={job._id} className="bg-white rounded-xl p-5 shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between gap-4 transition hover:shadow-md">
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${job.type === 'job' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
                           {job.type}
                         </span>
+                        {job.category && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                            {job.category}
+                          </span>
+                        )}
                         <span className="text-xs text-slate-400">{new Date(job.createdAt).toLocaleDateString()}</span>
                       </div>
                       <h3 className="font-bold text-lg text-slate-900">{job.title}</h3>

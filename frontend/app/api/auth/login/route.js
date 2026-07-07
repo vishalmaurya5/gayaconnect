@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/db/mongodb";
 import User from "@/lib/db/models/User";
 import { createUserSession } from "@/lib/security/auth";
 import { toAuthUser } from "@/lib/utils/contactAccess";
+import { setAdminCookie } from "@/lib/utils/adminAuth";
 
 export async function POST(request) {
   try {
@@ -58,6 +59,11 @@ export async function POST(request) {
 
     // Set HTTP-only cookies for Server Components
     await createUserSession(response, user, true);
+    
+    // Automatically grant admin dashboard access if the user is an admin
+    if (user.role === "admin") {
+      setAdminCookie(response);
+    }
 
     return response;
 

@@ -32,13 +32,23 @@ export async function POST(request) {
     // Verification complete, proceed with order creation
 
     // Create Razorpay Order
-    const options = {
-      amount: amount, // amount in the smallest currency unit (paise)
-      currency: "INR",
-      receipt: `rcpt_${userId.toString().slice(-8)}_${Date.now()}`
-    };
-
-    const order = await razorpay.orders.create(options);
+    let order;
+    const isDummy = process.env.DUMMY_RAZORPAY === "true" || process.env.NEXT_PUBLIC_USE_REAL_RAZORPAY === "false";
+    
+    if (isDummy) {
+      order = {
+        id: `dummy_order_${Date.now()}`,
+        amount: amount,
+        currency: "INR"
+      };
+    } else {
+      const options = {
+        amount: amount, // amount in the smallest currency unit (paise)
+        currency: "INR",
+        receipt: `rcpt_${userId.toString().slice(-8)}_${Date.now()}`
+      };
+      order = await razorpay.orders.create(options);
+    }
 
     // Save pending subscription in DB
     const subscription = new Subscription({
@@ -51,9 +61,10 @@ export async function POST(request) {
     
     await subscription.save();
 
-    return NextResponse.json({ success: true, orderId: order.id, amount: order.amount, currency: order.currency });
+    return NextResponse.json({ success: true, orderId: order.id, amount: order.amount, currency: order.currency, isDummy });
   } catch (error) {
     console.error("Create Order Error:", error);
-    return NextResponse.json({ success: false, message: error.message || 'Internal server error' }, { status: 500 });
+    const errorMessage = error?.error?.description || error?.message || 'Internal server error';
+    return NextResponse.json({ success: false, message: errorMessage }, { status: 500 });
   }
 }

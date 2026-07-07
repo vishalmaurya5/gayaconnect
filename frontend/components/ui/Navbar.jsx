@@ -64,6 +64,7 @@ export default function Navbar() {
         {/* Desktop Nav */}
         <div className="hidden xl:flex items-center gap-3 lg:gap-6">
           <NavLink href="/" isScrolled={isScrolled}>Home</NavLink>
+          <NavLink href="/explore" isScrolled={isScrolled}>Explore Gaya <span className={`ml-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${isScrolled ? 'bg-orange-500 text-white' : 'bg-white text-orange-500'}`}>New</span></NavLink>
           <NavLink href="/vendors" isScrolled={isScrolled}>Vendors</NavLink>
           <NavLink href="/offers" isScrolled={isScrolled}>Offers <span className={`ml-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${isScrolled ? 'bg-teal-600 text-white' : 'bg-white text-teal-600'}`}>New</span></NavLink>
           <NavLink href="/services" isScrolled={isScrolled}>Services</NavLink>
@@ -135,6 +136,7 @@ export default function Navbar() {
             </button>
 
             <MobileNavLink href="/" onClick={() => setIsMenuOpen(false)}>Home</MobileNavLink>
+            <MobileNavLink href="/explore" onClick={() => setIsMenuOpen(false)}>Explore Gaya 🌟</MobileNavLink>
             <MobileNavLink href="/vendors" onClick={() => setIsMenuOpen(false)}>Vendors</MobileNavLink>
             <MobileNavLink href="/offers" onClick={() => setIsMenuOpen(false)}>Offers</MobileNavLink>
             <MobileNavLink href="/services" onClick={() => setIsMenuOpen(false)}>Services</MobileNavLink>

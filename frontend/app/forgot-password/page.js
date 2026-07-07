@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Mail, ArrowRight, ArrowLeft } from "lucide-react";
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -15,8 +15,8 @@ export default function ForgotPasswordPage() {
     setError("");
     setMessage("");
 
-    if (!email) {
-      setError("Please enter your email address.");
+    if (!identifier) {
+      setError("Please enter your Mobile Number or Email.");
       return;
     }
 
@@ -25,11 +25,11 @@ export default function ForgotPasswordPage() {
       const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ identifier }),
       });
       const data = await res.json();
       if (res.ok) {
-        setMessage(data.message || "If an account exists for that email, a reset link has been sent.");
+        setMessage(data.message || "If an account exists, a reset link has been sent to the registered email address.");
       } else {
         setError(data.error || "Something went wrong. Please try again.");
       }
@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
         <div className="bg-white rounded-3xl shadow-xl shadow-indigo-100/50 p-8 border border-gray-100">
           <h1 className="text-xl font-bold text-gray-900 mb-1">Forgot password?</h1>
           <p className="text-sm text-gray-500 mb-6">
-            Enter the email linked to your account and we&apos;ll send you a link to reset your password.
+            Enter the Mobile Number or Email linked to your account and we&apos;ll send you a link to reset your password.
           </p>
 
           {error && (
@@ -69,17 +69,17 @@ export default function ForgotPasswordPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mobile Number or Email</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Mail size={18} className="text-gray-400" />
                 </div>
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
-                  placeholder="you@example.com"
+                  placeholder="e.g., 9876543210 or you@example.com"
                 />
               </div>
             </div>

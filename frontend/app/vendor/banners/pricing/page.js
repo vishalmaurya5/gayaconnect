@@ -46,8 +46,11 @@ export default function BannerPricingPage() {
       if (!orderData.success) throw new Error(orderData.message || 'Could not create payment order')
 
       if (orderData.isDummy) {
-        // Redirect to dummy razorpay, we'd need a special handler but let's assume it works.
-        router.push(`/dummy-razorpay?orderId=${orderData.order.id}&amount=${orderData.order.amount}&returnTo=/vendor/banners/success?paymentId=dummy`)
+        sessionStorage.setItem(`dummy-payment:${orderData.order.id}`, JSON.stringify({
+          plan: BANNER_POST_MONTHLY_PLAN,
+          returnTo: '/vendor/banners/success?paymentId=dummy'
+        }));
+        router.push(`/dummy-razorpay?orderId=${orderData.order.id}&amount=${orderData.order.amount}`)
         return
       }
 
