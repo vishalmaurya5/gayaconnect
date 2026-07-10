@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { 
   FiGrid, FiUsers, FiShoppingBag, FiTool, FiTag, 
   FiImage, FiDollarSign, FiLogOut, FiShield, FiMenu, FiX,
-  FiPhoneCall, FiSettings, FiMonitor, FiBriefcase, FiTruck, FiList
+  FiPhoneCall, FiSettings, FiMonitor, FiBriefcase, FiTruck, FiList, FiMessageSquare
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -53,6 +53,7 @@ export default function AdminLayout({ children }) {
 
   const menuItems = [
     { name: 'Dashboard', path: '/admin', icon: FiGrid },
+    { name: 'Feedbacks', path: '/admin/feedbacks', icon: FiMessageSquare },
     { name: 'Users', path: '/admin/users', icon: FiUsers },
     { name: 'Vendors', path: '/admin/vendors', icon: FiShoppingBag },
     { name: 'Labour', path: '/admin/labour', icon: FiTool },

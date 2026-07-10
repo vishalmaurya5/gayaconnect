@@ -7,9 +7,11 @@ import { FaWhatsapp } from 'react-icons/fa'
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
+import FeedbackModal from './FeedbackModal'
 
 export default function VendorCard({ vendor }) {
   const [isLiked, setIsLiked] = useState(false)
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
   const { user } = useAuth()
   const router = useRouter()
 
@@ -47,9 +49,17 @@ export default function VendorCard({ vendor }) {
               {vendor.name}
             </h3>
           </Link>
-          <div className="flex items-center gap-1 bg-green-50 border border-green-100 px-2 py-1 rounded-lg shrink-0">
-            <FiStar className="text-green-500 fill-green-500 text-sm" />
-            <span className="text-sm font-bold text-green-700">{vendor.rating || 4.5}</span>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <div className="flex items-center gap-1 bg-green-50 border border-green-100 px-2 py-1 rounded-lg">
+              <FiStar className="text-green-500 fill-green-500 text-sm" />
+              <span className="text-sm font-bold text-green-700">{vendor.rating || 4.5}</span>
+            </div>
+            <button 
+              onClick={(e) => { e.preventDefault(); setIsFeedbackModalOpen(true); }}
+              className="text-[10px] text-blue-600 font-bold hover:underline"
+            >
+              Rate Us
+            </button>
           </div>
         </div>
 
@@ -102,6 +112,12 @@ export default function VendorCard({ vendor }) {
           </div>
         </div>
       </div>
+      <FeedbackModal 
+        isOpen={isFeedbackModalOpen} 
+        onClose={() => setIsFeedbackModalOpen(false)} 
+        type="vendor" 
+        vendorId={vendor._id} 
+      />
     </div>
   )
 }
