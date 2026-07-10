@@ -38,22 +38,12 @@ export default function Navbar() {
         
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors duration-300 ${isScrolled ? 'bg-indigo-600' : 'bg-white/10'}`}>
-            <svg width="20" height="22" viewBox="0 0 20 22" fill="none">
-              <ellipse cx="10" cy="8" rx="7" ry="7" fill="white" opacity="0.9" />
-              <polygon points="10,22 5,14 15,14" fill="white" opacity="0.7" />
-              <circle cx="10" cy="8" r="3" fill={isScrolled ? "#4338CA" : "#4F46E5"} />
-              <line x1="10" y1="8" x2="6" y2="5.5" stroke={isScrolled ? "#4338CA" : "#4F46E5"} strokeWidth="1.2" />
-              <line x1="10" y1="8" x2="14" y2="5.5" stroke={isScrolled ? "#4338CA" : "#4F46E5"} strokeWidth="1.2" />
-              <line x1="10" y1="8" x2="10" y2="11.5" stroke={isScrolled ? "#4338CA" : "#4F46E5"} strokeWidth="1.2" />
-              <circle cx="6" cy="5.5" r="1.5" fill={isScrolled ? "#4338CA" : "#4F46E5"} />
-              <circle cx="14" cy="5.5" r="1.5" fill={isScrolled ? "#4338CA" : "#4F46E5"} />
-              <circle cx="10" cy="11.5" r="1.5" fill={isScrolled ? "#4338CA" : "#4F46E5"} />
-            </svg>
+          <div className={`w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center transition-all duration-300 shadow-sm border-2 ${isScrolled ? 'border-indigo-100 bg-white' : 'border-white/20 bg-white/90'}`}>
+            <img src="/gaya_seva_app_icon.png" alt="Gaya Seva Icon" className="w-full h-full object-cover" />
           </div>
           <div>
             <div className={`font-sora font-extrabold text-[19px] leading-tight transition-colors duration-300 ${isScrolled ? 'text-indigo-600' : 'text-white'}`}>
-              Gaya<span className={isScrolled ? 'text-teal-600' : 'text-teal-300'}>Connect</span>
+              Gaya<span className={isScrolled ? 'text-teal-600' : 'text-teal-300'}>Seva</span>
             </div>
             <div className={`text-[10px] uppercase tracking-wider font-semibold ${isScrolled ? 'text-slate-400' : 'text-indigo-200'}`}>
               Gaya District · Bihar

@@ -10,11 +10,11 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const sora = Sora({ subsets: ['latin'], variable: '--font-sora' })
 
 export const metadata = {
-  title: 'Gaya Connect - Your Digital Gateway to Local Services',
-  description: 'Find the best local shops, restaurants, repair services, hotels and more in Gaya. Book services online with Gaya Connect.',
-  keywords: 'Gaya local services, Gaya shops, Gaya restaurants, repair services Gaya, hotels in Gaya',
-  authors: [{ name: 'Gaya Connect' }],
-  icons: { icon: '/favicon.ico' },
+  title: 'Gaya Seva - Your Digital Gateway to Local Services',
+  description: 'Find the best local shops, restaurants, repair services, hotels and more in Gaya. Book services online with Gaya Seva.',
+  keywords: 'Gaya local services, Gaya shops, Gaya restaurants, repair services Gaya, hotels in Gaya, Gaya Seva',
+  authors: [{ name: 'Gaya Seva' }],
+  icons: { icon: '/gaya_seva_app_icon.png' },
 }
 
 export const viewport = {

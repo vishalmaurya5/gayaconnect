@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block text-3xl font-extrabold text-indigo-700 tracking-tight">
-            Gaya Connect
+            Gaya Seva
           </Link>
           <p className="text-gray-500 mt-2 text-sm">Reset your password</p>
         </div>

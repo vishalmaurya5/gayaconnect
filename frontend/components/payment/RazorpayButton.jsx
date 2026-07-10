@@ -24,7 +24,7 @@ export default function RazorpayButton({
   createOrderPayload,
   createOrderUrl = '/api/razorpay/order',
   verifyUrl = '/api/razorpay/verify',
-  name = 'Gaya Connect',
+  name = 'Gaya Seva',
   description = 'Payment',
   prefill = {},
   notes = {},

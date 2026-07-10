@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db/mongodb'
 import Banner from '@/lib/db/models/Banner'
+import Vendor from '@/lib/db/models/Vendor' // Required for populate
 
 export async function GET(request) {
   try {

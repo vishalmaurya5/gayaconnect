@@ -22,7 +22,7 @@ export default function VendorCTA() {
         </h2>
         
         <p className="text-slate-400 mt-2 max-w-3xl text-[16px] md:text-[20px] leading-[1.6] relative z-10 font-medium">
-          Join thousands of local professionals who are managing their listings, posting offers, and skyrocketing their revenue through Gaya Connect.
+          Join thousands of local professionals who are managing their listings, posting offers, and skyrocketing their revenue through Gaya Seva.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 mt-10 relative z-10 w-full sm:w-auto">

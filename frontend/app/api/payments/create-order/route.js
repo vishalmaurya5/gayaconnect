@@ -82,11 +82,11 @@ export async function POST(request) {
     });
 
     const planLabels = {
-      user_monthly:  "GayaConnect — Monthly subscription",
-      offer_7days:   "GayaConnect — Offer post (7 days)",
-      offer_30days:  "GayaConnect — Offer post (30 days)",
-      offer_365days: "GayaConnect — Offer post (1 year)",
-      banner_post_monthly: "GayaConnect — Weekly Banner advertisement",
+      user_monthly:  "GayaSeva — Monthly subscription",
+      offer_7days:   "GayaSeva — Offer post (7 days)",
+      offer_30days:  "GayaSeva — Offer post (30 days)",
+      offer_365days: "GayaSeva — Offer post (1 year)",
+      banner_post_monthly: "GayaSeva — Weekly Banner advertisement",
     };
 
     const order = await razorpay.orders.create({
@@ -112,7 +112,7 @@ export async function POST(request) {
       },
       plan,
       duration,
-      description: planLabels[planKey] || "GayaConnect payment",
+      description: planLabels[planKey] || "GayaSeva payment",
     });
   } catch (err) {
     console.error("create-order error:", err);

@@ -90,7 +90,7 @@ export default function LabourRegisterPage() {
           </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Registration Successful!</h2>
           <p className="text-slate-600 mb-8">
-            Your profile has been created successfully. You are now officially listed in the Gaya Connect worker directory.
+            Your profile has been created successfully. You are now officially listed in the Gaya Seva worker directory.
           </p>
           <button 
             onClick={() => router.push('/labour')}
@@ -111,7 +111,7 @@ export default function LabourRegisterPage() {
             <FiTool className="text-3xl" />
           </div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Register as a Worker</h1>
-          <p className="text-slate-600 mt-2">Join the Gaya Connect directory and get hired directly.</p>
+          <p className="text-slate-600 mt-2">Join the Gaya Seva directory and get hired directly.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
@@ -249,7 +249,7 @@ export default function LabourRegisterPage() {
             >
               {loading ? 'Submitting...' : 'Submit Profile for Approval'}
             </button>
-            <p className="text-center text-sm text-slate-500">By submitting, you agree to Gaya Connect's terms and conditions.</p>
+            <p className="text-center text-sm text-slate-500">By submitting, you agree to Gaya Seva's terms and conditions.</p>
           </div>
         </form>
       </div>

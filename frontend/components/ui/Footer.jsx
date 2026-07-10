@@ -25,7 +25,7 @@ export default function Footer() {
       <section className="bg-gradient-to-b from-white to-slate-50 py-16 border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h3 className="text-3xl font-sora font-extrabold text-slate-900 mb-4 tracking-tight">How Gaya Connect Works</h3>
+            <h3 className="text-3xl font-sora font-extrabold text-slate-900 mb-4 tracking-tight">How Gaya Seva Works</h3>
             <p className="text-slate-500 text-[15px] max-w-2xl mx-auto">Your simple guide to navigating our local platform, connecting with vendors, and managing your services effectively.</p>
           </div>
           
@@ -84,9 +84,12 @@ export default function Footer() {
                   
                   <div className="lg:col-span-3 space-y-6">
                       <Link href="/" className="block">
-                          <div className="font-sora text-3xl font-extrabold tracking-tight">
-                              <span className="text-black">Gaya</span>
-                              <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-500">Connect</span>
+                          <div className="flex items-center gap-3">
+                              <img src="/gaya_seva_app_icon.png" alt="Gaya Seva Logo" className="w-9 h-9 object-cover rounded-xl shadow-sm border border-slate-100" />
+                              <div className="font-sora text-3xl font-extrabold tracking-tight">
+                                  <span className="text-black">Gaya</span>
+                                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-500">Seva</span>
+                              </div>
                           </div>
                       </Link>
                       <p className="text-sm/6 text-neutral-600 max-w-96">
@@ -105,8 +108,8 @@ export default function Footer() {
                           <a href="tel:+918544491413" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
                               <FiPhone size={18} /> <span className="text-sm font-medium">+91 85444 91413</span>
                           </a>
-                          <a href="mailto:support@gayaconnect.in" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
-                              <FiMail size={18} /> <span className="text-sm font-medium">support@gayaconnect.in</span>
+                          <a href="mailto:support@gayaseva.in" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
+                              <FiMail size={18} /> <span className="text-sm font-medium">support@gayaseva.in</span>
                           </a>
                       </div>
                   </div>
@@ -143,14 +146,14 @@ export default function Footer() {
                               <li><Link href="/about" className="hover:text-emerald-600 transition-colors">About</Link></li>
                               <li><Link href="/privacy" className="hover:text-emerald-600 transition-colors">Privacy policy</Link></li>
                               <li><Link href="/terms" className="hover:text-emerald-600 transition-colors">Terms of service</Link></li>
-                              <li><a href="mailto:support@gayaconnect.in" className="hover:text-emerald-600 transition-colors">Contact Us</a></li>
+                              <li><a href="mailto:support@gayaseva.in" className="hover:text-emerald-600 transition-colors">Contact Us</a></li>
                           </ul>
                       </div>
                   </div>
               </div>
 
               <div className="max-w-7xl mx-auto mt-12 pt-4 border-t border-neutral-300 flex flex-col md:flex-row justify-between items-center gap-4">
-                  <p className="text-neutral-600 text-sm">© {new Date().getFullYear()} GayaConnect. Premium Local Discovery.</p>
+                  <p className="text-neutral-600 text-sm">© {new Date().getFullYear()} GayaSeva. Premium Local Discovery.</p>
                   
                   <div className="flex flex-wrap gap-3">
                     <span className="flex items-center gap-1.5 bg-neutral-100 border border-neutral-200 px-3 py-1.5 rounded-full text-neutral-600 text-xs font-medium"><FiShield className="text-emerald-500" /> 100% Secure Payments</span>
@@ -160,7 +163,7 @@ export default function Footer() {
               <div className="relative">
                   <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-3xl h-full max-h-64 bg-slate-100 rounded-full blur-[100px] pointer-events-none"/>
                   <h1 className="text-center font-extrabold leading-[0.7] text-transparent bg-clip-text bg-gradient-to-b from-slate-200 via-slate-300 to-slate-400 text-[clamp(3rem,11vw,15rem)] drop-shadow-sm mt-8 pb-4" >
-                      Gaya Connect
+                      Gaya Seva
                   </h1>
               </div>
           </footer>

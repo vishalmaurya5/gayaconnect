@@ -1,6 +1,6 @@
-# Gaya Connect - Dummy Data & Testing Guide
+# Gaya Seva - Dummy Data & Testing Guide
 
-This document outlines the core functions of the Gaya Connect platform and provides dummy data structures so you can easily test the full website (via MongoDB Compass, Postman, or your database GUI).
+This document outlines the core functions of the Gaya Seva platform and provides dummy data structures so you can easily test the full website (via MongoDB Compass, Postman, or your database GUI).
 
 ## 1. User
 **Function:** The core identity. Users can have roles like `user`, `vendor`, or `admin`.
@@ -157,7 +157,7 @@ This document outlines the core functions of the Gaya Connect platform and provi
 
 ---
 
-### 💡 Testing Tips for Gaya Connect
+### 💡 Testing Tips for Gaya Seva
 1. **Admin Access:** The easiest way to test admin features is to register normally on the website frontend. Then, open MongoDB (or MongoDB Compass), find your `User` document, and change `"role": "user"` to `"role": "admin"`.
 2. **References (`ObjectId`):** If you are inserting this dummy data manually into your database, remember to replace `REPLACE_WITH_..._OBJECT_ID` with actual `_id` values from your `Users` or `Vendors` collections so the relationships work properly.
 3. **Approval Flow:** Notice that many collections (`Vendor`, `Labourer`, `Vehicle`, `Banner`) have an `isApproved`, `adminApproved`, or `status` field. To test the public-facing website, make sure to set these to `true` or `"approved"`. To test the admin dashboard functionality, set them to `false` or `"pending"` so they show up in your admin approval queues!

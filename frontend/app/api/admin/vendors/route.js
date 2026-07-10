@@ -34,7 +34,7 @@ export async function POST(request) {
       email: body.email,
       phone: body.phone,
       role: 'vendor',
-      password: body.password || 'GayaConnect@123'
+      password: body.password || 'GayaSeva@123'
     })
     await user.save()
 

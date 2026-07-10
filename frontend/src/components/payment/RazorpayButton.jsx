@@ -7,7 +7,7 @@ export default function RazorpayButton({ amount, purpose, packageName, onSuccess
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
       amount: order.amount,
       currency: order.currency,
-      name: 'Gaya Connect',
+      name: 'Gaya Seva',
       description: packageName || 'Platform payment',
       order_id: order.id,
       handler: async (response) => {

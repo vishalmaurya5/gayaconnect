@@ -57,7 +57,7 @@ export default function SubscriptionGuard({ children }) {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
         currency: "INR",
-        name: "Gaya Connect",
+        name: "Gaya Seva",
         description: "Monthly Subscription",
         order_id: data.orderId,
         handler: async (response) => {
@@ -131,7 +131,7 @@ export default function SubscriptionGuard({ children }) {
             </button>
             
             <div className="text-center mb-6 mt-2">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Unlock Gaya Connect</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Unlock Gaya Seva</h3>
               <p className="text-gray-500 text-sm">Get full access to all vendors, offers, and local workforce contacts.</p>
             </div>
 

@@ -61,7 +61,7 @@ export default function BannerPricingPage() {
         key: orderData.keyId,
         amount: orderData.order.amount,
         currency: orderData.order.currency,
-        name: 'Gaya Connect',
+        name: 'Gaya Seva',
         description: 'Weekly Banner Advertisement',
         order_id: orderData.order.id,
         handler: async (response) => {
@@ -126,7 +126,7 @@ export default function BannerPricingPage() {
 
           <ul className="space-y-4 mb-8">
             {[
-              'Premium placement on Gaya Connect homepage',
+              'Premium placement on Gaya Seva homepage',
               'High visibility to all local visitors',
               'Link directly to your offers or website',
               'Boost brand awareness in your city'

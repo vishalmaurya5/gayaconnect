@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 
 export const sendEmail = async ({ to, subject, html }) => {
   await transporter.sendMail({
-    from: `Gaya Connect <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+    from: `Gaya Seva <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
     to,
     subject,
     html,

@@ -66,7 +66,7 @@ export default function BannerSlider({ position = 'home_top' }) {
             ) : activeBanner._id !== 'welcome-dummy' ? (
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/20 text-xs font-bold uppercase tracking-widest mb-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]"></span>
-                Gaya Connect Special
+                Gaya Seva Special
               </div>
             ) : null}
             <h3 className="text-2xl md:text-3xl font-bold mb-2">{activeBanner.title}</h3>

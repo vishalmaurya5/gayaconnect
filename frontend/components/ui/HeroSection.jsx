@@ -171,95 +171,60 @@ export default function HeroSection() {
 
           {/* RIGHT COLUMN - 30% */}
           <div className="lg:col-span-5 relative flex justify-center mt-12 lg:mt-0">
-            <div className="relative w-full max-w-[460px] mx-auto">
+            <div className="relative w-full max-w-[500px] aspect-[4/5] mx-auto group">
+              {/* Decorative Blur */}
+              <div className="absolute -inset-4 bg-gradient-to-tr from-indigo-500 to-teal-400 rounded-[40px] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-700 animate-pulse"></div>
               
-              {/* Decorative background element behind card */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-teal-400 rounded-[36px] blur-2xl opacity-20 animate-pulse"></div>
-
-              {/* Professional Vendor CTA Card */}
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95, rotateY: 10 }}
-                animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-                className="bg-white rounded-[32px] p-7 sm:p-9 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 relative z-20"
-                style={{ perspective: "1000px" }}
-              >
-                <div className="flex justify-between items-center mb-6">
-                  <div className="bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full text-[11px] font-bold tracking-widest uppercase flex items-center gap-1.5 border border-indigo-100">
-                    <Store className="w-3.5 h-3.5" /> For Businesses
-                  </div>
-                  <div className="bg-green-50 text-green-700 px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-widest uppercase flex items-center gap-2 border border-green-200/50 shadow-sm">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
-                    Live Now
-                  </div>
-                </div>
+              {/* Main Image Container */}
+              <div className="relative w-full h-full rounded-[36px] overflow-hidden shadow-2xl border-[4px] border-white z-20">
+                <img 
+                  src="/images/gaya_seva_hero_banner.png" 
+                  alt="Gaya Seva Professionals" 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
                 
-                <h3 className="font-sora font-[800] text-[26px] text-[#0F172A] leading-[1.2] mb-3">
-                  Accelerate your business.
-                </h3>
-                
-                <p className="text-[14px] text-slate-500 leading-relaxed mb-6 font-medium">
-                  Join <strong className="text-indigo-600 font-bold">1,000+ local experts</strong> multiplying their daily bookings through Gaya Connect.
-                </p>
-
-                {/* Real-time Proof / Sample Card */}
-                <div className="flex items-center gap-4 mb-6 p-3.5 bg-gradient-to-r from-slate-50 to-indigo-50/40 rounded-[20px] border border-slate-200/60 shadow-sm">
-                  <div className="relative shrink-0">
-                    <img 
-                      src="https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=150&h=150" 
-                      alt="Local Professional" 
-                      className="w-14 h-14 rounded-full border-[3px] border-white shadow-md object-cover" 
-                    />
-                    <div className="absolute -bottom-0.5 -right-0.5 bg-green-500 w-4 h-4 rounded-full border-2 border-white"></div>
-                  </div>
-                  <div>
-                    <h4 className="text-[14px] font-bold text-slate-900 flex items-center gap-1">
-                      Rajesh Kumar 
-                      <ShieldCheck className="w-4 h-4 text-blue-500" />
-                    </h4>
-                    <p className="text-[12px] font-medium text-slate-500 mt-0.5">Electrician • Gaya City</p>
-                    <div className="text-[11px] font-bold text-teal-600 mt-1 flex items-center gap-1 bg-teal-50 w-fit px-2 py-0.5 rounded-full border border-teal-100">
-                      <TrendingUp className="w-3 h-3" /> +4 bookings today
+                {/* Glassmorphism Floating Card Over Image */}
+                <div className="absolute bottom-6 left-6 right-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                      <img 
+                        src="/images/gaya_seva_logo.png" 
+                        alt="Gaya Seva Logo" 
+                        className="w-12 h-12 rounded-full border-2 border-white shadow-lg bg-white object-cover" 
+                      />
+                      <div>
+                        <h4 className="text-white font-bold text-[16px] flex items-center gap-1.5">
+                          Verified Experts <ShieldCheck className="w-4 h-4 text-teal-400" />
+                        </h4>
+                        <p className="text-white/90 text-[13px] font-medium">Ready to serve Gaya</p>
+                      </div>
+                    </div>
+                    <div className="bg-white/20 px-2 py-1 rounded-md flex items-center justify-center">
+                      <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
                     </div>
                   </div>
+                  <Link href="/register-vendor" className="w-full bg-white text-indigo-700 font-bold rounded-xl px-4 py-3 flex items-center justify-center gap-2 hover:bg-indigo-50 transition-colors shadow-lg">
+                    Join as Professional <ArrowRight className="w-4 h-4" />
+                  </Link>
                 </div>
+              </div>
 
-                <div className="space-y-3.5 mb-8">
-                  <div className="flex items-center gap-3 text-[14px] font-semibold text-slate-700">
-                    <div className="w-6 h-6 rounded-full bg-teal-50 flex items-center justify-center shrink-0 border border-teal-100">
-                      <CheckCircle2 className="w-4 h-4 text-teal-600" />
-                    </div>
-                    Premium verified profile
-                  </div>
-                  <div className="flex items-center gap-3 text-[14px] font-semibold text-slate-700">
-                    <div className="w-6 h-6 rounded-full bg-teal-50 flex items-center justify-center shrink-0 border border-teal-100">
-                      <CheckCircle2 className="w-4 h-4 text-teal-600" />
-                    </div>
-                    Increase revenue instantly
-                  </div>
-                </div>
-
-                <Link href="/register-vendor" className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold rounded-[16px] px-6 py-4 flex items-center justify-center gap-2 hover:shadow-[0_10px_30px_rgba(79,70,229,0.3)] transition-all hover:-translate-y-1 duration-300">
-                  List Your Business Free <ArrowRight className="w-5 h-5" />
-                </Link>
-              </motion.div>
-
-              {/* Trust badges below card */}
+              {/* Floating Element: Trust Badge */}
               <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.5 }}
-                className="flex items-center justify-center gap-6 mt-6 relative z-20 text-slate-500 text-[13px] font-bold uppercase tracking-wider"
+                className="absolute -right-4 top-10 bg-white rounded-2xl p-3 shadow-xl border border-slate-100 z-30 flex items-center gap-3 animate-bounce"
+                style={{ animationDuration: '4s' }}
               >
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-teal-500" /> 100% Secure
+                <div className="bg-amber-100 p-2 rounded-xl">
+                  <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
                 </div>
-                <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
-                <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-amber-400 fill-amber-400" /> 4.9/5 Rating
+                <div className="pr-2">
+                  <div className="text-[13px] font-extrabold text-slate-800">4.9/5 Rating</div>
+                  <div className="text-[10px] font-semibold text-slate-500">Trusted by Locals</div>
                 </div>
               </motion.div>
             </div>

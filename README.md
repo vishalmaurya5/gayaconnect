@@ -1,6 +1,6 @@
-# Gaya Connect
+# Gaya Seva
 
-Gaya Connect is a local discovery and vendor promotion platform for Gaya and
+Gaya Seva is a local discovery and vendor promotion platform for Gaya and
 Bodh Gaya. The website helps residents and visitors find nearby services,
 shops, hotels, offers, and local points of interest, while vendors can publish
 their business details and promotions.

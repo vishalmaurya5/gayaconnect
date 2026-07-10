@@ -3,8 +3,8 @@ import Link from "next/link";
 import { FileText, AlertTriangle, Users, Car, Gavel } from "lucide-react";
 
 export const metadata = {
-  title: "Terms of Use | Gaya Connect",
-  description: "Terms and conditions for using the Gaya Connect platform.",
+  title: "Terms of Use | Gaya Seva",
+  description: "Terms and conditions for using the Gaya Seva platform.",
 };
 
 export default function TermsOfUsePage() {
@@ -18,7 +18,7 @@ export default function TermsOfUsePage() {
             Terms of Use
           </h1>
           <p className="text-lg text-indigo-200/80 max-w-2xl mx-auto">
-            By accessing and using Gaya Connect, you agree to be bound by these terms. Please read them carefully.
+            By accessing and using Gaya Seva, you agree to be bound by these terms. Please read them carefully.
           </p>
           <p className="mt-4 text-sm text-slate-400">Last Updated: June 2026</p>
         </div>
@@ -33,7 +33,7 @@ export default function TermsOfUsePage() {
               <Users className="w-6 h-6 text-indigo-600" /> Platform Role & Limitations
             </h2>
             <div className="space-y-4 text-slate-600 leading-relaxed">
-              <p>Gaya Connect is strictly an <strong>online directory and lead-generation platform</strong> designed to connect local users with businesses, daily labourers, and vehicle owners in the Gaya district.</p>
+              <p>Gaya Seva is strictly an <strong>online directory and lead-generation platform</strong> designed to connect local users with businesses, daily labourers, and vehicle owners in the Gaya district.</p>
               <ul className="list-disc pl-5 space-y-2">
                 <li>We do not directly provide any services, labour, or vehicle rentals.</li>
                 <li>We do not guarantee the quality, safety, or legality of the services advertised by vendors or labourers.</li>
@@ -50,7 +50,7 @@ export default function TermsOfUsePage() {
               <p className="font-semibold text-orange-900">Specific Terms for Vehicle Owners and Renters:</p>
               <ul className="list-disc pl-5 space-y-2 text-orange-800">
                 <li>By listing a vehicle, the owner confirms that the vehicle is licensed for commercial use and holds valid commercial insurance.</li>
-                <li>Gaya Connect holds <strong>NO LIABILITY</strong> for any accidents, damages, theft, or legal disputes that occur during a vehicle rental period.</li>
+                <li>Gaya Seva holds <strong>NO LIABILITY</strong> for any accidents, damages, theft, or legal disputes that occur during a vehicle rental period.</li>
                 <li>Renters are strongly advised to verify the vehicle's condition, papers, and the owner's identity before making any offline payments or signing agreements.</li>
               </ul>
             </div>
@@ -61,7 +61,7 @@ export default function TermsOfUsePage() {
               <AlertTriangle className="w-6 h-6 text-indigo-600" /> Payments & Subscriptions
             </h2>
             <div className="space-y-4 text-slate-600 leading-relaxed">
-              <p>Gaya Connect offers paid features including monthly subscriptions, vendor registration fees, and banner advertisements.</p>
+              <p>Gaya Seva offers paid features including monthly subscriptions, vendor registration fees, and banner advertisements.</p>
               <ul className="list-disc pl-5 space-y-2">
                 <li><strong>Refund Policy:</strong> All digital payments (Subscriptions, Banners, Vehicle Listings, Vendor Registrations) made on the platform are <strong>non-refundable</strong> unless required by law.</li>
                 <li>Pricing for platform services is dynamic and subject to change at the discretion of the platform administration. Active subscriptions will honor the price paid at the time of purchase until expiration.</li>
@@ -75,7 +75,7 @@ export default function TermsOfUsePage() {
             </h2>
             <div className="space-y-4 text-slate-600 leading-relaxed">
               <p>You agree not to use the platform to post false information, scam other users, or distribute illegal content.</p>
-              <p>Gaya Connect reserves the right to suspend, disable, or permanently delete any user, vendor, or worker account at its sole discretion if it violates these Terms of Use, receives excessive negative feedback, or is suspected of fraudulent activity.</p>
+              <p>Gaya Seva reserves the right to suspend, disable, or permanently delete any user, vendor, or worker account at its sole discretion if it violates these Terms of Use, receives excessive negative feedback, or is suspected of fraudulent activity.</p>
             </div>
           </div>
 

@@ -79,7 +79,7 @@ export default function SubscriptionModal({ isOpen, onClose }) {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
         currency: data.currency,
-        name: "Gaya Connect",
+        name: "Gaya Seva",
         description: `Subscription - ${plan.name} Plan`,
         order_id: data.orderId,
         handler: async function (response) {

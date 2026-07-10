@@ -60,7 +60,7 @@ export default function AboutGaya() {
                 </span>
               </h2>
               <p className="text-slate-500 text-[16px] leading-relaxed mb-8">
-                Gaya is a city of profound spiritual and historical significance, revered by both Hindus and Buddhists worldwide. From the serene grounds of the Mahabodhi Temple in Bodh Gaya to the ancient Vishnupad Temple, the city draws millions seeking peace, salvation, and spiritual awakening. Gaya Connect proudly brings the services of this holy city to your fingertips.
+                Gaya is a city of profound spiritual and historical significance, revered by both Hindus and Buddhists worldwide. From the serene grounds of the Mahabodhi Temple in Bodh Gaya to the ancient Vishnupad Temple, the city draws millions seeking peace, salvation, and spiritual awakening. Gaya Seva proudly brings the services of this holy city to your fingertips.
               </p>
               
               <div className="flex flex-wrap gap-4">

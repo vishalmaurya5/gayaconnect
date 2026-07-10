@@ -43,7 +43,7 @@ export default function JobsAndSalesPage() {
   };
 
   const handleContact = (type, title) => {
-    const text = encodeURIComponent(`Hi, I am interested in the posting: "${title}" on Gaya Connect.`);
+    const text = encodeURIComponent(`Hi, I am interested in the posting: "${title}" on Gaya Seva.`);
     if (type === 'whatsapp') {
       window.open(`https://wa.me/${ADMIN_PHONE.replace(/[^0-9]/g, "")}?text=${text}`, '_blank');
     } else {
@@ -58,7 +58,7 @@ export default function JobsAndSalesPage() {
         {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-12">
           <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
-            Gaya Connect <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Marketplace</span>
+            Gaya Seva <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Marketplace</span>
           </h1>
           <p className="text-lg text-slate-600 mb-8">
             Discover the latest job opportunities and exclusive items for sale directly from our verified local vendors.
@@ -201,7 +201,7 @@ export default function JobsAndSalesPage() {
                     <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 flex items-start gap-2">
                       <FiInfo className="text-amber-600 mt-0.5 shrink-0" />
                       <p className="text-xs font-medium text-amber-800">
-                        To ensure security, please contact the Gaya Connect admin to proceed with this listing.
+                        To ensure security, please contact the Gaya Seva admin to proceed with this listing.
                       </p>
                     </div>
 
@@ -320,7 +320,7 @@ export default function JobsAndSalesPage() {
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
                 <FiInfo className="text-amber-600 mt-1 shrink-0 text-lg" />
                 <p className="text-sm font-medium text-amber-800 leading-relaxed">
-                  To ensure security, please contact the Gaya Connect admin to proceed with this listing.
+                  To ensure security, please contact the Gaya Seva admin to proceed with this listing.
                 </p>
               </div>
 

@@ -178,7 +178,7 @@ function LabourCard({ labour, isSubscribed, onSubscribe }) {
     }).catch(() => { });
 
     if (type === 'WhatsApp') {
-      window.location.href = `https://wa.me/91${cleanPhone}?text=Hi, I found your profile on Gaya Connect.`;
+      window.location.href = `https://wa.me/91${cleanPhone}?text=Hi, I found your profile on Gaya Seva.`;
     } else {
       window.location.href = `tel:${cleanPhone}`;
     }

@@ -51,7 +51,7 @@ export async function createPhonePeCheckout({ user, amount, merchantOrderId, req
     .amount(amountInPaise)
     .metaInfo(metaInfo)
     .redirectUrl(redirectUrl)
-    .message('Gaya Connect contact access')
+    .message('Gaya Seva contact access')
     .expireAfter(1200)
 
   if (prefillUserLoginDetails) {

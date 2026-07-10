@@ -119,7 +119,7 @@ export default function VendorVehiclesPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
         currency: "INR",
-        name: "Gaya Connect",
+        name: "Gaya Seva",
         description: "Vehicle Listing Fee",
         order_id: data.orderId,
         handler: async function (response) {
@@ -275,7 +275,7 @@ export default function VendorVehiclesPage() {
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input required type="checkbox" checked={vehForm.liabilityAccepted} onChange={e => setVehForm({...vehForm, liabilityAccepted: e.target.checked})} className="mt-1" />
                     <div className="text-xs text-amber-900 leading-relaxed">
-                      <strong>Terms & Conditions:</strong> I confirm this is a commercial vehicle. I assume all liabilities, risks, and responsibilities associated with renting out this vehicle. Gaya Connect is only a listing platform.
+                      <strong>Terms & Conditions:</strong> I confirm this is a commercial vehicle. I assume all liabilities, risks, and responsibilities associated with renting out this vehicle. Gaya Seva is only a listing platform.
                     </div>
                   </label>
                 </div>

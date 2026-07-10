@@ -1,8 +1,8 @@
 import { FiPhone, FiMail, FiMessageCircle, FiMapPin } from 'react-icons/fi';
 
 export const metadata = {
-  title: 'Contact Support | Gaya Connect',
-  description: 'Contact Gaya Connect support via phone, WhatsApp, or email.',
+  title: 'Contact Support | Gaya Seva',
+  description: 'Contact Gaya Seva support via phone, WhatsApp, or email.',
 };
 
 export default function ContactPage() {
@@ -12,7 +12,7 @@ export default function ContactPage() {
         <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-10 text-center relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-white opacity-10 blur-2xl transform rotate-12 scale-150"></div>
           <h1 className="text-3xl font-extrabold text-white relative z-10">Contact Support</h1>
-          <p className="mt-2 text-emerald-100 font-medium relative z-10">We're here to help you with anything related to Gaya Connect.</p>
+          <p className="mt-2 text-emerald-100 font-medium relative z-10">We're here to help you with anything related to Gaya Seva.</p>
         </div>
         
         <div className="p-8 sm:p-12 space-y-8">

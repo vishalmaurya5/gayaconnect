@@ -3,8 +3,8 @@ import Link from "next/link";
 import { Shield, Lock, Eye, Database, Globe } from "lucide-react";
 
 export const metadata = {
-  title: "Privacy Policy | Gaya Connect",
-  description: "Privacy Policy and data protection guidelines for Gaya Connect.",
+  title: "Privacy Policy | Gaya Seva",
+  description: "Privacy Policy and data protection guidelines for Gaya Seva.",
 };
 
 export default function PrivacyPolicyPage() {
@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
             Privacy Policy
           </h1>
           <p className="text-lg text-indigo-200/80 max-w-2xl mx-auto">
-            Your privacy is critically important to us. This policy outlines how Gaya Connect collects, uses, and protects your personal information.
+            Your privacy is critically important to us. This policy outlines how Gaya Seva collects, uses, and protects your personal information.
           </p>
           <p className="mt-4 text-sm text-slate-400">Last Updated: June 2026</p>
         </div>
@@ -65,7 +65,7 @@ export default function PrivacyPolicyPage() {
               <Lock className="w-6 h-6 text-indigo-600" /> Data Security & Protection
             </h2>
             <div className="space-y-4 text-slate-600 leading-relaxed">
-              <p>Gaya Connect utilizes industry-standard security measures to protect your data:</p>
+              <p>Gaya Seva utilizes industry-standard security measures to protect your data:</p>
               <ul className="list-disc pl-5 space-y-2">
                 <li><strong>Encryption:</strong> All passwords are securely hashed using bcrypt algorithms before being stored in our database.</li>
                 <li><strong>Secure Transmission:</strong> We force HTTPS on all connections ensuring your data is encrypted in transit.</li>

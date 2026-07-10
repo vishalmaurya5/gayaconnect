@@ -172,7 +172,7 @@ function AdminLogin({ onLogin }) {
           <FiShield className="text-3xl" />
         </span>
         <h1 className="text-3xl font-bold text-white tracking-tight">Admin Login</h1>
-        <p className="mt-2 text-slate-400">Secure access to the Gaya Connect control center.</p>
+        <p className="mt-2 text-slate-400">Secure access to the Gaya Seva control center.</p>
         <div className="mt-8 space-y-5">
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-300">Admin ID</label>

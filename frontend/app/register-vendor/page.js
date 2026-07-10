@@ -87,7 +87,7 @@ export default function RegisterVendorPage() {
         key: res.keyId,
         amount: res.amount,
         currency: res.currency,
-        name: "Gaya Connect",
+        name: "Gaya Seva",
         description: "Vendor Registration Fee",
         order_id: res.orderId,
         handler: async function (response) {
@@ -141,7 +141,7 @@ export default function RegisterVendorPage() {
           <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-600/30">
             <Store size={28} />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Partner with Gaya Connect</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Partner with Gaya Seva</h1>
           <p className="text-gray-500 text-sm">Grow your business and reach more customers</p>
         </div>
 

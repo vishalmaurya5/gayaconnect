@@ -1,7 +1,7 @@
 import MapClientWrapper from '@/components/ui/MapClientWrapper'
 
 export const metadata = {
-  title: 'Explore Gaya on Map | Gaya Connect',
+  title: 'Explore Gaya on Map | Gaya Seva',
   description: 'Find nearby vendors, local offers, and daily workers in Gaya, Bihar using our interactive map.',
 }
 

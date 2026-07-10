@@ -17,7 +17,7 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="font-bold text-xl text-blue-600">Gaya Connect</Link>
+        <Link href="/" className="font-bold text-xl text-blue-600">Gaya Seva</Link>
         <div className="hidden md:flex gap-4">
           <Link href="/vendors" className={activeClass('/vendors')}>Vendors</Link>
           <Link href="/community" className={activeClass('/community')}>Community</Link>

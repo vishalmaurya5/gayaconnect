@@ -10,7 +10,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const ADMIN_EMAIL    = 'vishalverma5359@gmail.com';
-const ADMIN_PASSWORD = 'GayaConnect7004394@2026';
+const ADMIN_PASSWORD = 'GayaSeva7004394@2026';
 const ADMIN_NAME     = 'Vishal Verma (Admin)';
 
 async function seed() {

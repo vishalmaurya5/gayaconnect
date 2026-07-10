@@ -85,7 +85,7 @@ export default function NewOfferPage() {
         key:         process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount:      orderData.amount,
         currency:    "INR",
-        name:        "Gaya Connect",
+        name:        "Gaya Seva",
         description: `Offer posting — ${selectedPlan.label}`,
         order_id:    orderData.orderId,
         handler: async (response) => {

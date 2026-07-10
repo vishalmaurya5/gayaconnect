@@ -33,7 +33,7 @@ async function trySend(port) {
   await transporter.verify();
   console.log('SMTP connection OK. Sending...');
   const info = await transporter.sendMail({
-    from: `Gaya Connect <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+    from: `Gaya Seva <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
     to,
     subject: 'Reset password',
     html: `<p>Reset link: <a href="${resetUrl}">${resetUrl}</a></p>`,

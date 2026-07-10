@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { FiSearch, FiShield, FiTrendingUp, FiMapPin, FiSmartphone, FiTarget, FiAlertCircle, FiBriefcase, FiHeart } from 'react-icons/fi'
 
 export const metadata = {
-  title: 'About Us | Gaya Connect',
-  description: 'Learn about Gaya Connect, our mission, the problems we solve, and how we are digitizing local businesses in Gaya.',
+  title: 'About Us | Gaya Seva',
+  description: 'Learn about Gaya Seva, our mission, the problems we solve, and how we are digitizing local businesses in Gaya.',
 }
 
 export default function AboutPage() {
@@ -17,7 +17,7 @@ export default function AboutPage() {
         <div className="container-custom relative z-10 text-center max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/60 backdrop-blur-md border border-emerald-200/50 text-emerald-800 text-sm font-bold uppercase tracking-widest mb-8 shadow-sm">
             <FiHeart className="text-emerald-500 animate-pulse" />
-            About Gaya Connect
+            About Gaya Seva
           </div>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-emerald-950 mb-8 leading-tight">
             Empowering Gaya's <br className="hidden md:block"/> Digital Revolution
@@ -76,7 +76,7 @@ export default function AboutPage() {
       <section className="container-custom py-28">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-600 mb-4">Our Mission</p>
-          <h2 className="text-4xl font-extrabold text-emerald-950 mb-6">Why Gaya Connect is Necessary</h2>
+          <h2 className="text-4xl font-extrabold text-emerald-950 mb-6">Why Gaya Seva is Necessary</h2>
           <p className="text-lg text-emerald-800/70 leading-relaxed font-medium">
             Our aim is simple but ambitious: to organize Gaya's local business landscape into a beautifully accessible, highly functional, and soothing digital directory.
           </p>
@@ -130,7 +130,7 @@ export default function AboutPage() {
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-600 mb-4">Platform Details</p>
               <h2 className="text-4xl font-extrabold text-emerald-950 mb-6">How It Works</h2>
               <p className="text-lg text-emerald-800/70 leading-relaxed mb-10 font-medium">
-                Gaya Connect is designed with state-of-the-art technology to ensure speed, security, and a visually soothing experience for everyone in the city.
+                Gaya Seva is designed with state-of-the-art technology to ensure speed, security, and a visually soothing experience for everyone in the city.
               </p>
               <Link href="/register" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 px-8 py-4 font-bold text-white shadow-lg shadow-emerald-500/30 transition hover:scale-105 hover:shadow-emerald-500/40">
                 Join the Network
@@ -166,7 +166,7 @@ export default function AboutPage() {
           <div className="relative z-10 max-w-2xl mx-auto">
             <h2 className="text-4xl font-extrabold mb-6 text-yellow-50">Be Part of Gaya's Growth</h2>
             <p className="text-lg text-emerald-100/90 mb-12 leading-relaxed">
-              Whether you are a resident looking for quick services, or a business owner wanting to modernize your reach, Gaya Connect is your platform.
+              Whether you are a resident looking for quick services, or a business owner wanting to modernize your reach, Gaya Seva is your platform.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-5">
               <Link href="/vendors" className="rounded-2xl bg-yellow-400 px-8 py-4 font-bold text-emerald-950 shadow-lg transition hover:bg-yellow-300 hover:-translate-y-1">

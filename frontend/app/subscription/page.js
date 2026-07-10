@@ -79,7 +79,7 @@ export default function SubscriptionPage() {
         key: orderData.keyId,
         amount: orderData.order.amount,
         currency: orderData.order.currency,
-        name: 'Gaya Connect',
+        name: 'Gaya Seva',
         description: 'Monthly Premium Access',
         order_id: orderData.order.id,
         handler: async (response) => {

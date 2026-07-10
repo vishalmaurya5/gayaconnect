@@ -289,8 +289,8 @@ export default function VendorDetailPage() {
                     className="flex items-center justify-center gap-2.5 bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[14.5px] py-3.5 rounded-xl transition-colors no-underline w-full cursor-pointer">
                     <Phone size={17} /> Call now
                   </a>
-                  <a href={`https://wa.me/${v.whatsapp?.replace(/[^0-9]/g, "")}?text=Hi, I found you on Gaya Connect. I need your services.`}
-                    onClick={(e) => handleContact(e, 'WhatsApp', `https://wa.me/${v.whatsapp?.replace(/[^0-9]/g, "")}?text=Hi, I found you on Gaya Connect. I need your services.`)}
+                  <a href={`https://wa.me/${v.whatsapp?.replace(/[^0-9]/g, "")}?text=Hi, I found you on Gaya Seva. I need your services.`}
+                    onClick={(e) => handleContact(e, 'WhatsApp', `https://wa.me/${v.whatsapp?.replace(/[^0-9]/g, "")}?text=Hi, I found you on Gaya Seva. I need your services.`)}
                     target="_blank" rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1ebd5a] text-white font-bold text-[14.5px] py-3.5 rounded-xl transition-colors no-underline w-full cursor-pointer">
                     <MessageCircle size={17} /> WhatsApp

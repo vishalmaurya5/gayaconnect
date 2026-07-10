@@ -172,7 +172,7 @@ export default function ProfilePage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
         currency: "INR",
-        name: "Gaya Connect",
+        name: "Gaya Seva",
         description: "Vehicle Listing Fee",
         order_id: data.orderId,
         handler: async function (response) {
@@ -578,7 +578,7 @@ export default function ProfilePage() {
                             <CheckCircle size={14} className="absolute left-0.5 text-white pointer-events-none opacity-0 peer-checked:opacity-100" />
                           </div>
                           <div className="text-[13px] text-amber-900 leading-relaxed font-medium">
-                            <strong>Terms & Conditions:</strong> I confirm this is a commercial vehicle. I assume all liabilities, risks, and responsibilities associated with renting out this vehicle. Gaya Connect is only a listing platform and holds no responsibility for damages or disputes.
+                            <strong>Terms & Conditions:</strong> I confirm this is a commercial vehicle. I assume all liabilities, risks, and responsibilities associated with renting out this vehicle. Gaya Seva is only a listing platform and holds no responsibility for damages or disputes.
                           </div>
                         </label>
                       </div>

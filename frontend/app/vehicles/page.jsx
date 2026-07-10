@@ -306,7 +306,7 @@ function VehicleCard({ vehicle, isSubscribed }) {
 
           {/* WhatsApp Button */}
           <a 
-            href={`https://wa.me/91${(vehicle.ownerId?.phone || vehicle.phone).replace(/\D/g, '')}?text=Hi, I want to rent your ${vehicle.vehicleName} from Gaya Connect.`} 
+            href={`https://wa.me/91${(vehicle.ownerId?.phone || vehicle.phone).replace(/\D/g, '')}?text=Hi, I want to rent your ${vehicle.vehicleName} from Gaya Seva.`} 
             onClick={(e) => handleContact('WhatsApp', e)}
             target="_blank"
             rel="noopener noreferrer"

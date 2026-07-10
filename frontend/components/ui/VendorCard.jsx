@@ -85,7 +85,7 @@ export default function VendorCard({ vendor }) {
                 <FiPhone /> Call
               </a>
               <a
-                href={`https://wa.me/91${phoneNumber.replace(/\D/g, '')}?text=Hi, I found your business on Gaya Connect.`}
+                href={`https://wa.me/91${phoneNumber.replace(/\D/g, '')}?text=Hi, I found your business on Gaya Seva.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-1.5 bg-emerald-50 hover:bg-emerald-500 text-emerald-700 hover:text-white border border-emerald-100 hover:border-transparent py-2 rounded-xl text-[13px] font-bold transition-all duration-300 shadow-sm"
