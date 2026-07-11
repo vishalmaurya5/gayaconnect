@@ -50,13 +50,13 @@ export default function ContactPage() {
               <h3 className="text-lg font-bold text-slate-800">Email Support</h3>
               <p className="text-slate-600 mt-1 leading-relaxed">Drop us an email. We aim to respond to all emails within 24 hours.</p>
               <div className="mt-3 flex flex-col gap-2">
-                <a href="mailto:support@gayaconnect.in" className="inline-flex items-center gap-2 text-emerald-600 font-bold hover:underline">
+                <a href="mailto:thegayaseva@gmail.com" className="inline-flex items-center gap-2 text-emerald-600 font-bold hover:underline">
                   <span className="w-5 flex justify-center text-slate-400"><FiMail /></span>
-                  support@gayaconnect.in <span className="text-xs text-slate-400 font-normal ml-2">(Primary)</span>
+                  thegayaseva@gmail.com <span className="text-xs text-slate-400 font-normal ml-2">(Primary)</span>
                 </a>
-                <a href="mailto:gayaconnectin@gmail.com" className="inline-flex items-center gap-2 text-emerald-600 font-bold hover:underline">
+                <a href="mailto:supportgayaseva@gmail.com" className="inline-flex items-center gap-2 text-emerald-600 font-bold hover:underline">
                   <span className="w-5 flex justify-center text-slate-400"><FiMail /></span>
-                  gayaconnectin@gmail.com <span className="text-xs text-slate-400 font-normal ml-2">(Alternative)</span>
+                  supportgayaseva@gmail.com <span className="text-xs text-slate-400 font-normal ml-2">(Alternative)</span>
                 </a>
               </div>
             </div>

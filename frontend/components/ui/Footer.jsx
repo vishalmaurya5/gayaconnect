@@ -108,8 +108,11 @@ export default function Footer() {
                           <a href="tel:+918544491413" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
                               <FiPhone size={18} /> <span className="text-sm font-medium">+91 85444 91413</span>
                           </a>
-                          <a href="mailto:support@gayaseva.in" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
-                              <FiMail size={18} /> <span className="text-sm font-medium">support@gayaseva.in</span>
+                          <a href="mailto:thegayaseva@gmail.com" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
+                              <FiMail size={18} /> <span className="text-sm font-medium">thegayaseva@gmail.com</span>
+                          </a>
+                          <a href="mailto:supportgayaseva@gmail.com" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
+                              <FiMail size={18} /> <span className="text-sm font-medium">supportgayaseva@gmail.com</span>
                           </a>
                       </div>
                   </div>
@@ -146,7 +149,7 @@ export default function Footer() {
                               <li><Link href="/about" className="hover:text-emerald-600 transition-colors">About</Link></li>
                               <li><Link href="/privacy" className="hover:text-emerald-600 transition-colors">Privacy policy</Link></li>
                               <li><Link href="/terms" className="hover:text-emerald-600 transition-colors">Terms of service</Link></li>
-                              <li><a href="mailto:support@gayaseva.in" className="hover:text-emerald-600 transition-colors">Contact Us</a></li>
+                              <li><a href="mailto:thegayaseva@gmail.com" className="hover:text-emerald-600 transition-colors">Contact Us</a></li>
                           </ul>
                       </div>
                   </div>
