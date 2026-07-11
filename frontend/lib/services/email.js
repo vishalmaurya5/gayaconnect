@@ -16,8 +16,7 @@ function mailTransport() {
 }
 
 export async function sendVerificationEmail(user, token) {
-  const defaultBaseUrl = process.env.NODE_ENV === 'production' ? 'https://gayaseva.com' : 'http://localhost:3000'
-  const baseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_BASE_URL || defaultBaseUrl
+  const baseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
   const verificationUrl = `${baseUrl}/api/auth/verify-email/${token}`
   const transport = mailTransport()
 
@@ -39,8 +38,7 @@ export async function sendVerificationEmail(user, token) {
 }
 
 export async function sendPasswordResetEmail(user, token) {
-  const defaultBaseUrl = process.env.NODE_ENV === 'production' ? 'https://gayaseva.com' : 'http://localhost:3000'
-  const baseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_BASE_URL || defaultBaseUrl
+  const baseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
   const resetUrl = `${baseUrl}/reset-password/${token}`
   const transport = mailTransport()
 
