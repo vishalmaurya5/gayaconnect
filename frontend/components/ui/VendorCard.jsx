@@ -52,11 +52,14 @@ export default function VendorCard({ vendor }) {
           <div className="flex flex-col items-end gap-1 shrink-0">
             <div className="flex items-center gap-1 bg-green-50 border border-green-100 px-2 py-1 rounded-lg">
               <FiStar className="text-green-500 fill-green-500 text-sm" />
-              <span className="text-sm font-bold text-green-700">{vendor.rating || 4.5}</span>
+              <span className="text-sm font-bold text-green-700">
+                {vendor.rating ? vendor.rating.toFixed(1) : '4.5'}
+                {vendor.totalReviews > 0 && <span className="text-xs text-green-600 ml-1">({vendor.totalReviews})</span>}
+              </span>
             </div>
             <button 
               onClick={(e) => { e.preventDefault(); setIsFeedbackModalOpen(true); }}
-              className="text-[10px] text-blue-600 font-bold hover:underline"
+              className="text-[12px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold py-1 px-3 rounded-md w-full transition-colors mt-0.5"
             >
               Rate Us
             </button>

@@ -1,11 +1,30 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db/mongodb';
 import Feedback from '@/lib/db/models/Feedback';
+import Vendor from '@/lib/db/models/Vendor';
+
+async function recalculateVendorRating(vendorId) {
+  if (!vendorId) return;
+  const feedbacks = await Feedback.find({ vendorId, type: 'vendor', status: 'approved' });
+  
+  if (feedbacks.length === 0) {
+    await Vendor.findByIdAndUpdate(vendorId, { rating: 4.5, totalReviews: 0 });
+    return;
+  }
+  
+  const total = feedbacks.reduce((sum, f) => sum + f.rating, 0);
+  const avg = (total / feedbacks.length).toFixed(1);
+  
+  await Vendor.findByIdAndUpdate(vendorId, { 
+    rating: parseFloat(avg), 
+    totalReviews: feedbacks.length 
+  });
+}
 
 export async function PATCH(request, { params }) {
   try {
     await connectDB();
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { status } = body;
 
@@ -29,6 +48,10 @@ export async function PATCH(request, { params }) {
       );
     }
 
+    if (feedback.type === 'vendor' && feedback.vendorId) {
+      await recalculateVendorRating(feedback.vendorId);
+    }
+
     return NextResponse.json({ success: true, data: feedback });
   } catch (error) {
     console.error('Error updating feedback status:', error);
@@ -42,7 +65,7 @@ export async function PATCH(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     await connectDB();
-    const { id } = params;
+    const { id } = await params;
 
     const feedback = await Feedback.findByIdAndDelete(id);
 
@@ -51,6 +74,10 @@ export async function DELETE(request, { params }) {
         { success: false, message: 'Feedback not found' },
         { status: 404 }
       );
+    }
+
+    if (feedback.type === 'vendor' && feedback.vendorId) {
+      await recalculateVendorRating(feedback.vendorId);
     }
 
     return NextResponse.json({ success: true, message: 'Feedback deleted successfully' });

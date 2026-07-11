@@ -58,7 +58,7 @@ export default function PopupAd() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className={`fixed inset-0 z-[9999] flex bg-slate-900/60 backdrop-blur-sm p-4 ${positionClass}`}
+          className={`fixed top-[104px] inset-x-0 bottom-0 z-40 flex bg-slate-900/60 backdrop-blur-sm p-4 ${positionClass}`}
         >
           <motion.div 
             initial={{ scale: 0.8, opacity: 0, y: 20 }}

@@ -17,6 +17,7 @@ export default function VendorDetailPage() {
   const [isSubscribed, setIsSub]  = useState(false);
   const [activeTab, setActiveTab] = useState("about");
   const [saved, setSaved]         = useState(false);
+  const [reviews, setReviews]     = useState([]);
 
   useEffect(() => {
     // Fetch vendor
@@ -24,6 +25,12 @@ export default function VendorDetailPage() {
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d?.vendor) setVendor(d.vendor); setLoading(false); })
       .catch(() => setLoading(false));
+
+    // Fetch vendor reviews
+    fetch(`/api/feedback?vendorId=${id}&type=vendor&status=approved`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.data) setReviews(d.data); })
+      .catch(() => {});
 
     // Check subscription
     fetch("/api/auth/me")
@@ -98,11 +105,7 @@ export default function VendorDetailPage() {
     ...vendor,
   };
 
-  const DEMO_REVIEWS = [
-    { name:"Rajeev V", rating:5, date:"2 weeks ago", text:"Excellent work! Fixed my wiring issue in 30 minutes. Very professional and reasonable pricing." },
-    { name:"Sunita D", rating:5, date:"1 month ago", text:"Got my inverter installed. Clean work, no mess. Would definitely call again." },
-    { name:"Amit K",   rating:4, date:"1 month ago", text:"Good service. Came on time. Slight delay on first call but resolved quickly." },
-  ];
+  // Remove DEMO_REVIEWS since we fetch real ones now
 
   return (
     <main className="bg-[#F8F9FC] min-h-screen">
@@ -247,12 +250,12 @@ export default function VendorDetailPage() {
 
                 {activeTab === "reviews" && (
                   <div className="space-y-4">
-                    {DEMO_REVIEWS.map((r, i) => (
+                    {reviews.length > 0 ? reviews.map((r, i) => (
                       <div key={i} className="border-b border-gray-50 pb-4 last:border-0 last:pb-0">
                         <div className="flex items-center justify-between mb-1.5">
                           <div className="flex items-center gap-2">
                             <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-[12px]">
-                              {r.name[0]}
+                              {r.name ? r.name[0].toUpperCase() : 'U'}
                             </div>
                             <span className="font-semibold text-[13.5px] text-gray-800">{r.name}</span>
                           </div>
@@ -263,12 +266,22 @@ export default function VendorDetailPage() {
                                   className={s <= r.rating ? "text-amber-400 fill-amber-400" : "text-gray-200 fill-gray-200"} />
                               ))}
                             </div>
-                            <span className="text-[11.5px] text-gray-400">{r.date}</span>
+                            <span className="text-[11.5px] text-gray-400">
+                              {new Date(r.createdAt).toLocaleDateString()}
+                            </span>
                           </div>
                         </div>
-                        <p className="text-[13.5px] text-gray-600 leading-relaxed">{r.text}</p>
+                        <p className="text-[13.5px] text-gray-600 leading-relaxed">{r.comment}</p>
                       </div>
-                    ))}
+                    )) : (
+                      <div className="text-center py-8">
+                        <div className="text-gray-400 mb-2">
+                          <Star size={32} className="mx-auto text-gray-300" />
+                        </div>
+                        <h4 className="text-[14px] font-semibold text-gray-700 mb-1">No reviews yet</h4>
+                        <p className="text-[13px] text-gray-500">This vendor doesn't have any reviews. Be the first to leave a feedback on their card!</p>
+                      </div>
+                    )}
                   </div>
                 )}
                 </div>

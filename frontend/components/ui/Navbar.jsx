@@ -42,11 +42,12 @@ export default function Navbar() {
             <img src="/gaya_seva_app_icon.png" alt="Gaya Seva Icon" className="w-full h-full object-cover" />
           </div>
           <div>
-            <div className={`font-sora font-extrabold text-[19px] leading-tight transition-colors duration-300 ${isScrolled ? 'text-indigo-600' : 'text-white'}`}>
-              Gaya<span className={isScrolled ? 'text-teal-600' : 'text-teal-300'}>Seva</span>
+            <div className="font-sora text-[22px] leading-none flex items-center tracking-tighter drop-shadow-sm">
+              <span className={`font-black transition-colors duration-300 ${isScrolled ? 'text-slate-800' : 'text-white'}`}>Gaya</span>
+              <span className={`font-bold italic transition-colors duration-300 ${isScrolled ? 'text-indigo-600' : 'text-amber-400'}`}>Seva</span>
             </div>
-            <div className={`text-[10px] uppercase tracking-wider font-semibold ${isScrolled ? 'text-slate-400' : 'text-indigo-200'}`}>
-              Gaya District · Bihar
+            <div className={`text-[9px] uppercase tracking-widest font-black transition-colors duration-300 ${isScrolled ? 'text-amber-500' : 'text-amber-300 drop-shadow-md'}`}>
+              Grow · Collaborate · Earn
             </div>
           </div>
         </Link>
