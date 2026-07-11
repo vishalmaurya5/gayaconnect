@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useAuth } from '@/contexts/AuthContext';
 import { usePathname } from 'next/navigation';
-import { FiPhone, FiMail, FiMapPin, FiShield, FiMap } from 'react-icons/fi';
+import { FiPhone, FiMail, FiMapPin, FiShield, FiMap, FiInstagram, FiFacebook } from 'react-icons/fi';
 
 export default function Footer() {
   const { openSubscriptionModal } = useAuth();
@@ -114,6 +114,26 @@ export default function Footer() {
                           <a href="mailto:supportgayaseva@gmail.com" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
                               <FiMail size={18} /> <span className="text-sm font-medium">supportgayaseva@gmail.com</span>
                           </a>
+                          <div className="flex flex-wrap items-center gap-3 mt-2">
+                              <a href="https://www.instagram.com/thegayaseva?igsh=MTRyMGZxNHdzZ2V1NA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-neutral-800 px-4 py-3 rounded-2xl transition-all shadow-sm hover:shadow-md group">
+                                  <div className="bg-gradient-to-tr from-yellow-400 via-rose-500 to-purple-600 p-1.5 rounded-lg text-white group-hover:scale-110 transition-transform">
+                                      <FiInstagram size={20} />
+                                  </div>
+                                  <span className="text-[15px] font-bold">Follow @thegayaseva</span>
+                              </a>
+                              <a href="https://www.instagram.com/gayaconnect/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-neutral-800 px-4 py-3 rounded-2xl transition-all shadow-sm hover:shadow-md group">
+                                  <div className="bg-gradient-to-tr from-yellow-400 via-rose-500 to-purple-600 p-1.5 rounded-lg text-white group-hover:scale-110 transition-transform">
+                                      <FiInstagram size={20} />
+                                  </div>
+                                  <span className="text-[15px] font-bold">Follow @gayaconnect</span>
+                              </a>
+                              <a href="https://www.facebook.com/profile.php?id=61591230812726&sk=directory_contact_info" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-neutral-800 px-4 py-3 rounded-2xl transition-all shadow-sm hover:shadow-md group">
+                                  <div className="bg-blue-600 p-1.5 rounded-lg text-white group-hover:scale-110 transition-transform">
+                                      <FiFacebook size={20} />
+                                  </div>
+                                  <span className="text-[15px] font-bold">Like us on Facebook</span>
+                              </a>
+                          </div>
                       </div>
                   </div>
 
