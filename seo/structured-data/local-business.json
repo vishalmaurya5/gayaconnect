@@ -2,14 +2,23 @@
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   "name": "Gaya Seva",
-  "url": "https://example.com",
+  "url": "https://gayaseva.com",
+  "logo": "https://gayaseva.com/gaya_seva_app_icon.png",
+  "image": "https://gayaseva.com/gaya_seva_app_icon.png",
+  "description": "Premium Local Discovery platform for Gaya, Bodh Gaya & Bihar. Find trusted services, vendors, deals, and local workers all in one place.",
+  "telephone": "+919117588242",
+  "email": "thegayaseva@gmail.com",
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": "Street",
-    "addressLocality": "City",
-    "addressRegion": "State",
-    "postalCode": "00000",
+    "streetAddress": "Gaya City",
+    "addressLocality": "Gaya",
+    "addressRegion": "Bihar",
+    "postalCode": "823001",
     "addressCountry": "IN"
-  }
+  },
+  "sameAs": [
+    "https://www.instagram.com/thegayaseva",
+    "https://www.instagram.com/gayaconnect",
+    "https://www.facebook.com/profile.php?id=61591230812726&sk=directory_contact_info"
+  ]
 }
-

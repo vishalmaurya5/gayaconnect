@@ -58,9 +58,38 @@ export const viewport = {
 }
 
 export default function RootLayout({ children }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Gaya Seva",
+    "url": "https://gayaseva.com",
+    "logo": "https://gayaseva.com/gaya_seva_app_icon.png",
+    "image": "https://gayaseva.com/gaya_seva_app_icon.png",
+    "description": "Premium Local Discovery platform for Gaya, Bodh Gaya & Bihar. Find trusted services, vendors, deals, and local workers all in one place.",
+    "telephone": "+919117588242",
+    "email": "thegayaseva@gmail.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Gaya City",
+      "addressLocality": "Gaya",
+      "addressRegion": "Bihar",
+      "postalCode": "823001",
+      "addressCountry": "IN"
+    },
+    "sameAs": [
+      "https://www.instagram.com/thegayaseva",
+      "https://www.instagram.com/gayaconnect",
+      "https://www.facebook.com/profile.php?id=61591230812726"
+    ]
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} ${inter.variable} ${sora.variable}`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <AuthProvider>
           <Navbar />
           <main className="min-h-screen">
