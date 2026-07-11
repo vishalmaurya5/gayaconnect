@@ -1,5 +1,5 @@
-export const PROFILE_IMAGE_MAX_BYTES = 50 * 1024
-export const PROFILE_IMAGE_MAX_LABEL = '50 KB'
+export const PROFILE_IMAGE_MAX_BYTES = 100 * 1024
+export const PROFILE_IMAGE_MAX_LABEL = '100 KB'
 
 export function validateImageDataUrl(dataUrl, fieldName = 'Profile photo', maxBytes = PROFILE_IMAGE_MAX_BYTES, maxLabel = PROFILE_IMAGE_MAX_LABEL) {
   if (!dataUrl) return null

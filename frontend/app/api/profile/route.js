@@ -80,7 +80,10 @@ export async function PUT(request) {
           vendor.services = parsed.data.services.split(',').map(s => s.trim()).filter(Boolean)
         }
         vendor.description = description || ''
-        if (profileImage !== undefined) vendor.logo = user.profileImage || ''
+        if (profileImage !== undefined) {
+          vendor.logo = user.profileImage || ''
+          vendor.images = user.profileImage ? [user.profileImage] : []
+        }
         vendor.isApproved = true
         await vendor.save()
       } else {
@@ -98,6 +101,7 @@ export async function PUT(request) {
           workingHours: parsed.data.workingHours || '',
           services: parsed.data.services ? parsed.data.services.split(',').map(s => s.trim()).filter(Boolean) : [],
           logo: user.profileImage || '',
+          images: user.profileImage ? [user.profileImage] : [],
           isApproved: true
         })
       }

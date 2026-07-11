@@ -19,7 +19,7 @@ export default function VendorDashboard() {
   // Edit Profile States
   const [isEditing, setIsEditing] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
-  const [editForm, setEditForm] = useState({ name: '', businessName: '', address: '', instagram: '', facebook: '', experience: '', workingHours: '', services: '' });
+  const [editForm, setEditForm] = useState({ name: '', businessName: '', address: '', instagram: '', facebook: '', experience: '', workingHours: '', services: '', profileImage: '' });
 
   const { user, setUser } = useAuth();
   
@@ -110,6 +110,26 @@ export default function VendorDashboard() {
   const completed = bookings.filter((b) => b.status === 'completed').length;
   const revenue = bookings.filter((b) => b.paymentStatus === 'paid').reduce((s, b) => s + Number(b.servicePrice || 0), 0);
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (file.size > 100 * 1024) {
+      toast.error('File size must be less than 100KB');
+      return;
+    }
+    if (!file.type.startsWith('image/jpeg')) {
+      toast.error('Only JPG/JPEG files are allowed');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setEditForm(prev => ({ ...prev, profileImage: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleEditToggle = () => {
     if (!isEditing) {
       setEditForm({
@@ -120,7 +140,8 @@ export default function VendorDashboard() {
         facebook: vendorDetails?.facebook || '',
         experience: vendorDetails?.experience || '',
         workingHours: vendorDetails?.workingHours || '',
-        services: vendorDetails?.services?.join(', ') || ''
+        services: vendorDetails?.services?.join(', ') || '',
+        profileImage: vendorDetails?.images?.[0] || user?.profileImage || ''
       });
     }
     setIsEditing(!isEditing);
@@ -139,7 +160,8 @@ export default function VendorDashboard() {
         experience: editForm.experience,
         workingHours: editForm.workingHours,
         services: editForm.services,
-        phone: user?.phone
+        phone: user?.phone,
+        profileImage: editForm.profileImage
       };
       
       const res = await fetch('/api/profile', {
@@ -265,6 +287,25 @@ export default function VendorDashboard() {
                     <span className="font-bold text-slate-900">{user?.name}</span>
                   ) : (
                     <input type="text" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} className="w-full border border-slate-300 rounded px-2 py-1 focus:outline-indigo-500" />
+                  )}
+                </div>
+                <div className="sm:col-span-2">
+                  <span className="block text-slate-500 font-semibold mb-1">Profile Photo (Max 100KB, JPEG only)</span>
+                  {!isEditing ? (
+                    vendorDetails?.images?.[0] || user?.profileImage ? (
+                      <img src={vendorDetails?.images?.[0] || user?.profileImage} alt="Profile" className="h-16 w-16 object-cover rounded-lg border border-slate-200" />
+                    ) : (
+                      <span className="font-bold text-slate-900">No photo uploaded</span>
+                    )
+                  ) : (
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      {editForm.profileImage ? (
+                         <img src={editForm.profileImage} alt="Preview" className="h-16 w-16 object-cover rounded-lg border border-indigo-200" />
+                      ) : (
+                         <div className="h-16 w-16 bg-slate-100 rounded-lg border border-slate-300 flex items-center justify-center text-xs text-slate-400">No Image</div>
+                      )}
+                      <input type="file" accept=".jpg,.jpeg" onChange={handleImageUpload} className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                    </div>
                   )}
                 </div>
                 <div className="sm:col-span-2">
