@@ -50,6 +50,7 @@ try {
       role: 'admin',
       isActive: true,
       isEmailVerified: true,
+      phone: `+9100${Math.floor(10000000 + Math.random() * 90000000)}` // Add random phone
     });
     console.log(`New admin created ✅  (${email})`);
   }
