@@ -143,7 +143,22 @@ function VendorsContent() {
           {vendors.map((vendor) => (<VendorCard key={vendor._id} vendor={vendor} />))}
         </div>
       ) : (
-        <div className="text-center py-16"><p className="text-gray-400 text-lg">No vendors found</p></div>
+        <div className="text-center py-16">
+          <p className="text-slate-500 text-lg mb-4">No vendors found</p>
+          {(search || area || category !== 'all' || sort !== 'recommended') && (
+            <button 
+              onClick={() => {
+                setSearch('');
+                setArea('');
+                setCategory('all');
+                setSort('recommended');
+              }}
+              className="px-6 py-2.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors"
+            >
+              Clear Filters & View All
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

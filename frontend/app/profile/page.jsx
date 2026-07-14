@@ -71,6 +71,11 @@ export default function ProfilePage() {
             workerAvailability: d.worker?.availability ?? true,
             workerSkills: d.worker?.skills ? d.worker.skills.join(', ') : "",
             workerPhone: d.worker?.phone || d.user.phone || "",
+            workerLwfId: d.worker?.lwfId || "",
+            workerAadhaar: d.worker?.aadhaarNumber || "",
+            workerBloodGroup: d.worker?.bloodGroup || "",
+            workerState: d.worker?.state || "",
+            workerDistrict: d.worker?.district || "",
           });
           if (d.worker) {
             setWorker(d.worker);
@@ -722,6 +727,11 @@ export default function ProfilePage() {
                     {[
                       { label:"Worker Name",   key:"workerName",  type:"text" },
                       { label:"Phone Number",  key:"workerPhone", type:"tel" },
+                      { label:"Local Workforce ID", key:"workerLwfId", type:"text", readOnly: true },
+                      { label:"Aadhaar Number",key:"workerAadhaar", type:"text" },
+                      { label:"Blood Group",   key:"workerBloodGroup", type:"text" },
+                      { label:"State",         key:"workerState", type:"text" },
+                      { label:"District",      key:"workerDistrict", type:"text" },
                       { label:"Role/Category", key:"workerRole",  type:"text" },
                       { label:"Skill/Specialization", key:"workerSkills", type:"text" },
                       { label:"Service Area",  key:"workerArea",  type:"text" },
@@ -730,7 +740,7 @@ export default function ProfilePage() {
                     ].map(f => (
                       <div key={f.key} className="relative">
                         <label className="block text-[11px] font-bold text-gray-600 mb-2 uppercase tracking-wider">{f.label}</label>
-                        {editing ? (
+                        {editing && !f.readOnly ? (
                           <input type={f.type} value={form[f.key]}
                             onChange={e => setForm(p => ({...p, [f.key]: e.target.value}))}
                             className="w-full bg-white border-2 border-gray-100 focus:border-indigo-500 rounded-2xl px-4 py-3.5 text-[15px] font-medium text-gray-800 outline-none transition-all shadow-sm focus:shadow-md" />

@@ -51,16 +51,16 @@ export default function AboutGaya() {
             {/* Left Text Content */}
             <div className="lg:w-5/12 lg:sticky lg:top-32">
               <div className="text-orange-500 text-[11px] font-bold uppercase tracking-widest mb-3 flex items-center gap-2">
-                <span className="w-8 h-[2px] bg-orange-500 rounded-full"></span> The Holy City
+                <span className="w-8 h-[2px] bg-orange-500 rounded-full"></span> Platform
               </div>
               <h2 className="font-sora text-3xl md:text-4xl lg:text-5xl font-[800] text-[#0F172A] tracking-tight leading-tight mb-6">
-                Discover Gaya Ji <br/>
+                About <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-500">
-                  Land of Salvation & Enlightenment
+                  Gaya Seva
                 </span>
               </h2>
               <p className="text-slate-500 text-[16px] leading-relaxed mb-8">
-                Gaya is a city of profound spiritual and historical significance, revered by both Hindus and Buddhists worldwide. From the serene grounds of the Mahabodhi Temple in Bodh Gaya to the ancient Vishnupad Temple, the city draws millions seeking peace, salvation, and spiritual awakening. Gaya Seva proudly brings the services of this holy city to your fingertips.
+                Gaya Seva is a trusted digital platform connecting citizens with verified businesses, skilled professionals, local jobs, rentals, exclusive offers, and everyday services. Our mission is to simplify daily life while helping local businesses and professionals grow together.
               </p>
               
               <div className="flex flex-wrap gap-4">

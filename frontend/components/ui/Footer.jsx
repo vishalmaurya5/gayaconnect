@@ -93,7 +93,7 @@ export default function Footer() {
                           </div>
                       </Link>
                       <p className="text-sm/6 text-neutral-600 max-w-96">
-                          Your premium local discovery platform for Gaya &amp; Bodh Gaya. Find trusted services, vendors, deals, and local workers all in one place.
+                          Empowering Gaya, One Service at a Time. Your premium digital ecosystem for verified businesses, local professionals, exclusive deals, and community trust.
                       </p>
                       
                       <button onClick={openSubscriptionModal} className="mt-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl px-5 py-2.5 text-sm font-bold flex items-center gap-3 hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-900/30 w-max">

@@ -50,10 +50,32 @@ export async function GET(request) {
       query.dailyRate = { $gte: minRate, $lte: maxRate };
     }
 
+    const sort = searchParams.get("sort") || "recommended";
+    
+    let sortOptions = {};
+    switch(sort) {
+      case 'rating_desc':
+        sortOptions = { rating: -1, createdAt: -1 };
+        break;
+      case 'rate_asc':
+        sortOptions = { dailyRate: 1 };
+        break;
+      case 'rate_desc':
+        sortOptions = { dailyRate: -1 };
+        break;
+      case 'newest':
+        sortOptions = { createdAt: -1 };
+        break;
+      case 'recommended':
+      default:
+        sortOptions = { rating: -1, reviewCount: -1, createdAt: -1 };
+        break;
+    }
+
     const [workers, total] = await Promise.all([
       Labour.find(query)
         .select("-phone -whatsapp -aadhaarNumber -aadhaarImage") // hide contact and Aadhaar by default
-        .sort({ rating: -1, createdAt: -1 })
+        .sort(sortOptions)
         .skip(skip)
         .limit(limit)
         .lean(),

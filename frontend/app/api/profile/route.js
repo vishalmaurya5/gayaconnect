@@ -51,7 +51,8 @@ export async function PUT(request) {
     const { 
       name, address, profileImage, 
       businessName, category, subCategory, businessAddress, description,
-      workerName, workerRole, workerCategory, workerArea, workerDailyRate, workerHourlyRate, workerAvailability, workerSkills, workerPhone
+      workerName, workerRole, workerCategory, workerArea, workerDailyRate, workerHourlyRate, workerAvailability, workerSkills, workerPhone,
+      workerAadhaar, workerBloodGroup, workerState, workerDistrict
     } = parsed.data
 
     user.name = name
@@ -124,6 +125,10 @@ export async function PUT(request) {
         }
       }
       if (workerPhone !== undefined && workerPhone !== '') worker.phone = workerPhone;
+      if (workerAadhaar !== undefined) worker.aadhaarNumber = workerAadhaar;
+      if (workerBloodGroup !== undefined) worker.bloodGroup = workerBloodGroup;
+      if (workerState !== undefined) worker.state = workerState;
+      if (workerDistrict !== undefined) worker.district = workerDistrict;
       if (profileImage !== undefined) worker.photo = user.profileImage || '';
       await worker.save()
     }

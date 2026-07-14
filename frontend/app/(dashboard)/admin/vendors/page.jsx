@@ -10,8 +10,17 @@ import { useForm } from 'react-hook-form';
 export default function AdminVendorsPage() {
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [creating, setCreating] = useState(false);
   const [editingVendor, setEditingVendor] = useState(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
   const [updating, setUpdating] = useState(false);
   const admin = useContext(AdminContext);
 
@@ -64,12 +73,12 @@ export default function AdminVendorsPage() {
   };
 
   useEffect(() => {
-    fetchVendors();
-  }, []);
+    fetchVendors(search);
+  }, [search]);
 
-  const fetchVendors = async () => {
+  const fetchVendors = async (s = '') => {
     try {
-      const res = await fetch('/api/admin/vendors');
+      const res = await fetch(`/api/admin/vendors?search=${s}`);
       const data = await res.json();
       if (data.success) {
         setVendors(data.vendors || []);
@@ -141,8 +150,17 @@ export default function AdminVendorsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-4">
         <h1 className="text-2xl font-bold text-slate-800">Vendor Management</h1>
+        <div className="relative">
+          <input 
+            type="text" 
+            placeholder="Search business, name, email, phone..." 
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="w-full sm:w-80 rounded-xl border border-slate-300 px-4 py-2 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          />
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">

@@ -13,7 +13,35 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
 
-    const vendors = await Vendor.find().populate('userId', 'email phone name').sort('-createdAt')
+    const { searchParams } = new URL(request.url)
+    const search = searchParams.get('search')
+
+    let query = {}
+
+    if (search) {
+      const searchRegex = { $regex: search, $options: 'i' }
+      
+      // First find matching users
+      const matchingUsers = await User.find({
+        $or: [
+          { name: searchRegex },
+          { email: searchRegex },
+          { phone: searchRegex }
+        ]
+      }).select('_id')
+      
+      const userIds = matchingUsers.map(u => u._id)
+
+      query.$or = [
+        { name: searchRegex },
+        { businessName: searchRegex },
+        { category: searchRegex },
+        { address: searchRegex },
+        { userId: { $in: userIds } }
+      ]
+    }
+
+    const vendors = await Vendor.find(query).populate('userId', 'email phone name').sort('-createdAt')
     return NextResponse.json({ success: true, vendors })
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 })

@@ -4,14 +4,18 @@ import Link from "next/link";
 import { FiGrid } from "react-icons/fi";
 import HeroSection from "@/components/ui/HeroSection";
 import TrustStrip from "@/components/ui/TrustStrip";
+import LiveStatistics from "@/components/ui/LiveStatistics";
 import BannerSlider from "@/components/ui/BannerSlider";
 import CategoryGrid from "@/components/ui/CategoryGrid";
 import VendorSection from "@/components/ui/VendorSection";
 import OfferSection from "@/components/ui/OfferSection";
 import LabourSection from "@/components/ui/LabourSection";
+import JobPreviewSection from "@/components/ui/JobPreviewSection";
+import WhyChooseUs from "@/components/ui/WhyChooseUs";
 import HowItWorks from "@/components/ui/HowItWorks";
 import Testimonials from "@/components/ui/Testimonials";
 import VendorCTA from "@/components/ui/VendorCTA";
+import DownloadApp from "@/components/ui/DownloadApp";
 import PopupAd from "@/components/ui/PopupAd";
 import AboutGaya from "@/components/ui/AboutGaya";
 import FeaturesSection from "@/components/ui/FeaturesSection";
@@ -41,6 +45,8 @@ export default function HomePage() {
         <TrustStrip />
       </div>
 
+      <LiveStatistics />
+
       {/* Main Banner Slider */}
       <section className="max-w-[1440px] mx-auto px-5 lg:px-10 mt-12 relative z-10">
         <BannerSlider position="home_top" />
@@ -56,20 +62,20 @@ export default function HomePage() {
           <div className="relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full border border-white/10 text-[11px] font-bold text-teal-300 uppercase tracking-widest mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
-              Premium Access
+              Premium Membership
             </div>
             <h3 className="font-sora text-2xl md:text-3xl font-[800] text-white leading-tight">
-              Get started for just <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300">₹11/month</span>
+              Unlock Every Premium Feature for Just <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300">₹11/Month</span>
             </h3>
             <p className="text-slate-300 mt-3 text-[15px] max-w-xl leading-relaxed">
-              Unlock all verified vendor contacts, exclusive local offers, and local workforce listings instantly. Join thousands of users today.
+              Connect with verified businesses, skilled workforce, exclusive offers, premium listings, and much more with one affordable membership.
             </p>
           </div>
           <button 
             onClick={openSubscriptionModal}
             className="relative z-10 shrink-0 bg-white text-[#0F172A] font-bold px-8 py-4 rounded-[16px] shadow-xl hover:shadow-[0_10px_30px_rgba(255,255,255,0.2)] hover:-translate-y-1 transition-all duration-300 w-full md:w-auto text-[15px] flex items-center justify-center gap-2"
           >
-            Subscribe Now
+            Become Premium
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
           </button>
         </div>
@@ -87,11 +93,11 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
             <div>
               <div className="text-indigo-600 text-[11px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
-                <span className="w-8 h-[2px] bg-indigo-600 rounded-full"></span> Explore
+                <span className="w-8 h-[2px] bg-indigo-600 rounded-full"></span> Find trusted services for every need, all in one place.
               </div>
               <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight flex items-center gap-3">
                 <FiGrid className="text-indigo-500 w-8 h-8 md:w-10 md:h-10" /> 
-                Browse services
+                Explore Services
               </h2>
             </div>
             <Link href="/services" className="text-[#0F172A] font-bold text-[14px] flex items-center gap-2 hover:text-indigo-600 transition-colors bg-white px-5 py-2.5 rounded-full border border-slate-200 shadow-sm hover:shadow-md">
@@ -113,9 +119,9 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
             <div>
               <div className="text-teal-600 text-[11px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
-                <span className="w-8 h-[2px] bg-teal-600 rounded-full"></span> Top Rated
+                <span className="w-8 h-[2px] bg-teal-600 rounded-full"></span> Discover trusted local businesses with verified profiles, genuine customer reviews, and quality services.
               </div>
-              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Trusted professionals</h2>
+              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Verified Businesses</h2>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/map" className="hidden sm:flex text-indigo-600 font-bold text-[14px] items-center gap-2 hover:text-indigo-800 transition-colors bg-indigo-50 px-5 py-2.5 rounded-full border border-indigo-100 hover:border-indigo-200">
@@ -123,7 +129,7 @@ export default function HomePage() {
                 Map
               </Link>
               <Link href="/vendors" className="text-[#0F172A] font-bold text-[14px] flex items-center gap-2 hover:text-teal-600 transition-colors bg-slate-50 px-5 py-2.5 rounded-full border border-slate-200 hover:border-teal-200">
-                View all vendors <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                View All Businesses <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </Link>
             </div>
           </div>
@@ -138,9 +144,9 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
               <div>
                 <div className="text-rose-500 text-[11px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
-                  <span className="w-8 h-[2px] bg-rose-500 rounded-full"></span> Savings
+                  <span className="w-8 h-[2px] bg-rose-500 rounded-full"></span> Save more with exciting discounts and verified deals from trusted businesses.
                 </div>
-                <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Latest local offers</h2>
+                <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Exclusive Deals & Offers</h2>
               </div>
               <div className="flex items-center gap-3">
                 <Link href="/map" className="hidden sm:flex text-indigo-600 font-bold text-[14px] items-center gap-2 hover:text-indigo-800 transition-colors bg-indigo-50 px-5 py-2.5 rounded-full border border-indigo-100 hover:border-indigo-200">
@@ -163,9 +169,9 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
             <div>
               <div className="text-amber-500 text-[11px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
-                <span className="w-8 h-[2px] bg-amber-500 rounded-full"></span> Skilled Workforce
+                <span className="w-8 h-[2px] bg-amber-500 rounded-full"></span> Find trusted and verified professionals for every type of work.
               </div>
-              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Hire local workforce</h2>
+              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Hire Skilled Professionals</h2>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/map" className="hidden sm:flex text-indigo-600 font-bold text-[14px] items-center gap-2 hover:text-indigo-800 transition-colors bg-indigo-50 px-5 py-2.5 rounded-full border border-indigo-100 hover:border-indigo-200">
@@ -173,13 +179,36 @@ export default function HomePage() {
                 Map
               </Link>
               <Link href="/labour" className="text-[#0F172A] font-bold text-[14px] flex items-center gap-2 hover:text-amber-600 transition-colors bg-slate-50 px-5 py-2.5 rounded-full border border-slate-200">
-                View all workers <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                Browse Professionals <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </Link>
             </div>
           </div>
           <LabourSection />
         </div>
       </section>
+
+      {/* Jobs Preview Section */}
+      <section className="bg-transparent py-20 relative overflow-hidden">
+        <div className="max-w-[1440px] mx-auto px-5 lg:px-10 relative z-10">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+            <div>
+              <div className="text-blue-500 text-[11px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+                <span className="w-8 h-[2px] bg-blue-500 rounded-full"></span> Careers
+              </div>
+              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Latest Local Jobs</h2>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link href="/jobs" className="text-[#0F172A] font-bold text-[14px] flex items-center gap-2 hover:text-blue-600 transition-colors bg-white px-5 py-2.5 rounded-full border border-slate-200 shadow-sm">
+                View All Jobs <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </Link>
+            </div>
+          </div>
+          <JobPreviewSection />
+        </div>
+      </section>
+
+      {/* Why Choose Gaya Seva */}
+      <WhyChooseUs />
 
       {/* How it Works Section */}
       <section className="bg-slate-900 py-24 relative overflow-hidden">
@@ -201,9 +230,9 @@ export default function HomePage() {
         <div className="max-w-[1440px] mx-auto px-5 lg:px-10">
           <div className="text-center mb-16">
             <div className="text-emerald-500 text-[11px] font-bold uppercase tracking-widest mb-3 flex items-center justify-center gap-2">
-              <span className="w-8 h-[2px] bg-emerald-500 rounded-full"></span> Community Love <span className="w-8 h-[2px] bg-emerald-500 rounded-full"></span>
+              <span className="w-8 h-[2px] bg-emerald-500 rounded-full"></span> Community Trust <span className="w-8 h-[2px] bg-emerald-500 rounded-full"></span>
             </div>
-            <h2 className="font-sora text-3xl md:text-4xl lg:text-5xl font-[800] text-[#0F172A] tracking-tight">What people say</h2>
+            <h2 className="font-sora text-3xl md:text-4xl lg:text-5xl font-[800] text-[#0F172A] tracking-tight">Loved by Our Community</h2>
           </div>
           <Testimonials />
         </div>
@@ -213,6 +242,9 @@ export default function HomePage() {
       <div className="max-w-[1440px] mx-auto px-5 lg:px-10 pb-20 pt-10">
         <VendorCTA />
       </div>
+
+      {/* Download App Section */}
+      <DownloadApp />
 
       {/* Enquiry Form */}
       <EnquiryForm />

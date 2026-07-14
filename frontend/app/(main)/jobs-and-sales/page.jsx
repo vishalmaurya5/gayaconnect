@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FiBriefcase, FiTag, FiMapPin, FiMessageCircle, FiPhone, FiInfo, FiX, FiGrid } from 'react-icons/fi';
+import { FiBriefcase, FiTag, FiMapPin, FiMessageCircle, FiPhone, FiInfo, FiX, FiGrid, FiSearch } from 'react-icons/fi';
 import { JOB_SALE_CATEGORIES } from '@/lib/utils/jobSaleCategories';
 
 const ADMIN_PHONE = '+919117588242'; // From the contact page
@@ -13,6 +13,8 @@ export default function JobsAndSalesPage() {
   const [filter, setFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [locationInput, setLocationInput] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [sortOrder, setSortOrder] = useState('newest');
   const [selectedJob, setSelectedJob] = useState(null);
 
   useEffect(() => {
@@ -20,7 +22,7 @@ export default function JobsAndSalesPage() {
       fetchJobs();
     }, 400);
     return () => clearTimeout(timer);
-  }, [filter, categoryFilter, locationInput]);
+  }, [filter, categoryFilter, locationInput, searchInput, sortOrder]);
 
   const fetchJobs = async () => {
     setLoading(true);
@@ -29,6 +31,8 @@ export default function JobsAndSalesPage() {
       if (filter !== 'all') url.searchParams.append('type', filter);
       if (categoryFilter !== 'all') url.searchParams.append('category', categoryFilter);
       if (locationInput) url.searchParams.append('location', locationInput);
+      if (searchInput) url.searchParams.append('search', searchInput);
+      if (sortOrder) url.searchParams.append('sort', sortOrder);
       
       const res = await fetch(url.toString());
       const data = await res.json();
@@ -89,40 +93,93 @@ export default function JobsAndSalesPage() {
             </div>
 
             {/* Inputs Container */}
-            <div className="flex flex-col sm:flex-row flex-1 xl:flex-none w-full xl:w-auto gap-4">
-              <form onSubmit={(e) => { e.preventDefault(); fetchJobs(); }} className="flex flex-1 xl:w-[320px] bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100 transition-all">
-                <div className="px-3 flex items-center text-slate-400 bg-slate-50 border-r border-slate-100">
-                  <FiMapPin />
-                </div>
-                <input 
-                  type="text" 
-                  placeholder="Search by address or area..." 
-                  value={locationInput}
-                  onChange={(e) => setLocationInput(e.target.value)}
-                  className="w-full px-3 py-2.5 text-sm outline-none font-medium text-slate-700 placeholder:text-slate-400 min-w-0"
-                />
-                <button type="submit" className="px-4 sm:px-5 bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-colors whitespace-nowrap">
-                  Search
-                </button>
-              </form>
+            <div className="flex flex-col flex-1 w-full gap-4">
+              
+              <div className="flex flex-col sm:flex-row gap-4 w-full">
+                {/* Search Keyword */}
+                <form onSubmit={(e) => { e.preventDefault(); fetchJobs(); }} className="flex flex-1 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100 transition-all">
+                  <div className="px-3 flex items-center text-slate-400 bg-slate-50 border-r border-slate-100">
+                    <FiSearch />
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="Search titles, descriptions..." 
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    className="w-full px-3 py-2.5 text-sm outline-none font-medium text-slate-700 placeholder:text-slate-400 min-w-0"
+                  />
+                </form>
 
-              <div className="flex w-full sm:w-56 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100 transition-all shrink-0">
-                <div className="px-3 flex items-center text-slate-400 bg-slate-50 border-r border-slate-100">
-                  <FiGrid />
-                </div>
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="w-full px-3 py-2.5 text-sm outline-none font-medium text-slate-700 bg-white cursor-pointer min-w-0"
-                >
-                  <option value="all">All Categories</option>
-                  {JOB_SALE_CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
+                {/* Location Search */}
+                <form onSubmit={(e) => { e.preventDefault(); fetchJobs(); }} className="flex flex-1 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100 transition-all">
+                  <div className="px-3 flex items-center text-slate-400 bg-slate-50 border-r border-slate-100">
+                    <FiMapPin />
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="Search by address or area..." 
+                    value={locationInput}
+                    onChange={(e) => setLocationInput(e.target.value)}
+                    className="w-full px-3 py-2.5 text-sm outline-none font-medium text-slate-700 placeholder:text-slate-400 min-w-0"
+                  />
+                </form>
               </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 w-full">
+                {/* Category Filter */}
+                <div className="flex flex-1 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100 transition-all">
+                  <div className="px-3 flex items-center text-slate-400 bg-slate-50 border-r border-slate-100">
+                    <FiGrid />
+                  </div>
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="w-full px-3 py-2.5 text-sm outline-none font-medium text-slate-700 bg-white cursor-pointer min-w-0"
+                  >
+                    <option value="all">All Categories</option>
+                    {JOB_SALE_CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Sort Order */}
+                <div className="flex flex-1 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100 transition-all">
+                  <div className="px-3 flex items-center text-slate-400 bg-slate-50 border-r border-slate-100">
+                    <FiTag />
+                  </div>
+                  <select
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    className="w-full px-3 py-2.5 text-sm outline-none font-medium text-slate-700 bg-white cursor-pointer min-w-0"
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="price_asc">Price / Salary (Low to High)</option>
+                    <option value="price_desc">Price / Salary (High to Low)</option>
+                  </select>
+                </div>
+              </div>
+              
             </div>
           </div>
+          
+          {(searchInput || locationInput || categoryFilter !== 'all' || filter !== 'all' || sortOrder !== 'newest') && (
+            <div className="flex justify-end mt-4">
+              <button 
+                onClick={() => {
+                  setSearchInput('');
+                  setLocationInput('');
+                  setCategoryFilter('all');
+                  setFilter('all');
+                  setSortOrder('newest');
+                }}
+                className="text-sm font-bold text-rose-500 hover:text-rose-600 transition-colors px-3 py-1 bg-rose-50 rounded-md"
+              >
+                Clear All Filters
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Content Section */}
@@ -235,10 +292,16 @@ export default function JobsAndSalesPage() {
               There are currently no {filter !== 'all' ? filter + 's' : 'jobs or sales'} available. Please check back later!
             </p>
             <button
-              onClick={() => setFilter('all')}
+              onClick={() => {
+                setFilter('all');
+                setSearchInput('');
+                setLocationInput('');
+                setCategoryFilter('all');
+                setSortOrder('newest');
+              }}
               className="px-6 py-2.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors"
             >
-              View All Listings
+              Clear Filters & View All
             </button>
           </div>
         )}

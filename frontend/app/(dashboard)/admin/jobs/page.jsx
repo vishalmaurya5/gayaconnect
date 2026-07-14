@@ -8,17 +8,28 @@ import { JOB_SALE_CATEGORIES } from '@/lib/utils/jobSaleCategories';
 export default function AdminJobsPage() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [form, setForm] = useState({ title: '', description: '', type: 'job', category: '', salaryOrPrice: '', location: '' });
   const [posting, setPosting] = useState(false);
 
   useEffect(() => {
-    fetchJobs();
-  }, []);
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
-  const fetchJobs = async () => {
+  useEffect(() => {
+    fetchJobs(searchTerm);
+  }, [searchTerm]);
+
+  const fetchJobs = async (s = '') => {
     try {
       // Just re-use the public/vendor api
-      const res = await fetch('/api/jobs');
+      const url = new URL('/api/jobs', window.location.origin);
+      if (s) url.searchParams.append('search', s);
+      const res = await fetch(url.toString());
       const data = await res.json();
       if (data.success) {
         setJobs(data.jobs || []);
@@ -76,7 +87,18 @@ export default function AdminJobsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-800">Manage Jobs & Sales</h1>
+      <div className="flex justify-between items-center flex-wrap gap-4">
+        <h1 className="text-2xl font-bold text-slate-800">Manage Jobs & Sales</h1>
+        <div className="relative">
+          <input 
+            type="text" 
+            placeholder="Search titles, description..." 
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="w-full sm:w-80 rounded-xl border border-slate-300 px-4 py-2 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
+      </div>
       
       {/* Post Form */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">

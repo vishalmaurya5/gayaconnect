@@ -12,7 +12,20 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
 
-    const offers = await Offer.find().populate('vendorId', 'name category').sort('-createdAt')
+    const { searchParams } = new URL(request.url)
+    const search = searchParams.get('search')
+    let query = {}
+
+    if (search) {
+      const searchRegex = { $regex: search, $options: 'i' }
+      query.$or = [
+        { title: searchRegex },
+        { description: searchRegex },
+        { discountText: searchRegex }
+      ]
+    }
+
+    const offers = await Offer.find(query).populate('vendorId', 'name category').sort('-createdAt')
     return NextResponse.json({ success: true, offers })
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 })

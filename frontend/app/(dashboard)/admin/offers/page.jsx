@@ -8,17 +8,26 @@ export default function AdminOffersPage() {
   const [offers, setOffers] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [posting, setPosting] = useState(false);
   const [form, setForm] = useState({ vendorId: '', title: '', description: '', discountText: '', validUntil: '' });
 
   useEffect(() => {
-    fetchOffersAndVendors();
-  }, []);
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
-  const fetchOffersAndVendors = async () => {
+  useEffect(() => {
+    fetchOffersAndVendors(searchTerm);
+  }, [searchTerm]);
+
+  const fetchOffersAndVendors = async (s = '') => {
     try {
       const [offersRes, overviewRes] = await Promise.all([
-        fetch('/api/admin/offers'),
+        fetch(`/api/admin/offers?search=${s}`),
         fetch('/api/admin/overview')
       ]);
       const offersData = await offersRes.json();
@@ -119,14 +128,23 @@ export default function AdminOffersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-4">
         <h1 className="text-2xl font-bold text-slate-800">Manage Offers</h1>
-        <button 
-          onClick={deleteExpiredOffers} 
-          className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg font-semibold hover:bg-red-100 transition"
-        >
-          <FiTrash2 /> Delete All Expired
-        </button>
+        <div className="flex gap-4 items-center">
+          <input 
+            type="text" 
+            placeholder="Search offers..." 
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="w-full sm:w-64 rounded-lg border border-slate-300 px-4 py-2 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          />
+          <button 
+            onClick={deleteExpiredOffers} 
+            className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg font-semibold hover:bg-red-100 transition whitespace-nowrap"
+          >
+            <FiTrash2 /> Delete Expired
+          </button>
+        </div>
       </div>
 
       {/* Post New Offer Form */}

@@ -1,26 +1,31 @@
-import { ShieldCheck, TrendingUp, Users, Zap } from 'lucide-react';
+import { ShieldCheck, Users, Lock, Crown, Star } from 'lucide-react';
 
 export default function TrustStrip() {
   const items = [
     { 
       icon: <ShieldCheck className="w-6 h-6 text-indigo-600" />, 
-      title: "Verified & Trusted", 
-      subtitle: "Build trust and credibility",
+      title: "Verified Businesses", 
+      subtitle: "Trusted local services",
     },
     { 
-      icon: <TrendingUp className="w-6 h-6 text-teal-500" />, 
-      title: "Grow Your Business", 
-      subtitle: "Get more leads and sales",
+      icon: <Users className="w-6 h-6 text-teal-500" />, 
+      title: "Skilled Workforce", 
+      subtitle: "Verified professionals",
     },
     { 
-      icon: <Users className="w-6 h-6 text-indigo-600" />, 
-      title: "Local Reach", 
-      subtitle: "Connect with local customers",
+      icon: <Lock className="w-6 h-6 text-indigo-600" />, 
+      title: "Secure Platform", 
+      subtitle: "Safe & reliable",
     },
     { 
-      icon: <Zap className="w-6 h-6 text-teal-500" />, 
-      title: "Easy Management", 
-      subtitle: "Manage your profile & leads",
+      icon: <Star className="w-6 h-6 text-amber-500" />, 
+      title: "Trusted by Gaya", 
+      subtitle: "Thousands of users",
+    },
+    { 
+      icon: <Crown className="w-6 h-6 text-teal-500" />, 
+      title: "₹11 Premium", 
+      subtitle: "Unlock all features",
     },
   ];
 

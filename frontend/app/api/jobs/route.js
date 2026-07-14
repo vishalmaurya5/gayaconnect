@@ -14,16 +14,44 @@ export async function GET(request) {
     const vendorId = searchParams.get('vendorId');
     const location = searchParams.get('location');
     const category = searchParams.get('category');
+    const search = searchParams.get('search');
+    const sort = searchParams.get('sort') || 'newest';
 
     const query = { isActive: true };
     if (type && type !== 'all') query.type = type;
     if (vendorId) query.vendorId = vendorId;
     if (location) query.location = { $regex: location, $options: 'i' };
     if (category && category !== 'all') query.category = category;
+    
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { location: { $regex: search, $options: 'i' } },
+        { category: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    let sortOptions = {};
+    switch(sort) {
+      case 'price_asc':
+        sortOptions = { salaryOrPrice: 1 };
+        break;
+      case 'price_desc':
+        sortOptions = { salaryOrPrice: -1 };
+        break;
+      case 'oldest':
+        sortOptions = { createdAt: 1 };
+        break;
+      case 'newest':
+      default:
+        sortOptions = { createdAt: -1 };
+        break;
+    }
 
     const jobs = await Job.find(query)
       .populate('vendorId', 'name category address location')
-      .sort('-createdAt');
+      .sort(sortOptions);
 
     return NextResponse.json({ success: true, jobs });
   } catch (error) {

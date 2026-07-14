@@ -14,6 +14,7 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url)
     const filter = searchParams.get('filter') || 'all'
+    const search = searchParams.get('search')
 
     const query = { role: 'user' }
     
@@ -32,6 +33,15 @@ export async function GET(request) {
           { subscriptionExpiry: null }
         ]
       }
+    }
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } },
+        { aadhaarNumber: { $regex: search, $options: 'i' } }
+      ]
     }
 
     const users = await User.find(query).sort('-createdAt')

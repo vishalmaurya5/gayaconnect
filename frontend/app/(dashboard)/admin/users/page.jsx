@@ -9,9 +9,18 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [creating, setCreating] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const { register: regCreate, handleSubmit: handleCreateSubmit, reset: resetCreate } = useForm({
     defaultValues: { name: '', email: '', phone: '', password: '' }
@@ -63,13 +72,13 @@ export default function AdminUsersPage() {
   };
 
   useEffect(() => {
-    fetchUsers(filter);
-  }, [filter]);
+    fetchUsers(filter, search);
+  }, [filter, search]);
 
-  const fetchUsers = async (f) => {
+  const fetchUsers = async (f, s) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/users?filter=${f}`);
+      const res = await fetch(`/api/admin/users?filter=${f}&search=${s}`);
       const data = await res.json();
       if (data.success) {
         setUsers(data.users || []);
@@ -147,7 +156,7 @@ export default function AdminUsersPage() {
       if (json.success) {
         toast.success('User created successfully');
         resetCreate();
-        fetchUsers(filter);
+        fetchUsers(filter, search);
       } else {
         toast.error(json.message || 'Failed to create user');
       }
@@ -162,8 +171,17 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-4">
         <h1 className="text-2xl font-bold text-slate-800">User Management</h1>
+        <div className="relative">
+          <input 
+            type="text" 
+            placeholder="Search name, email, phone, Aadhaar..." 
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="w-full sm:w-80 rounded-xl border border-slate-300 px-4 py-2 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          />
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">

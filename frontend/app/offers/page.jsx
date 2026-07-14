@@ -72,13 +72,29 @@ export default function OffersPage() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [category, setCategory]         = useState("All");
   const [search, setSearch]             = useState("");
+  const [searchInput, setSearchInput]   = useState(""); // For debouncing
+  const [sortOrder, setSortOrder]       = useState("newest");
   const [offers, setOffers]             = useState(() => DEMO_OFFERS.map(refreshedDemoOffer));
   const [loading, setLoading]           = useState(true);
   const [loadError, setLoadError]       = useState("");
   const [selectedOffer, setSelectedOffer] = useState(null);
 
+  // Debounce search
   useEffect(() => {
-    fetch("/api/offers")
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setLoading(true);
+    const params = new URLSearchParams();
+    if (category !== "All") params.append("category", category);
+    if (search) params.append("search", search);
+    if (sortOrder) params.append("sort", sortOrder);
+
+    fetch(`/api/offers?${params.toString()}`)
       .then(async r => {
         const data = await r.json();
         if (!r.ok || !data.success) throw new Error(data.message || "Could not load offers");
@@ -99,14 +115,26 @@ export default function OffersPage() {
           setIsSubscribed(active);
         }
       }).catch(() => {});
-  }, []);
+  }, [category, search, sortOrder]);
 
-  // Filter offers
-  const filtered = offers.filter(o => {
+  // Filter demo offers locally since they are not in DB
+  const filteredDemo = DEMO_OFFERS.map(refreshedDemoOffer).filter(o => {
     const matchCat    = category === "All" || o.category === category;
     const matchSearch = !search || o.title.toLowerCase().includes(search.toLowerCase()) || o.vendor.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
+
+  // DB offers are already filtered by the API
+  const dbOffers = offers.filter(o => !DEMO_OFFERS.some(demo => demo._id === o._id));
+  
+  // Combine them
+  const filtered = [...filteredDemo, ...dbOffers];
+
+  if (sortOrder === 'newest') {
+    filtered.sort((a, b) => new Date(b.createdAt || b.expiresAt) - new Date(a.createdAt || a.expiresAt));
+  } else if (sortOrder === 'oldest') {
+    filtered.sort((a, b) => new Date(a.createdAt || a.expiresAt) - new Date(b.createdAt || b.expiresAt));
+  }
 
   const hotOffers = filtered.filter(o => o.hot);
   const allOffers = filtered.filter(o => !o.hot);
@@ -148,16 +176,27 @@ export default function OffersPage() {
         )}
 
         {/* Search + filter */}
-        <div className="flex gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="flex items-center gap-2 flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2.5">
             <Search size={16} className="text-gray-400" />
             <input
               type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
+              value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
               placeholder="Search offers, vendors…"
               className="flex-1 text-[14px] text-gray-700 placeholder-gray-400 outline-none"
             />
+          </div>
+          <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 sm:w-48 shrink-0">
+            <Filter size={16} className="text-gray-400" />
+            <select
+              value={sortOrder}
+              onChange={e => setSortOrder(e.target.value)}
+              className="flex-1 text-[14px] text-gray-700 outline-none bg-transparent"
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+            </select>
           </div>
         </div>
 
@@ -215,7 +254,20 @@ export default function OffersPage() {
           <div className="text-center py-20">
             <div className="text-5xl mb-4">🏷️</div>
             <h3 className="font-['Sora',sans-serif] text-xl font-bold text-gray-800 mb-2">No offers found</h3>
-            <p className="text-gray-500 text-[14px]">Try a different category or search term</p>
+            <p className="text-gray-500 text-[14px] mb-6">Try a different category or search term</p>
+            {(search || category !== 'All' || sortOrder !== 'newest') && (
+              <button 
+                onClick={() => {
+                  setSearch('');
+                  setSearchInput('');
+                  setCategory('All');
+                  setSortOrder('newest');
+                }}
+                className="px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-md"
+              >
+                Clear Filters & View All
+              </button>
+            )}
           </div>
         )}
       </div>

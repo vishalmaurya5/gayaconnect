@@ -1,24 +1,34 @@
 export default function HowItWorks() {
   const steps = [
     {
-      title: "Search or Browse",
-      desc: "Find the service you need by searching or exploring our local categories.",
+      title: "Search",
+      desc: "Find verified services, businesses, or jobs.",
       icon: "🔍"
     },
     {
-      title: "Compare & Contact",
-      desc: "View ratings, compare offers, and instantly unlock contact details.",
+      title: "Connect",
+      desc: "Get instant access to contact details.",
       icon: "📞"
     },
     {
-      title: "Get it Done",
-      desc: "Connect directly with trusted Gaya professionals and get your work done.",
+      title: "Book",
+      desc: "Schedule services at your convenience.",
+      icon: "📅"
+    },
+    {
+      title: "Get Work Done",
+      desc: "Experience reliable and quality service.",
       icon: "✅"
+    },
+    {
+      title: "Rate Experience",
+      desc: "Leave reviews to help the community.",
+      icon: "⭐"
     }
   ];
 
   return (
-    <div className="grid md:grid-cols-3 gap-8 md:gap-12 text-center mt-10">
+    <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 text-center mt-10">
       {steps.map((step, idx) => (
         <div key={idx} className="flex flex-col items-center relative group">
           

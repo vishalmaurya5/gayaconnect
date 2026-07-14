@@ -19,6 +19,7 @@ export default function LabourListingPage() {
     district: '',
     category: '',
     availability: '',
+    sort: 'recommended',
   });
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export default function LabourListingPage() {
       if (filters.district) params.append('district', filters.district);
       if (filters.category) params.append('category', filters.category);
       if (filters.availability) params.append('availability', filters.availability);
+      if (filters.sort) params.append('sort', filters.sort);
 
       const res = await fetch(`/api/labour?${params.toString()}`);
       const data = await res.json();
@@ -134,7 +136,33 @@ export default function LabourListingPage() {
                 <option value="today">Available Today</option>
               </select>
             </div>
+
+            <div className="flex-1">
+              <select
+                value={filters.sort}
+                onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition appearance-none"
+              >
+                <option value="recommended">Recommended</option>
+                <option value="rating_desc">Highest Rated</option>
+                <option value="rate_asc">Daily Rate (Low to High)</option>
+                <option value="rate_desc">Daily Rate (High to Low)</option>
+                <option value="newest">Newest First</option>
+              </select>
+            </div>
           </div>
+          
+          {/* Clear Filters Button */}
+          {Object.values(filters).some(val => val !== '' && val !== 'recommended') && (
+            <div className="flex justify-end">
+              <button 
+                onClick={() => setFilters({ search: '', state: '', district: '', category: '', availability: '', sort: 'recommended' })}
+                className="text-sm font-bold text-rose-500 hover:text-rose-600 transition-colors px-3 py-1 bg-rose-50 rounded-md"
+              >
+                Clear Filters
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Labour Registration Banner */}

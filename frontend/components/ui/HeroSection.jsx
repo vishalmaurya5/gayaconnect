@@ -14,12 +14,29 @@ import { FaWhatsapp } from 'react-icons/fa';
 
 export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState("Gaya");
+  const [category, setCategory] = useState("");
   const { openSubscriptionModal } = useAuth();
   const router = useRouter();
 
   const handleSearch = () => {
-    router.push('/vendors');
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('search', searchQuery);
+    if (location) params.set('area', location);
+    if (category && category !== 'jobs' && category !== 'rentals') params.set('category', category);
+    
+    // Determine the route based on the category
+    let route = '/vendors';
+    if (category === 'jobs' || category === 'rentals') {
+      route = '/jobs-and-sales';
+      if (category === 'jobs') params.set('type', 'job');
+      if (category === 'rentals') params.set('type', 'sale'); // Assuming rentals are in sales for now
+    } else if (category === 'professionals') {
+      route = '/labour';
+      params.delete('category'); // the labour page might have a different parameter or we just let search handle it
+    }
+
+    router.push(`${route}?${params.toString()}`);
   };
 
   const fadeUp = {
@@ -68,28 +85,28 @@ export default function HeroSection() {
               className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 border border-slate-200 shadow-sm mb-4 hover:shadow-md transition-shadow cursor-default"
             >
               <div className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full p-1 text-white">
-                <Sparkles className="w-3.5 h-3.5" />
+                <Star className="w-3.5 h-3.5 fill-current" />
               </div>
-              <span className="text-[13px] font-semibold text-slate-800 tracking-tight">Gaya's #1 Local Services Platform</span>
+              <span className="text-[13px] font-semibold text-slate-800 tracking-tight">Gaya's Most Trusted Digital Platform</span>
             </motion.div>
 
             {/* Heading */}
             <motion.h1 
               variants={fadeUp}
-              className="font-sora font-[800] text-[36px] md:text-[48px] lg:text-[62px] text-[#0F172A] leading-[1.1] tracking-tight w-full max-w-3xl"
+              className="font-sora font-[800] text-[36px] md:text-[48px] lg:text-[56px] text-[#0F172A] leading-[1.1] tracking-tight w-full max-w-3xl"
             >
-              Your City. Your Experts. <br className="hidden md:block" />
+              Your Trusted Partner <br className="hidden md:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-500">
-                One Platform.
+                for Everyday Needs
               </span>
             </motion.h1>
 
             {/* Description */}
             <motion.p 
               variants={fadeUp}
-              className="mt-3 font-inter text-[16px] lg:text-[18px] text-slate-600 max-w-[600px] leading-relaxed"
+              className="mt-4 font-inter text-[16px] lg:text-[18px] text-slate-600 max-w-[600px] leading-relaxed"
             >
-              Connecting Gaya's finest professionals with the people who need them. Whether you're looking for <strong className="text-slate-900 font-semibold">instant reliable help</strong> or ready to <strong className="text-indigo-600 font-semibold">skyrocket your business growth</strong>.
+              Discover verified businesses, skilled professionals, local jobs, rentals, exclusive offers, and essential services—all in one trusted platform built for the people of Gaya.
             </motion.p>
 
             {/* Floating Search Card */}
@@ -102,18 +119,38 @@ export default function HeroSection() {
                   <Search className="w-4 h-4" />
                 </div>
                 <div className="w-full text-left">
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">What are you looking for?</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Looking For</label>
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="e.g. Electrician, Plumber"
+                    placeholder="Search services, businesses, professionals..."
                     className="w-full text-[14px] font-semibold text-slate-900 outline-none placeholder:text-slate-400 bg-transparent"
                   />
                 </div>
               </div>
+
+              <div className="w-full md:w-[160px] px-4 py-2 border-b md:border-b-0 md:border-r border-slate-100 flex items-center gap-3 bg-slate-50/50 md:bg-transparent rounded-xl md:rounded-none">
+                <div className="bg-orange-50 p-1.5 rounded-lg text-orange-600 shrink-0">
+                  <Grid className="w-4 h-4" />
+                </div>
+                <div className="w-full text-left">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Category</label>
+                  <select 
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full text-[14px] font-semibold text-slate-900 outline-none bg-transparent cursor-pointer"
+                  >
+                    <option value="">All Categories</option>
+                    <option value="businesses">Businesses</option>
+                    <option value="professionals">Professionals</option>
+                    <option value="jobs">Jobs</option>
+                    <option value="rentals">Rentals</option>
+                  </select>
+                </div>
+              </div>
               
-              <div className="flex-1 w-full px-4 py-2 flex items-center gap-3 bg-slate-50/50 md:bg-transparent rounded-xl md:rounded-none">
+              <div className="w-full md:w-[150px] px-4 py-2 flex items-center gap-3 bg-slate-50/50 md:bg-transparent rounded-xl md:rounded-none">
                 <div className="bg-teal-50 p-1.5 rounded-lg text-teal-600 shrink-0">
                   <MapPin className="w-4 h-4" />
                 </div>
@@ -123,7 +160,7 @@ export default function HeroSection() {
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    placeholder="Gaya City, Bodh Gaya..."
+                    placeholder="Gaya"
                     className="w-full text-[14px] font-semibold text-slate-900 outline-none placeholder:text-slate-400 bg-transparent"
                   />
                 </div>
@@ -158,27 +195,20 @@ export default function HeroSection() {
 
             {/* Action Buttons */}
             <motion.div variants={fadeUp} className="mt-8 flex flex-col sm:flex-row flex-wrap w-full justify-center lg:justify-start gap-4">
-              <Link href="/explore" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold px-6 py-3 rounded-full shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 hover:-translate-y-0.5 transition-all duration-300 group">
+              <Link href="/services" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold px-6 py-3 rounded-full shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 hover:-translate-y-0.5 transition-all duration-300 group">
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Star className="w-4 h-4 text-white fill-white" />
+                  <Grid className="w-4 h-4 text-white" />
                 </div>
-                Explore Gaya
+                Explore Services
               </Link>
 
-              <Link href="/map" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-50 to-teal-50 text-indigo-700 font-bold px-6 py-3 rounded-full border border-indigo-100 hover:shadow-md hover:border-indigo-200 transition-all duration-300 group">
-                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm text-indigo-600 group-hover:scale-110 transition-transform">
-                  <MapPin className="w-4 h-4" />
-                </div>
-                Map
-              </Link>
-              
-              <button onClick={() => document.getElementById('enquiry')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="inline-flex items-center justify-center gap-2 bg-[#0F172A] text-white font-bold px-6 py-3 rounded-full shadow-lg shadow-slate-900/20 hover:bg-indigo-600 hover:shadow-indigo-500/30 transition-all duration-300 hover:-translate-y-0.5 group">
+              <Link href="/register-vendor" className="inline-flex items-center justify-center gap-2 bg-[#0F172A] text-white font-bold px-6 py-3 rounded-full shadow-lg shadow-slate-900/20 hover:bg-indigo-600 hover:shadow-indigo-500/30 transition-all duration-300 hover:-translate-y-0.5 group">
                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                  <Store className="w-4 h-4 text-white" />
                 </div>
-                Enquiry
+                Become a Vendor
                 <ArrowRight className="w-4 h-4 text-white/50 group-hover:translate-x-1 transition-transform" />
-              </button>
+              </Link>
             </motion.div>
 
           </motion.div>
@@ -204,7 +234,7 @@ export default function HeroSection() {
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
                       <img 
-                        src="/images/gaya_seva_logo.png" 
+                        src="/gaya_seva_app_icon.png" 
                         alt="Gaya Seva Logo" 
                         className="w-12 h-12 rounded-full border-2 border-white shadow-lg bg-white object-cover" 
                       />

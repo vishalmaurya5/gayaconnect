@@ -12,7 +12,22 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
 
-    const labourers = await Labourer.find().populate('userId', 'email phone name').sort('-createdAt')
+    const { searchParams } = new URL(request.url)
+    const search = searchParams.get('search')
+    let query = {}
+
+    if (search) {
+      const searchRegex = { $regex: search, $options: 'i' }
+      query.$or = [
+        { name: searchRegex },
+        { phone: searchRegex },
+        { profession: searchRegex },
+        { location: searchRegex },
+        { category: searchRegex }
+      ]
+    }
+
+    const labourers = await Labourer.find(query).populate('userId', 'email phone name').sort('-createdAt')
     return NextResponse.json({ success: true, labourers })
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 })

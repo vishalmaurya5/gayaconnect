@@ -33,6 +33,9 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url)
     const vendorId = searchParams.get('vendorId')
     const includeAll = searchParams.get('all') === 'true'
+    const search = searchParams.get('search')
+    const category = searchParams.get('category')
+    const sort = searchParams.get('sort') || 'newest'
 
     const query = includeAll
       ? {}
@@ -45,12 +48,48 @@ export async function GET(request) {
           ],
         }
 
+    if (category && category !== 'all') {
+      query.category = category
+    }
+
+    if (search) {
+      query.$or = [
+        ...(query.$or || []),
+      ]
+      
+      const searchConditions = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { discountText: { $regex: search, $options: 'i' } },
+        { category: { $regex: search, $options: 'i' } }
+      ]
+
+      if (query.$or && query.$or.length > 0 && !includeAll) {
+        // If we already have the validUntil $or condition, we need an $and
+        query.$and = [{ $or: query.$or }, { $or: searchConditions }]
+        delete query.$or
+      } else {
+        query.$or = searchConditions
+      }
+    }
+
     if (vendorId) {
       const vendor = await resolveVendor(vendorId)
       query.vendorId = { $in: [vendorId, vendor?._id].filter(Boolean) }
     }
 
-    const offers = await Offer.find(query).sort('-createdAt').lean()
+    let sortOptions = { createdAt: -1 }
+    switch (sort) {
+      case 'oldest':
+        sortOptions = { createdAt: 1 }
+        break;
+      case 'newest':
+      default:
+        sortOptions = { createdAt: -1 }
+        break;
+    }
+
+    const offers = await Offer.find(query).sort(sortOptions).lean()
     const ownerIds = offers.map((offer) => offer.vendorId).filter(Boolean)
     const vendors = await Vendor.find({
       $or: [{ _id: { $in: ownerIds } }, { userId: { $in: ownerIds } }],

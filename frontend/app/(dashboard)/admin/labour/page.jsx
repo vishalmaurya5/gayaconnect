@@ -11,16 +11,25 @@ export default function AdminLabourPage() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const admin = useContext(AdminContext);
 
   useEffect(() => {
-    fetchLabourers();
-  }, []);
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
-  const fetchLabourers = async () => {
+  useEffect(() => {
+    fetchLabourers(searchTerm);
+  }, [searchTerm]);
+
+  const fetchLabourers = async (s = '') => {
+    setLoading(true);
     try {
-      const res = await fetch('/api/admin/labour');
+      const res = await fetch(`/api/admin/labour?search=${s}`);
       const data = await res.json();
       if (data.success) {
         setLabourers(data.labourers || []);
@@ -99,9 +108,9 @@ export default function AdminLabourPage() {
           <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input 
             type="text"
-            placeholder="Search by Aadhaar, Name, ID..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by Aadhaar, Name, Profession..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none"
           />
         </div>
@@ -153,12 +162,7 @@ export default function AdminLabourPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {labourers.filter(l => 
-                  !searchTerm || 
-                  l.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                  (l.aadhaarNumber && l.aadhaarNumber.includes(searchTerm)) ||
-                  (l.lwfId && l.lwfId.toLowerCase().includes(searchTerm.toLowerCase()))
-                ).map(labour => (
+                {labourers.map(labour => (
                   <tr key={labour._id} className="hover:bg-slate-50 transition">
                     <td className="px-6 py-4">
                       <div className="font-bold text-slate-900 flex items-center gap-2">
