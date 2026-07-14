@@ -4,12 +4,12 @@ import Vendor from '@/lib/db/models/Vendor';
 import Labourer from '@/lib/db/models/Labourer';
 import Job from '@/lib/db/models/Job';
 import Offer from '@/lib/db/models/Offer';
-import { checkAdmin } from '@/lib/security/adminAuth';
+import { verifyAdminRequest } from '@/lib/utils/adminAuth';
 
 export async function GET(request) {
   try {
-    const auth = await checkAdmin(request);
-    if (!auth.success) return NextResponse.json(auth, { status: 401 });
+    const auth = verifyAdminRequest(request);
+    if (!auth) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
 
     const { searchParams } = new URL(request.url);
     const city = searchParams.get('city');
@@ -53,8 +53,8 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const auth = await checkAdmin(request);
-    if (!auth.success) return NextResponse.json(auth, { status: 401 });
+    const auth = verifyAdminRequest(request);
+    if (!auth) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
 
     const body = await request.json();
     const { id, type, action } = body; // action is 'APPROVE' or 'REJECT'
