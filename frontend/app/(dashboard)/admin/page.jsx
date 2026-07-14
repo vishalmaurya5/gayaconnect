@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { 
   FiUsers, FiShoppingBag, FiTool, FiTag, 
-  FiImage, FiDollarSign, FiUserPlus, FiAlertCircle, FiBriefcase
+  FiImage, FiDollarSign, FiUserPlus, FiAlertCircle, FiBriefcase, FiCheckCircle, FiMapPin
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { Bar } from 'react-chartjs-2';
@@ -29,15 +29,17 @@ ChartJS.register(
 export default function AdminDashboardPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedCity, setSelectedCity] = useState('');
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [selectedCity]);
 
   const fetchDashboardData = async () => {
+    setLoading(true);
     try {
-      // Using the overview API which has the rich Recharts data
-      const res = await fetch('/api/admin/overview');
+      const url = selectedCity ? `/api/admin/overview?city=${selectedCity}` : '/api/admin/overview';
+      const res = await fetch(url);
       const json = await res.json();
       if (json.success) {
         setData(json);
@@ -66,12 +68,12 @@ export default function AdminDashboardPage() {
   const stats = [
     { label: 'Total Users', value: data?.stats?.users, icon: FiUsers, color: 'text-blue-600', bg: 'bg-blue-100' },
     { label: 'Total Vendors', value: data?.stats?.vendors, icon: FiShoppingBag, color: 'text-purple-600', bg: 'bg-purple-100' },
-    { label: 'Total Labour', value: data?.stats?.labourers, icon: FiTool, color: 'text-orange-600', bg: 'bg-orange-100' },
-    { label: 'Jobs & Sales', value: data?.stats?.jobs, icon: FiBriefcase, color: 'text-teal-600', bg: 'bg-teal-100' },
-    { label: 'Active Offers', value: data?.stats?.activeOffers, icon: FiTag, color: 'text-pink-600', bg: 'bg-pink-100' },
-    { label: 'Active Banners', value: data?.stats?.activeBanners, icon: FiImage, color: 'text-indigo-600', bg: 'bg-indigo-100' },
-    { label: 'Revenue (Total)', value: `₹${data?.stats?.revenue}`, icon: FiDollarSign, color: 'text-emerald-600', bg: 'bg-emerald-100' },
-    { label: 'Pending Vendors', value: data?.stats?.pendingVendors, icon: FiAlertCircle, color: 'text-amber-600', bg: 'bg-amber-100' },
+    { label: 'Local Workforce', value: data?.stats?.labourers, icon: FiTool, color: 'text-orange-600', bg: 'bg-orange-100' },
+    { label: 'Pending Reviews', value: data?.stats?.pendingReviews || 0, icon: FiAlertCircle, color: 'text-rose-600', bg: 'bg-rose-100' },
+    { label: 'Approved Records', value: data?.stats?.approvedRecords || 0, icon: FiCheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-100' },
+    { label: 'Active Cities', value: data?.stats?.activeCities || 0, icon: FiMapPin, color: 'text-cyan-600', bg: 'bg-cyan-100' },
+    { label: 'Job Posts', value: data?.stats?.jobs, icon: FiBriefcase, color: 'text-teal-600', bg: 'bg-teal-100' },
+    { label: 'Revenue', value: `₹${data?.stats?.revenue}`, icon: FiDollarSign, color: 'text-indigo-600', bg: 'bg-indigo-100' },
   ];
 
   const chartData = {
@@ -114,8 +116,18 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Dashboard Overview</h1>
+        <select 
+          value={selectedCity} 
+          onChange={(e) => setSelectedCity(e.target.value)}
+          className="bg-white border border-slate-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-emerald-500 font-medium text-slate-700 outline-none"
+        >
+          <option value="">All India (Global)</option>
+          <option value="Gaya">Gaya</option>
+          <option value="Patna">Patna</option>
+          <option value="Delhi">Delhi</option>
+        </select>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">

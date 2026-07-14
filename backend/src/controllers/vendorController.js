@@ -2,9 +2,11 @@ import Vendor from '../models/Vendor.js';
 import Review from '../models/Review.js';
 import { asyncHandler, slugify } from '../utils/helpers.js';
 import { hasActiveContactAccess, redactVendorContact } from '../utils/contactAccess.js';
+import { clearCache } from '../middleware/cache.js';
 
 export const createVendor = asyncHandler(async (req, res) => {
   const vendor = await Vendor.create({ ...req.body, user: req.user._id, slug: slugify(req.body.businessName) });
+  await clearCache('vendors');
   res.status(201).json(vendor);
 });
 
@@ -15,12 +17,16 @@ export const updateVendor = asyncHandler(async (req, res) => {
 
   Object.assign(vendor, req.body);
   await vendor.save();
+  await clearCache('vendors');
+  await clearCache('vendor-slug');
   res.json(vendor);
 });
 
 export const deleteVendor = asyncHandler(async (req, res) => {
   const vendor = await Vendor.findByIdAndDelete(req.params.id);
   if (!vendor) return res.status(404).json({ message: 'Vendor not found' });
+  await clearCache('vendors');
+  await clearCache('vendor-slug');
   res.json({ message: 'Vendor deleted' });
 });
 
@@ -95,11 +101,15 @@ export const nearbyVendors = asyncHandler(async (req, res) => {
 export const approveVendor = asyncHandler(async (req, res) => {
   const vendor = await Vendor.findByIdAndUpdate(req.params.id, { isApproved: true, isRejected: false, rejectionReason: null }, { new: true });
   if (!vendor) return res.status(404).json({ message: 'Vendor not found' });
+  await clearCache('vendors');
+  await clearCache('vendor-slug');
   res.json(vendor);
 });
 
 export const rejectVendor = asyncHandler(async (req, res) => {
   const vendor = await Vendor.findByIdAndUpdate(req.params.id, { isApproved: false, isRejected: true, rejectionReason: req.body.reason || 'Policy mismatch' }, { new: true });
   if (!vendor) return res.status(404).json({ message: 'Vendor not found' });
+  await clearCache('vendors');
+  await clearCache('vendor-slug');
   res.json(vendor);
 });

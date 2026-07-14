@@ -1,8 +1,10 @@
 import Category from '../models/Category.js';
 import { asyncHandler, slugify } from '../utils/helpers.js';
+import { clearCache } from '../middleware/cache.js';
 
 export const createCategory = asyncHandler(async (req, res) => {
   const category = await Category.create({ ...req.body, slug: slugify(req.body.name) });
+  await clearCache('categories');
   res.status(201).json(category);
 });
 
@@ -16,11 +18,13 @@ export const updateCategory = asyncHandler(async (req, res) => {
   if (update.name) update.slug = slugify(update.name);
   const category = await Category.findByIdAndUpdate(req.params.id, update, { new: true });
   if (!category) return res.status(404).json({ message: 'Category not found' });
+  await clearCache('categories');
   res.json(category);
 });
 
 export const deleteCategory = asyncHandler(async (req, res) => {
   const category = await Category.findByIdAndDelete(req.params.id);
   if (!category) return res.status(404).json({ message: 'Category not found' });
+  await clearCache('categories');
   res.json({ message: 'Category deleted' });
 });

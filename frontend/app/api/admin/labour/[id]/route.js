@@ -36,8 +36,8 @@ export async function DELETE(request, props) {
     const params = await props.params;
     await connectDB()
     const adminUser = verifyAdminRequest(request)
-    if (!adminUser) {
-      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+    if (!adminUser || adminUser.adminRole !== 'SUPER_ADMIN') {
+      return NextResponse.json({ success: false, message: 'Super Admin access required to delete records' }, { status: 401 })
     }
 
     const labour = await Labourer.findByIdAndDelete(params.id)

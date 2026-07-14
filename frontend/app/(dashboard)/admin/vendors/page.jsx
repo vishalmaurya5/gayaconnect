@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FiCheckCircle, FiXCircle, FiTrash2, FiEdit2, FiX } from 'react-icons/fi';
+import { useState, useEffect, useContext } from 'react';
+import { FiCheckCircle, FiXCircle, FiTrash2, FiEdit2, FiX, FiFileText } from 'react-icons/fi';
+import { AdminContext } from '../layout';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 
@@ -11,6 +13,7 @@ export default function AdminVendorsPage() {
   const [creating, setCreating] = useState(false);
   const [editingVendor, setEditingVendor] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const admin = useContext(AdminContext);
 
   const { register: regCreate, handleSubmit: handleCreateSubmit, reset: resetCreate } = useForm({
     defaultValues: { name: '', email: '', phone: '', password: '', businessName: '', category: '', address: '' }
@@ -228,15 +231,22 @@ export default function AdminVendorsPage() {
                       <button onClick={() => openEditModal(vendor)} className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition inline-flex items-center gap-1" title="Edit Full Profile">
                         <FiEdit2 /> Edit
                       </button>
+                      {vendor.status === 'APPROVED' || vendor.isApproved ? (
+                        <Link href={`/admin/vendors/${vendor._id}/certificate`} className="px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 font-semibold hover:bg-indigo-200 transition inline-flex items-center gap-1">
+                          <FiFileText /> Certificate
+                        </Link>
+                      ) : null}
                       <button 
                         onClick={() => toggleApproval(vendor._id, vendor.isApproved)} 
                         className={`px-3 py-1.5 rounded-lg font-semibold text-white transition ${vendor.isApproved ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'}`}
                       >
                         {vendor.isApproved ? 'Revoke' : 'Approve'}
                       </button>
-                      <button onClick={() => deleteVendor(vendor._id)} className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" title="Delete">
-                        <FiTrash2 className="text-lg" />
-                      </button>
+                      {admin?.role === 'SUPER_ADMIN' && (
+                        <button onClick={() => deleteVendor(vendor._id)} className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" title="Delete">
+                          <FiTrash2 className="text-lg" />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

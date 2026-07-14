@@ -10,6 +10,7 @@ const offerSchema = new mongoose.Schema({
   planType: { type: String },
   paymentId: { type: String },
   isActive: { type: Boolean, default: true },
+  status: { type: String, enum: ['PENDING', 'APPROVED', 'REJECTED'], default: 'PENDING' },
   validUntil: { type: Date },
   // Kept for offers written by the older payment flow.
   expiresAt: { type: Date },

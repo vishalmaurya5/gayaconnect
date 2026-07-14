@@ -1,17 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
   FiGrid, FiUsers, FiShoppingBag, FiTool, FiTag, 
   FiImage, FiDollarSign, FiLogOut, FiShield, FiMenu, FiX,
-  FiPhoneCall, FiSettings, FiMonitor, FiBriefcase, FiTruck, FiList, FiMessageSquare
+  FiPhoneCall, FiSettings, FiMonitor, FiBriefcase, FiTruck, FiList, FiMessageSquare, FiCheckSquare, FiUserPlus
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
+export const AdminContext = createContext({ role: 'ADMIN' });
+
 export default function AdminLayout({ children }) {
   const [authenticated, setAuthenticated] = useState(false);
+  const [adminDetails, setAdminDetails] = useState({ role: 'ADMIN' });
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
@@ -27,6 +30,7 @@ export default function AdminLayout({ children }) {
       const data = await res.json();
       if (data.success) {
         setAuthenticated(true);
+        setAdminDetails(data.admin || { role: 'ADMIN' });
       } else {
         setAuthenticated(false);
       }
@@ -53,8 +57,8 @@ export default function AdminLayout({ children }) {
 
   const menuItems = [
     { name: 'Dashboard', path: '/admin', icon: FiGrid },
+    { name: 'Review Center', path: '/admin/reviews', icon: FiCheckSquare },
     { name: 'Feedbacks', path: '/admin/feedbacks', icon: FiMessageSquare },
-    { name: 'Users', path: '/admin/users', icon: FiUsers },
     { name: 'Vendors', path: '/admin/vendors', icon: FiShoppingBag },
     { name: 'Labour', path: '/admin/labour', icon: FiTool },
     { name: 'Vehicles', path: '/admin/vehicles', icon: FiTruck },
@@ -65,6 +69,8 @@ export default function AdminLayout({ children }) {
     { name: 'Payments', path: '/admin/payments', icon: FiDollarSign },
     { name: 'Call Logs', path: '/admin/calls', icon: FiPhoneCall },
     { name: 'Popup Ad', path: '/admin/popup', icon: FiMonitor },
+    { name: 'System Users', path: '/admin/users', icon: FiUsers },
+    { name: 'Admins', path: '/admin/users/admins', icon: FiUserPlus },
     { name: 'Settings', path: '/admin/settings', icon: FiSettings },
   ];
 
@@ -82,10 +88,10 @@ export default function AdminLayout({ children }) {
       <aside className={`fixed inset-y-0 left-0 z-30 w-[280px] bg-[#0A0F1C] border-r border-slate-800/60 shadow-2xl text-slate-300 transform transition-transform duration-300 lg:translate-x-0 lg:static lg:flex-shrink-0 flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-20 flex items-center justify-between px-6 border-b border-slate-800/60 bg-[#0A0F1C]/80 backdrop-blur-xl shrink-0">
           <span className="font-extrabold text-xl flex items-center gap-3 tracking-tight">
-            <div className="bg-gradient-to-tr from-emerald-500 to-teal-400 p-2 rounded-xl shadow-lg shadow-emerald-500/20">
-              <FiShield className="text-white text-xl" /> 
+            <div className="bg-gradient-to-tr from-amber-500 to-orange-400 p-2 rounded-xl shadow-lg shadow-amber-500/20">
+              <img src="/logo2.png" alt="Gaya Seva" className="h-6 w-6 object-contain filter brightness-0 invert" />
             </div>
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Admin Pro</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Gaya Seva</span>
           </span>
           <button className="lg:hidden text-slate-400 hover:text-white transition-colors" onClick={() => setSidebarOpen(false)}>
             <FiX className="text-2xl" />
@@ -128,11 +134,13 @@ export default function AdminLayout({ children }) {
           <button onClick={() => setSidebarOpen(true)} className="p-2 -ml-2 text-slate-600 hover:text-slate-900">
             <FiMenu className="text-2xl" />
           </button>
-          <span className="ml-2 font-bold text-slate-800">Admin Portal</span>
+          <span className="ml-2 font-bold text-slate-800">Gaya Seva Admin</span>
         </header>
         
         <main className="flex-1 overflow-auto p-4 lg:p-8">
-          {children}
+          <AdminContext.Provider value={adminDetails}>
+            {children}
+          </AdminContext.Provider>
         </main>
       </div>
     </div>

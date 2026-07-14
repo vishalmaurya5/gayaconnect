@@ -6,6 +6,21 @@ import { gayaPlaces } from "@/lib/data/gayaPlaces";
 import { nearbyPlaces } from "@/lib/data/nearbyPlaces";
 import Link from "next/link";
 
+const PlaceImage = ({ place, className }) => {
+  return (
+    <img 
+      src={place.image} 
+      alt={place.title} 
+      className={className} 
+      onError={(e) => {
+        e.currentTarget.onerror = null;
+        e.currentTarget.src = '/images/gaya/mahabodhi.png';
+      }}
+      loading="lazy"
+    />
+  );
+};
+
 const categories = [
   { id: "all", label: "All Places" },
   { id: "temples", label: "Temples" },
@@ -110,14 +125,9 @@ export default function ExploreGayaPage() {
               >
                 <div className="h-56 w-full overflow-hidden relative">
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent z-10"></div>
-                  <img 
-                    src={place.image} 
-                    alt={place.title} 
+                  <PlaceImage 
+                    place={place} 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = '/images/gaya/mahabodhi.png'; // Reliable local fallback
-                    }}
                   />
                   <div className="absolute top-4 left-4 z-20 bg-black/40 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-white/20">
                     {place.category}
@@ -163,14 +173,9 @@ export default function ExploreGayaPage() {
             
             <div className="h-72 sm:h-96 w-full relative">
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent z-10"></div>
-              <img 
-                src={selectedPlace.image} 
-                alt={selectedPlace.title} 
+              <PlaceImage 
+                place={selectedPlace} 
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = '/images/gaya/mahabodhi.png'; // Reliable local fallback
-                }}
               />
               <div className="absolute bottom-8 left-8 right-8 z-20">
                 <div className="inline-flex items-center gap-1.5 bg-indigo-500/80 backdrop-blur text-white px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider mb-3">

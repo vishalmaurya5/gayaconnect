@@ -17,11 +17,18 @@ export default function LabourRegisterPage() {
     category: '',
     customCategory: '',
     area: '',
+    address: '',
+    pincode: '',
+    district: '',
+    state: '',
+    bloodGroup: '',
     dailyRate: '',
     onCall: false,
     photo: '',
     skills: '',
-    availability: true
+    availability: true,
+    aadhaarNumber: '',
+    aadhaarImage: ''
   });
 
   const handlePhoto = (e) => {
@@ -42,12 +49,35 @@ export default function LabourRegisterPage() {
     reader.readAsDataURL(file);
   };
 
+  const handleAadhaarImage = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
+      toast.error('Only JPG and JPEG images are allowed for Aadhaar Card');
+      return;
+    }
+    if (file.size > 100 * 1024) {
+      toast.error('Aadhaar Card image must be under 100 KB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => setForm({ ...form, aadhaarImage: reader.result });
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const finalCategory = form.category === 'Other' ? form.customCategory : form.category;
     
-    if (!form.name || !form.phone || !finalCategory || !form.area) {
-      toast.error('Please fill all required fields');
+    if (!form.name || !form.phone || !finalCategory || !form.area || !form.aadhaarNumber || !form.aadhaarImage) {
+      toast.error('Please fill all required fields including Aadhaar details');
+      return;
+    }
+
+    if (!/^\d{12}$/.test(form.aadhaarNumber)) {
+      toast.error('Aadhaar number must be exactly 12 digits');
       return;
     }
 
@@ -140,6 +170,25 @@ export default function LabourRegisterPage() {
               </div>
             </div>
 
+            {/* Aadhaar Image Upload */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6">
+              <label className="block text-sm font-semibold text-slate-900 mb-2">Upload Aadhaar Card *</label>
+              <p className="text-xs text-slate-500 mb-4">Must be clear, under 100 KB, and in JPG/JPEG format for verification.</p>
+              <div className="flex items-center gap-4">
+                {form.aadhaarImage ? (
+                  <div className="h-16 flex items-center px-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-sm font-bold">
+                    <FiCheckCircle className="mr-2" /> Uploaded Successfully
+                  </div>
+                ) : (
+                  <label className="cursor-pointer flex-1 flex flex-col items-center justify-center h-24 border-2 border-dashed border-slate-300 hover:border-emerald-500 hover:bg-emerald-50 rounded-xl transition">
+                    <FiUpload className="text-xl text-slate-400 mb-1" />
+                    <span className="text-sm font-medium text-slate-600">Select File</span>
+                    <input type="file" required accept="image/jpeg, image/jpg" onChange={handleAadhaarImage} className="hidden" />
+                  </label>
+                )}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name *</label>
@@ -164,6 +213,21 @@ export default function LabourRegisterPage() {
                   onChange={(e) => setForm({...form, phone: e.target.value})}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
                   placeholder="10 digit number"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Aadhaar Number *</label>
+                <input 
+                  type="text" 
+                  required
+                  pattern="[0-9]{12}"
+                  title="12 digit Aadhaar number"
+                  maxLength={12}
+                  value={form.aadhaarNumber}
+                  onChange={(e) => setForm({...form, aadhaarNumber: e.target.value.replace(/\D/g, '')})}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition tracking-[0.2em] font-mono text-lg"
+                  placeholder="XXXX XXXX XXXX"
                 />
               </div>
 
@@ -202,6 +266,61 @@ export default function LabourRegisterPage() {
                   onChange={(e) => setForm({...form, area: e.target.value})}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
                   placeholder="e.g. AP Colony"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Full Address</label>
+                <input 
+                  type="text" 
+                  value={form.address}
+                  onChange={(e) => setForm({...form, address: e.target.value})}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
+                  placeholder="Enter full address"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Pincode</label>
+                <input 
+                  type="text" 
+                  value={form.pincode}
+                  onChange={(e) => setForm({...form, pincode: e.target.value})}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
+                  placeholder="e.g. 823001"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">District</label>
+                <input 
+                  type="text" 
+                  value={form.district}
+                  onChange={(e) => setForm({...form, district: e.target.value})}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
+                  placeholder="e.g. Gaya"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">State</label>
+                <input 
+                  type="text" 
+                  value={form.state}
+                  onChange={(e) => setForm({...form, state: e.target.value})}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
+                  placeholder="e.g. Bihar"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Blood Group</label>
+                <input 
+                  type="text" 
+                  value={form.bloodGroup}
+                  onChange={(e) => setForm({...form, bloodGroup: e.target.value})}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
+                  placeholder="e.g. O+, B-"
                 />
               </div>
 

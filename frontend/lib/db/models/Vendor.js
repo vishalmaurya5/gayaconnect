@@ -21,6 +21,8 @@ const vendorSchema = new mongoose.Schema({
   services: [{ type: String }],
   images: [{ type: String }],
   isPremium: { type: Boolean, default: false },
+  vendorId: { type: String, unique: true, sparse: true },
+  status: { type: String, enum: ['PENDING', 'APPROVED', 'REJECTED'], default: 'PENDING' },
   isApproved: { type: Boolean, default: false },
   rating: { type: Number, default: 4.5 },
   totalReviews: { type: Number, default: 0 },

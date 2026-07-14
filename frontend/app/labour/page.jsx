@@ -14,8 +14,10 @@ export default function LabourListingPage() {
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
   const [filters, setFilters] = useState({
+    search: '',
+    state: '',
+    district: '',
     category: '',
-    area: '',
     availability: '',
   });
 
@@ -41,8 +43,10 @@ export default function LabourListingPage() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
+      if (filters.search) params.append('search', filters.search);
+      if (filters.state) params.append('state', filters.state);
+      if (filters.district) params.append('district', filters.district);
       if (filters.category) params.append('category', filters.category);
-      if (filters.area) params.append('area', filters.area);
       if (filters.availability) params.append('availability', filters.availability);
 
       const res = await fetch(`/api/labour?${params.toString()}`);
@@ -76,38 +80,60 @@ export default function LabourListingPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
+        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-8 flex flex-col gap-4">
+          <div className="relative">
             <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
             <input
               type="text"
-              placeholder="Search by area or locality..."
-              value={filters.area}
-              onChange={(e) => setFilters({ ...filters, area: e.target.value })}
+              placeholder="Global Search (locality, skills, blood group, pincode...)"
+              value={filters.search}
+              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
             />
           </div>
 
-          <div className="flex-1">
-            <select
-              value={filters.category}
-              onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition appearance-none"
-            >
-              <option value="">All Categories</option>
-              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Filter by State"
+                value={filters.state}
+                onChange={(e) => setFilters({ ...filters, state: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
+              />
+            </div>
+            
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Filter by District"
+                value={filters.district}
+                onChange={(e) => setFilters({ ...filters, district: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
+              />
+            </div>
 
-          <div className="flex-1">
-            <select
-              value={filters.availability}
-              onChange={(e) => setFilters({ ...filters, availability: e.target.value })}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition appearance-none"
-            >
-              <option value="">Any Availability</option>
-              <option value="today">Available Today</option>
-            </select>
+            <div className="flex-1">
+              <select
+                value={filters.category}
+                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition appearance-none"
+              >
+                <option value="">All Categories</option>
+                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+
+            <div className="flex-1">
+              <select
+                value={filters.availability}
+                onChange={(e) => setFilters({ ...filters, availability: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition appearance-none"
+              >
+                <option value="">Any Availability</option>
+                <option value="today">Available Today</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -221,10 +247,21 @@ function LabourCard({ labour, isSubscribed, onSubscribe }) {
       <div className="h-px w-full bg-white/10 my-3.5"></div>
 
       {/* Location */}
-      <div className="flex items-center gap-2 text-[13px] mb-3">
-        <FiMapPin size={14} className="text-gray-400 shrink-0" />
-        <span className="text-gray-300">{labour.area}</span>
+      <div className="flex items-start gap-2 text-[13px] mb-3">
+        <FiMapPin size={14} className="text-gray-400 shrink-0 mt-0.5" />
+        <div className="flex flex-col">
+          <span className="text-gray-300 font-medium">{labour.area}{labour.district ? `, ${labour.district}` : ''}</span>
+          <span className="text-gray-400 text-[11px]">{labour.state ? labour.state : ''} {labour.pincode ? `- ${labour.pincode}` : ''}</span>
+        </div>
       </div>
+
+      {labour.bloodGroup && (
+        <div className="flex items-center gap-2 mb-3">
+          <span className="bg-red-500/10 text-red-400 px-2.5 py-1 rounded-full text-[11px] font-bold border border-red-500/20">
+            🩸 Blood: {labour.bloodGroup}
+          </span>
+        </div>
+      )}
 
       {/* Skills — only takes up space if present, no reserved slot */}
       {labour.skills && labour.skills.length > 0 && (

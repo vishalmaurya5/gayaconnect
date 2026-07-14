@@ -156,15 +156,29 @@ export default function HeroSection() {
               ))}
             </motion.div>
 
-            {/* Map Link */}
-            <motion.div variants={fadeUp} className="mt-8 flex w-full justify-center lg:justify-start">
-              <Link href="/map" className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-teal-50 text-indigo-700 font-bold px-6 py-3 rounded-full border border-indigo-100 hover:shadow-md hover:border-indigo-200 transition-all duration-300 group">
+            {/* Action Buttons */}
+            <motion.div variants={fadeUp} className="mt-8 flex flex-col sm:flex-row flex-wrap w-full justify-center lg:justify-start gap-4">
+              <Link href="/explore" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold px-6 py-3 rounded-full shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 hover:-translate-y-0.5 transition-all duration-300 group">
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Star className="w-4 h-4 text-white fill-white" />
+                </div>
+                Explore Gaya
+              </Link>
+
+              <Link href="/map" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-50 to-teal-50 text-indigo-700 font-bold px-6 py-3 rounded-full border border-indigo-100 hover:shadow-md hover:border-indigo-200 transition-all duration-300 group">
                 <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm text-indigo-600 group-hover:scale-110 transition-transform">
                   <MapPin className="w-4 h-4" />
                 </div>
-                Explore Interactive Map
-                <ArrowRight className="w-4 h-4 text-indigo-400 group-hover:translate-x-1 transition-transform" />
+                Map
               </Link>
+              
+              <button onClick={() => document.getElementById('enquiry')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="inline-flex items-center justify-center gap-2 bg-[#0F172A] text-white font-bold px-6 py-3 rounded-full shadow-lg shadow-slate-900/20 hover:bg-indigo-600 hover:shadow-indigo-500/30 transition-all duration-300 hover:-translate-y-0.5 group">
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                </div>
+                Enquiry
+                <ArrowRight className="w-4 h-4 text-white/50 group-hover:translate-x-1 transition-transform" />
+              </button>
             </motion.div>
 
           </motion.div>

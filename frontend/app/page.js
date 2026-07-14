@@ -15,6 +15,8 @@ import VendorCTA from "@/components/ui/VendorCTA";
 import PopupAd from "@/components/ui/PopupAd";
 import AboutGaya from "@/components/ui/AboutGaya";
 import FeaturesSection from "@/components/ui/FeaturesSection";
+import EnquiryForm from "@/components/ui/EnquiryForm";
+import StickyEnquiryCTA from "@/components/ui/StickyEnquiryCTA";
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomePage() {
@@ -211,6 +213,12 @@ export default function HomePage() {
       <div className="max-w-[1440px] mx-auto px-5 lg:px-10 pb-20 pt-10">
         <VendorCTA />
       </div>
+
+      {/* Enquiry Form */}
+      <EnquiryForm />
+      
+      {/* Sticky Quick-Scroll Button */}
+      <StickyEnquiryCTA />
       </div>
     </div>
   );

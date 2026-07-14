@@ -8,7 +8,7 @@ export async function GET(request) {
     return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
   }
 
-  return NextResponse.json({ success: true, admin: { userId: admin.sub, role: 'admin' } })
+  return NextResponse.json({ success: true, admin: { userId: admin.sub, role: admin.adminRole || 'SUPER_ADMIN' } })
 }
 
 export async function POST(request) {
@@ -17,16 +17,15 @@ export async function POST(request) {
 
   const { userId = '', password = '' } = await request.json().catch(() => ({}))
 
-  const ok = await verifyAdminPassword(userId, password)
-  if (!ok) {
+  const authResult = await verifyAdminPassword(userId, password)
+  if (!authResult || !authResult.success) {
     return NextResponse.json({ success: false, message: 'Invalid admin credentials' }, { status: 401 })
   }
 
-  const { userId: adminUserId } = getAdminCredentials()
   return setAdminCookie(NextResponse.json({
     success: true,
-    admin: { userId: adminUserId, role: 'admin' },
-  }))
+    admin: { userId: authResult.userId, role: authResult.role },
+  }), authResult.userId, authResult.role)
 }
 
 export async function DELETE() {

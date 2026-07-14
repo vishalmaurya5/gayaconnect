@@ -7,6 +7,7 @@ const vendorSchema = new mongoose.Schema({
   subCategory: { type: String },
   description: { type: String },
   address: { type: String },
+  city: { type: String },
   location: {
     type: { type: String, enum: ['Point'], default: 'Point' },
     coordinates: { type: [Number], default: [0, 0] }
@@ -22,6 +23,8 @@ const vendorSchema = new mongoose.Schema({
 });
 
 vendorSchema.index({ location: '2dsphere' });
+vendorSchema.index({ name: 'text', description: 'text', category: 'text' });
+vendorSchema.index({ isApproved: 1, category: 1, city: 1, createdAt: -1 });
 
 const Vendor = mongoose.models.Vendor || mongoose.model('Vendor', vendorSchema);
 export default Vendor;

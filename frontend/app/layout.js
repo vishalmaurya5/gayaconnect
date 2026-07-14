@@ -10,6 +10,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const sora = Sora({ subsets: ['latin'], variable: '--font-sora' })
 
 export const metadata = {
+  metadataBase: new URL('https://gayaseva.com'),
   title: 'Gaya Seva - Premium Local Services in Gaya, Gayaji & Bihar',
   description: 'Find the best local shops, restaurants, repair services, hotels, and daily laborers in Gaya, Gayaji, Bodh Gaya, and all areas across the Gaya district, Bihar. Explore the most trusted local digital directory.',
   keywords: 'Gaya, Gayaji, Bihar, Gaya district, Gaya local services, Bodh Gaya services, Gaya shops, Gaya restaurants, repair services Gaya, hotels in Gaya, daily wage workers Gaya, local workforce Bihar, Gaya Seva, Gaya city portal, Gaya marketplace, famous places in Gaya, malls in Gaya, waterparks in Gaya, Gaya tourist places',

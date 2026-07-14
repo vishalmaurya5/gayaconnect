@@ -1,5 +1,6 @@
 import express from 'express';
 import { protect, optionalProtect, authorize } from '../middleware/auth.js';
+import { cacheResponse } from '../middleware/cache.js';
 import {
   createVendor,
   updateVendor,
@@ -13,9 +14,9 @@ import {
 
 const router = express.Router();
 
-router.get('/', optionalProtect, getVendors);
+router.get('/', optionalProtect, cacheResponse('vendors', 600), getVendors);
 router.get('/nearby', optionalProtect, nearbyVendors);
-router.get('/:slug', optionalProtect, getVendorBySlug);
+router.get('/:slug', optionalProtect, cacheResponse('vendor-slug', 600), getVendorBySlug);
 router.post('/', protect, authorize('vendor', 'admin'), createVendor);
 router.put('/:id', protect, authorize('vendor', 'admin'), updateVendor);
 router.delete('/:id', protect, authorize('admin'), deleteVendor);
