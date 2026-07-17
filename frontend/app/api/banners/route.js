@@ -9,7 +9,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url)
     const position = searchParams.get('position')
 
-    const query = { isActive: true, adminApproved: true }
+    const query = { isActive: true, adminApproved: true, endDate: { $gte: new Date() } }
     if (position) query.position = position
 
     const banners = await Banner.find(query)
@@ -25,8 +25,11 @@ export async function POST(request) {
   try {
     await connectDB()
     const body = await request.json()
-    // Need auth for real usage
-    const banner = new Banner(body)
+    const bannerData = { ...body }
+    if (!bannerData.endDate) {
+      bannerData.endDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 1 week default
+    }
+    const banner = new Banner(bannerData)
     await banner.save()
 
     return NextResponse.json({ success: true, banner })

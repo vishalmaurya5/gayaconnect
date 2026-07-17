@@ -2,26 +2,42 @@
 
 import Link from "next/link";
 import { FiGrid } from "react-icons/fi";
+import dynamic from 'next/dynamic';
+import { useAuth } from '@/contexts/AuthContext';
 import HeroSection from "@/components/ui/HeroSection";
 import TrustStrip from "@/components/ui/TrustStrip";
 import LiveStatistics from "@/components/ui/LiveStatistics";
-import BannerSlider from "@/components/ui/BannerSlider";
-import CategoryGrid from "@/components/ui/CategoryGrid";
-import VendorSection from "@/components/ui/VendorSection";
-import OfferSection from "@/components/ui/OfferSection";
-import LabourSection from "@/components/ui/LabourSection";
-import JobPreviewSection from "@/components/ui/JobPreviewSection";
-import WhyChooseUs from "@/components/ui/WhyChooseUs";
-import HowItWorks from "@/components/ui/HowItWorks";
-import Testimonials from "@/components/ui/Testimonials";
-import VendorCTA from "@/components/ui/VendorCTA";
-import DownloadApp from "@/components/ui/DownloadApp";
 import PopupAd from "@/components/ui/PopupAd";
-import AboutGaya from "@/components/ui/AboutGaya";
-import FeaturesSection from "@/components/ui/FeaturesSection";
-import EnquiryForm from "@/components/ui/EnquiryForm";
 import StickyEnquiryCTA from "@/components/ui/StickyEnquiryCTA";
-import { useAuth } from '@/contexts/AuthContext';
+
+// Dynamic Imports with Suspense Skeleton Fallbacks (Optimized for FCP/LCP)
+const BannerSlider = dynamic(() => import('@/components/ui/BannerSlider'), { 
+  loading: () => <div className="h-[250px] md:h-[400px] w-full bg-slate-200 dark:bg-slate-800 animate-pulse rounded-[24px]"></div>,
+  ssr: false 
+});
+const CategoryGrid = dynamic(() => import('@/components/ui/CategoryGrid'), { 
+  loading: () => <div className="h-[400px] w-full bg-slate-200 dark:bg-slate-800 animate-pulse rounded-2xl"></div>
+});
+const VendorSection = dynamic(() => import('@/components/ui/VendorSection'), { 
+  loading: () => <div className="h-[400px] w-full bg-slate-200 dark:bg-slate-800 animate-pulse rounded-2xl"></div> 
+});
+const OfferSection = dynamic(() => import('@/components/ui/OfferSection'), { 
+  loading: () => <div className="h-[300px] w-full bg-slate-200 dark:bg-slate-800 animate-pulse rounded-2xl"></div> 
+});
+const LabourSection = dynamic(() => import('@/components/ui/LabourSection'), { 
+  loading: () => <div className="h-[400px] w-full bg-slate-200 dark:bg-slate-800 animate-pulse rounded-2xl"></div> 
+});
+const JobPreviewSection = dynamic(() => import('@/components/ui/JobPreviewSection'), { 
+  loading: () => <div className="h-[400px] w-full bg-slate-200 dark:bg-slate-800 animate-pulse rounded-2xl"></div> 
+});
+const WhyChooseUs = dynamic(() => import('@/components/ui/WhyChooseUs'));
+const HowItWorks = dynamic(() => import('@/components/ui/HowItWorks'));
+const Testimonials = dynamic(() => import('@/components/ui/Testimonials'));
+const VendorCTA = dynamic(() => import('@/components/ui/VendorCTA'));
+const DownloadApp = dynamic(() => import('@/components/ui/DownloadApp'));
+const AboutGaya = dynamic(() => import('@/components/ui/AboutGaya'));
+const FeaturesSection = dynamic(() => import('@/components/ui/FeaturesSection'));
+const EnquiryForm = dynamic(() => import('@/components/ui/EnquiryForm'), { ssr: false });
 
 export default function HomePage() {
   const { user, openSubscriptionModal } = useAuth();

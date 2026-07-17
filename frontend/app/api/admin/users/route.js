@@ -16,7 +16,9 @@ export async function GET(request) {
     const filter = searchParams.get('filter') || 'all'
     const search = searchParams.get('search')
 
-    const query = { role: 'user' }
+    const query = {
+      $or: [{ role: 'user' }, { role: { $exists: false } }]
+    }
     
     if (filter === 'deleted') {
       query.isDeleted = true
@@ -27,21 +29,34 @@ export async function GET(request) {
         query.subscriptionActive = true
         query.subscriptionExpiry = { $gt: new Date() }
       } else if (filter === 'unsubscribed') {
-        query.$or = [
-          { subscriptionActive: false },
-          { subscriptionExpiry: { $lte: new Date() } },
-          { subscriptionExpiry: null }
+        // Here we can use $and if we need to combine with search later, but let's just construct the final query properly
+        query.$and = [
+          {
+            $or: [
+              { subscriptionActive: false },
+              { subscriptionExpiry: { $lte: new Date() } },
+              { subscriptionExpiry: null }
+            ]
+          }
         ]
       }
     }
 
     if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { phone: { $regex: search, $options: 'i' } },
-        { aadhaarNumber: { $regex: search, $options: 'i' } }
-      ]
+      const searchCondition = {
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { phone: { $regex: search, $options: 'i' } },
+          { aadhaarNumber: { $regex: search, $options: 'i' } }
+        ]
+      }
+      
+      if (query.$and) {
+        query.$and.push(searchCondition)
+      } else {
+        query.$and = [searchCondition]
+      }
     }
 
     const users = await User.find(query).sort('-createdAt')

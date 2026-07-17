@@ -23,7 +23,9 @@ export async function GET(request) {
         { phone: searchRegex },
         { profession: searchRegex },
         { location: searchRegex },
-        { category: searchRegex }
+        { category: searchRegex },
+        { lwfId: searchRegex },
+        { aadhaarNumber: searchRegex }
       ]
     }
 
@@ -43,13 +45,22 @@ export async function POST(request) {
     }
 
     const body = await request.json()
+    const count = await Labourer.countDocuments({ lwfId: { $exists: true } });
+    const lwfId = `GS-LWF-${String(count + 1).padStart(6, '0')}`;
+
     const labour = new Labourer({
       name: body.name,
       profession: body.profession,
       location: body.location,
       phone: body.phone,
       experience: body.experience,
-      isApproved: true
+      aadhaarNumber: body.aadhaarNumber,
+      bloodGroup: body.bloodGroup,
+      state: body.state,
+      district: body.district,
+      isApproved: true,
+      status: 'APPROVED',
+      lwfId
     })
     await labour.save()
 

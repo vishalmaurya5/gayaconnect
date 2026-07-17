@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import FeedbackModal from './FeedbackModal';
 
 const staticTestimonials = [
@@ -76,43 +76,9 @@ export default function Testimonials() {
             </div>
           ))
         ) : (
-          feedbacks.map((t, idx) => {
-            const isDynamic = !!t.rating;
-            const ratingStars = isDynamic ? t.rating : 5;
-            const commentText = isDynamic ? t.comment : t.text;
-            const authorName = isDynamic ? t.name : t.name;
-            const authorRole = isDynamic ? 'Website User' : t.role;
-            const initials = isDynamic ? getInitials(t.name) : t.initials;
-            const bgClass = isDynamic ? bgColors[idx % bgColors.length] : t.bg;
-
-            return (
-              <div key={idx} className="bg-white border border-slate-100 rounded-[24px] p-8 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-300 relative group flex flex-col">
-                <div className="absolute top-6 right-6 text-slate-100 font-serif text-6xl leading-none select-none group-hover:text-indigo-50/50 transition-colors">
-                  "
-                </div>
-                
-                <div className="flex gap-1 mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className={`w-4 h-4 ${i < ratingStars ? 'text-amber-400 fill-amber-400' : 'text-slate-200 fill-slate-200'}`} viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                
-                <p className="text-[15px] text-slate-600 leading-relaxed mb-8 relative z-10 italic font-medium flex-grow break-words">"{commentText}"</p>
-                
-                <div className="flex items-center gap-4 mt-auto pt-4 border-t border-slate-50">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-[13px] font-[800] ${bgClass} text-indigo-700 border border-slate-100 shadow-sm shrink-0`}>
-                    {initials}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-[800] text-[15px] text-slate-900 truncate">{authorName}</div>
-                    <div className="text-[12px] font-medium text-slate-400 mt-0.5 truncate">{authorRole}</div>
-                  </div>
-                </div>
-              </div>
-            );
-          })
+          feedbacks.map((t, idx) => (
+            <TestimonialCard key={idx} t={t} idx={idx} />
+          ))
         )}
       </div>
 
@@ -124,3 +90,62 @@ export default function Testimonials() {
     </div>
   );
 }
+
+const bgColors = ["bg-indigo-50 dark:bg-indigo-900/30", "bg-teal-50 dark:bg-teal-900/30", "bg-amber-50 dark:bg-amber-900/30", "bg-rose-50 dark:bg-rose-900/30", "bg-blue-50 dark:bg-blue-900/30", "bg-emerald-50 dark:bg-emerald-900/30"];
+
+const getInitials = (name) => {
+  if (!name) return 'U';
+  const parts = name.split(' ');
+  if (parts.length > 1) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+};
+
+import { motion } from 'framer-motion';
+
+const TestimonialCard = React.memo(({ t, idx }) => {
+  const isDynamic = !!t.rating;
+  const ratingStars = isDynamic ? t.rating : 5;
+  const commentText = isDynamic ? t.comment : t.text;
+  const authorName = isDynamic ? t.name : t.name;
+  const authorRole = isDynamic ? 'Website User' : t.role;
+  const initials = isDynamic ? getInitials(t.name) : t.initials;
+  const bgClass = isDynamic ? bgColors[idx % bgColors.length] : (t.bg + ' dark:' + t.bg.replace('-50', '-900/30'));
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
+      whileHover={{ y: -6, scale: 1.01 }}
+      className="bg-white dark:bg-[#111827] border border-slate-100 dark:border-slate-800 rounded-[24px] p-8 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.4)] transition-all duration-300 relative group flex flex-col"
+    >
+      <div className="absolute top-6 right-6 text-slate-100 dark:text-slate-800 font-serif text-6xl leading-none select-none group-hover:text-indigo-50/50 dark:group-hover:text-indigo-900/20 transition-colors">
+        "
+      </div>
+      
+      <div className="flex gap-1 mb-6">
+        {[...Array(5)].map((_, i) => (
+          <svg key={i} className={`w-4 h-4 ${i < ratingStars ? 'text-amber-400 fill-amber-400' : 'text-slate-200 dark:text-slate-700 fill-slate-200 dark:fill-slate-700'}`} viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        ))}
+      </div>
+      
+      <p className="text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed mb-8 relative z-10 italic font-medium flex-grow break-words">"{commentText}"</p>
+      
+      <div className="flex items-center gap-4 mt-auto pt-4 border-t border-slate-50 dark:border-slate-800">
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-[13px] font-[800] ${bgClass} text-indigo-700 dark:text-indigo-400 border border-slate-100 dark:border-slate-700 shadow-sm shrink-0`}>
+          {initials}
+        </div>
+        <div className="min-w-0">
+          <div className="font-[800] text-[15px] text-slate-900 dark:text-white truncate">{authorName}</div>
+          <div className="text-[12px] font-medium text-slate-400 dark:text-slate-500 mt-0.5 truncate">{authorRole}</div>
+        </div>
+      </div>
+    </motion.div>
+  );
+});
+TestimonialCard.displayName = 'TestimonialCard';

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { FiPrinter, FiArrowLeft } from 'react-icons/fi';
+import { Printer, ArrowLeft, Download, ShieldCheck, Award } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 
@@ -28,103 +28,180 @@ export default function VendorCertificatePage() {
     }
   };
 
-  if (loading) return <div className="p-10 text-center font-bold">Generating Certificate...</div>;
-  if (!vendor) return <div className="p-10 text-center font-bold text-red-500">Vendor Not Found</div>;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+        <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+        <div className="text-lg font-bold text-slate-700 animate-pulse">Generating Secure Certificate...</div>
+      </div>
+    );
+  }
 
-  const qrData = `Gaya Seva Vendor ID: ${vendor.vendorId || 'PENDING'}\nBusiness: ${vendor.name}\nCategory: ${vendor.category}`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
+  if (!vendor) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-2">
+          <ShieldCheck className="w-8 h-8" />
+        </div>
+        <div className="text-2xl font-bold text-slate-900">Vendor Not Found</div>
+        <Link href="/admin/vendors" className="text-indigo-600 font-medium hover:underline">Return to Directory</Link>
+      </div>
+    );
+  }
+
+  const qrData = `Gaya Seva Official Vendor\nID: ${vendor.vendorId || 'PENDING'}\nBusiness: ${vendor.name}\nStatus: Verified`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrData)}&color=0f172a&bgcolor=ffffff`;
   
   const issueDate = new Date(vendor.createdAt).toLocaleDateString('en-IN', {
-    day: 'numeric', month: 'long', year: 'numeric'
+    day: '2-digit', month: 'long', year: 'numeric'
   });
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 print:m-0 print:space-y-0 print:w-full print:h-screen">
+    <div className="max-w-5xl mx-auto space-y-8 pb-12 print:m-0 print:p-0 print:space-y-0 print:max-w-none">
       
-      {/* Controls (Hidden on Print) */}
-      <div className="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm print:hidden border border-slate-200">
-        <Link href="/admin/vendors" className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold">
-          <FiArrowLeft /> Back to Vendors
+      {/* Control Panel (Hidden on Print) */}
+      <div className="flex flex-col sm:flex-row justify-between items-center bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm print:hidden border border-slate-200 dark:border-slate-800 gap-4">
+        <Link href="/admin/vendors" className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white font-semibold transition-colors px-4 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">
+          <ArrowLeft className="w-5 h-5" /> Back to Registry
         </Link>
-        <button 
-          onClick={() => window.print()}
-          className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-emerald-700 transition"
-        >
-          <FiPrinter /> Print Certificate
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200 dark:border-slate-700"
+          >
+            <Download className="w-4 h-4" /> Download PDF
+          </button>
+          <button 
+            onClick={() => window.print()}
+            className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20"
+          >
+            <Printer className="w-5 h-5" /> Print Certificate
+          </button>
+        </div>
       </div>
 
-      {/* Certificate Wrapper (Landscape Print) */}
-      <div className="bg-white p-2 rounded-xl shadow-2xl border border-slate-200 print:shadow-none print:border-none print:p-0">
+      {/* Certificate Canvas Container */}
+      <div className="bg-slate-200 dark:bg-slate-800 p-4 sm:p-8 rounded-3xl print:p-0 print:bg-white flex justify-center overflow-x-auto">
         
-        {/* Certificate Border Design */}
-        <div className="border-[12px] border-emerald-900 p-2 print:border-[8px]">
-          <div className="border-4 border-emerald-600 p-8 relative overflow-hidden bg-cover bg-center" style={{ backgroundImage: 'url("/patterns/topography.svg")' }}>
-            
-            <div className="absolute inset-0 bg-white/95"></div> {/* Brightener overlay */}
+        {/* The Certificate Itself (A4 Landscape aspect ratio approximate: 1123x794) */}
+        <div className="relative bg-white w-[1123px] h-[794px] shadow-2xl print:shadow-none shrink-0 overflow-hidden print:w-full print:h-screen flex flex-col">
+          
+          {/* Background Patterns & Gradients */}
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] z-0"></div>
+          <div className="absolute top-0 left-0 w-full h-4 bg-gradient-to-r from-indigo-800 via-indigo-500 to-teal-500 z-10"></div>
+          <div className="absolute bottom-0 left-0 w-full h-4 bg-gradient-to-r from-teal-500 via-indigo-500 to-indigo-800 z-10"></div>
+          
+          {/* Ornate Border */}
+          <div className="absolute inset-6 border-[3px] border-slate-200 z-10 pointer-events-none"></div>
+          <div className="absolute inset-8 border border-slate-300 z-10 pointer-events-none"></div>
+          
+          {/* Corner Ornaments */}
+          <div className="absolute top-6 left-6 w-12 h-12 border-t-[3px] border-l-[3px] border-indigo-900 z-20"></div>
+          <div className="absolute top-6 right-6 w-12 h-12 border-t-[3px] border-r-[3px] border-indigo-900 z-20"></div>
+          <div className="absolute bottom-6 left-6 w-12 h-12 border-b-[3px] border-l-[3px] border-indigo-900 z-20"></div>
+          <div className="absolute bottom-6 right-6 w-12 h-12 border-b-[3px] border-r-[3px] border-indigo-900 z-20"></div>
 
-            <div className="relative z-10 flex flex-col items-center text-center">
-              
-              {/* Header */}
-              <div className="flex items-center justify-between w-full mb-8">
-                <img src="/logo2.png" alt="Gaya Seva" className="h-20" />
-                <div className="text-right">
-                  <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Certificate Number</p>
-                  <p className="text-2xl font-black text-slate-900 font-mono">{vendor.vendorId || 'PENDING'}</p>
+          {/* Main Content Container */}
+          <div className="relative z-30 flex-1 flex flex-col p-16">
+            
+            {/* Header Section */}
+            <div className="flex justify-between items-start w-full">
+              <div className="flex items-center gap-4">
+                <img src="/logo2.png" alt="Gaya Seva Logo" className="h-20 object-contain" />
+                <div className="pl-4 border-l-2 border-slate-200">
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Gaya Seva</h2>
+                  <p className="text-sm font-semibold text-slate-500 tracking-widest uppercase">Digital Vendor Registry</p>
                 </div>
               </div>
 
-              {/* Title */}
-              <h1 className="text-5xl font-black text-slate-900 tracking-tight uppercase mt-6 mb-2 font-serif">Certificate of Registration</h1>
-              <div className="w-64 h-1 bg-emerald-500 mb-8 rounded-full"></div>
+              <div className="text-right bg-slate-50 px-6 py-3 rounded-lg border border-slate-100">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">Official Document ID</p>
+                <p className="text-xl font-black text-slate-900 font-mono tracking-widest">{vendor.vendorId || 'PENDING-ID'}</p>
+              </div>
+            </div>
 
-              <p className="text-xl text-slate-600 font-medium mb-4 italic font-serif">This is to proudly certify that</p>
+            {/* Core Certificate Body */}
+            <div className="flex-1 flex flex-col items-center justify-center text-center mt-8">
               
-              <h2 className="text-4xl font-extrabold text-emerald-700 mb-4 uppercase">{vendor.name}</h2>
+              <div className="flex items-center gap-3 mb-4 text-amber-500">
+                <Award className="w-8 h-8" />
+              </div>
               
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-                has successfully registered as an official service provider on the Gaya Seva platform. 
-                They are authorized to offer services under the category of <span className="font-bold text-slate-900 border-b-2 border-emerald-500">{vendor.category}</span> in the region of <span className="font-bold text-slate-900 border-b-2 border-emerald-500">{vendor.address || 'Gaya, Bihar'}</span>.
+              <h1 className="text-[54px] font-black text-slate-900 tracking-tight uppercase leading-none font-serif">
+                Certificate of<br/>Registration
+              </h1>
+              
+              <div className="flex items-center justify-center w-full my-8">
+                <div className="w-24 h-px bg-slate-300"></div>
+                <div className="mx-4 text-slate-400 text-sm font-serif italic tracking-widest">This proudly certifies that</div>
+                <div className="w-24 h-px bg-slate-300"></div>
+              </div>
+
+              <h2 className="text-5xl font-extrabold text-indigo-900 mb-6 uppercase tracking-wide px-10">
+                {vendor.name}
+              </h2>
+
+              <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                has successfully met all verification requirements and is registered as an official service provider on the Gaya Seva platform. They are fully authorized to offer premium services under the category of <strong className="text-slate-900 border-b border-indigo-200 pb-0.5">{vendor.category}</strong> within the operational region of <strong className="text-slate-900 border-b border-indigo-200 pb-0.5">{vendor.address || 'Gaya, Bihar'}</strong>.
               </p>
 
-              {/* Footer Grid */}
-              <div className="w-full grid grid-cols-3 gap-8 items-end mt-12 border-t-2 border-slate-200 pt-8">
-                
-                {/* Date & Seal */}
-                <div className="text-left">
-                  <p className="font-bold text-slate-900 text-lg mb-1">{issueDate}</p>
-                  <p className="text-sm text-slate-500 font-bold uppercase tracking-wider border-t border-slate-300 pt-1 inline-block">Date of Issue</p>
-                </div>
+            </div>
 
-                {/* QR Code */}
-                <div className="flex justify-center">
-                  <div className="p-2 border-4 border-emerald-600 rounded-xl bg-white shadow-lg transform -translate-y-4">
-                    <img src={qrUrl} alt="QR Code" className="w-24 h-24" crossOrigin="anonymous" />
-                  </div>
+            {/* Footer Section */}
+            <div className="w-full grid grid-cols-3 gap-8 items-end mt-12 pt-8">
+              
+              {/* Date */}
+              <div className="text-left flex flex-col items-start">
+                <p className="font-bold text-slate-900 text-xl mb-2">{issueDate}</p>
+                <div className="w-40 border-t-2 border-slate-800 pt-2">
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Date of Issue</p>
                 </div>
+              </div>
 
-                {/* Signature */}
-                <div className="text-right">
-                  <div className="h-16 mb-2 flex items-end justify-end">
-                    <img src="/logo2.png" alt="Signature Seal" className="h-12 opacity-30 mix-blend-multiply" />
-                  </div>
-                  <p className="font-bold text-slate-900 text-lg mb-1">Director, Gaya Seva</p>
-                  <p className="text-sm text-slate-500 font-bold uppercase tracking-wider border-t border-slate-300 pt-1 inline-block">Authorized Signatory</p>
+              {/* QR Verification Seal */}
+              <div className="flex justify-center relative">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-indigo-50 rounded-full -z-10"></div>
+                <div className="p-3 bg-white rounded-xl shadow-xl border border-slate-100 flex flex-col items-center justify-center gap-2">
+                  <img src={qrUrl} alt="Verification QR" className="w-24 h-24 mix-blend-multiply" crossOrigin="anonymous" />
+                  <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Scan to Verify</span>
                 </div>
+              </div>
 
+              {/* Signature */}
+              <div className="text-right flex flex-col items-end">
+                <div className="h-20 mb-2 relative flex items-end justify-end w-full">
+                  {/* Decorative Signature Line */}
+                  <img src="/logo2.png" alt="Seal" className="h-16 opacity-10 absolute right-12 bottom-2 mix-blend-multiply grayscale" />
+                  <span className="font-serif italic text-3xl text-slate-800 pr-4">Gaya Seva Admin</span>
+                </div>
+                <div className="w-48 border-t-2 border-slate-800 pt-2 text-right">
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Authorized Signatory</p>
+                  <p className="text-[10px] text-slate-400 uppercase font-semibold mt-0.5">Gaya Seva Director</p>
+                </div>
               </div>
 
             </div>
 
           </div>
+          
+          {/* Watermark */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.02] z-0">
+            <img src="/logo2.png" alt="Watermark" className="w-[600px] grayscale" />
+          </div>
+
         </div>
       </div>
       
-      {/* Global CSS for Landscape Print */}
+      {/* Global Print Styles specific to this layout */}
       <style jsx global>{`
         @media print {
-          @page { size: landscape; margin: 0; }
-          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          @page { size: A4 landscape; margin: 0; }
+          body { 
+            -webkit-print-color-adjust: exact !important; 
+            print-color-adjust: exact !important;
+            background-color: white !important;
+          }
+          /* Hide scrollbars during print setup */
+          ::-webkit-scrollbar { display: none; }
         }
       `}</style>
     </div>

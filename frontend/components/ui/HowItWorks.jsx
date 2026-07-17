@@ -1,36 +1,61 @@
-export default function HowItWorks() {
-  const steps = [
-    {
-      title: "Search",
-      desc: "Find verified services, businesses, or jobs.",
-      icon: "🔍"
-    },
-    {
-      title: "Connect",
-      desc: "Get instant access to contact details.",
-      icon: "📞"
-    },
-    {
-      title: "Book",
-      desc: "Schedule services at your convenience.",
-      icon: "📅"
-    },
-    {
-      title: "Get Work Done",
-      desc: "Experience reliable and quality service.",
-      icon: "✅"
-    },
-    {
-      title: "Rate Experience",
-      desc: "Leave reviews to help the community.",
-      icon: "⭐"
-    }
-  ];
+'use client';
+import { motion } from 'framer-motion';
+import React from 'react';
 
+const steps = [
+  {
+    title: "Search",
+    desc: "Find verified services, businesses, or jobs.",
+    icon: "🔍"
+  },
+  {
+    title: "Connect",
+    desc: "Get instant access to contact details.",
+    icon: "📞"
+  },
+  {
+    title: "Book",
+    desc: "Schedule services at your convenience.",
+    icon: "📅"
+  },
+  {
+    title: "Get Work Done",
+    desc: "Experience reliable and quality service.",
+    icon: "✅"
+  },
+  {
+    title: "Rate Experience",
+    desc: "Leave reviews to help the community.",
+    icon: "⭐"
+  }
+];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 15 } }
+};
+
+export default function HowItWorks() {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 text-center mt-10">
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-50px" }}
+      className="grid grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 text-center mt-10"
+    >
       {steps.map((step, idx) => (
-        <div key={idx} className="flex flex-col items-center relative group">
+        <motion.div variants={itemVariants} key={idx} className="flex flex-col items-center relative group">
           
           {/* Connector line for desktop */}
           {idx !== steps.length - 1 && (
@@ -48,8 +73,8 @@ export default function HowItWorks() {
           
           <h3 className="text-xl font-[800] text-white mb-3 font-sora">{step.title}</h3>
           <p className="text-slate-400 text-[15px] max-w-[280px] leading-relaxed">{step.desc}</p>
-        </div>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }

@@ -43,7 +43,7 @@ export async function POST(request) {
       imageUrl,
       link,
       position,
-      endDate: endDate ? new Date(endDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days
+      endDate: endDate ? new Date(endDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Default 7 days
       adminApproved: true,
       isActive: true
     })

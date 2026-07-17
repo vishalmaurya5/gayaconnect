@@ -37,6 +37,7 @@ export async function GET(request) {
         { businessName: searchRegex },
         { category: searchRegex },
         { address: searchRegex },
+        { vendorId: searchRegex },
         { userId: { $in: userIds } }
       ]
     }

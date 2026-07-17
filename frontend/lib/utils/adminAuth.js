@@ -52,7 +52,7 @@ export async function verifyAdminPassword(userId, password) {
     await connectDB()
     const user = await User.findOne({ 
       $or: [{ email: userId }, { phone: userId }],
-      adminRole: { $in: ['SUPER_ADMIN', 'ADMIN'] } 
+      adminRole: { $in: ['SUPER_ADMIN', 'ADMIN', 'JOBS_MANAGER', 'MARKETPLACE_MANAGER'] } 
     }).select('+password')
 
     if (user && await bcrypt.compare(String(password), user.password)) {

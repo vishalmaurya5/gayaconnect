@@ -32,6 +32,9 @@ export async function POST(request) {
         if (existingUser) userId = existingUser._id;
       } catch (e) {}
 
+      const count = await Labourer.countDocuments({ lwfId: { $exists: true } });
+      const lwfId = `GS-LWF-${String(count + 1).padStart(6, '0')}`;
+
       const newLabourer = await Labourer.create({
         userId,
         name,
@@ -41,9 +44,15 @@ export async function POST(request) {
         category: skill,
         area: address,
         dailyRate: dailyRate ? Number(dailyRate) : 0,
+        aadhaarNumber: body.aadhaarNumber,
+        bloodGroup: body.bloodGroup,
+        state: body.state,
+        district: body.district,
         isApproved: true,
+        status: 'APPROVED',
         rating: 0,
-        reviewCount: 0
+        reviewCount: 0,
+        lwfId
       });
 
       return NextResponse.json({ 
@@ -94,6 +103,9 @@ export async function POST(request) {
     const newUser = await User.create(userData);
 
     if (type === "vendor") {
+      const vCount = await Vendor.countDocuments({ vendorId: { $exists: true } });
+      const vendorId = `GS-VEN-${String(vCount + 1).padStart(6, '0')}`;
+
       await Vendor.create({
         userId: newUser._id,
         regCode: userData.regCode,
@@ -101,6 +113,8 @@ export async function POST(request) {
         category: category,
         address: address,
         isApproved: true, // Auto-approved
+        status: 'APPROVED',
+        vendorId
       });
     }
 

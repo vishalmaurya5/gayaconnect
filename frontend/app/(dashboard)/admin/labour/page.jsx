@@ -1,10 +1,52 @@
 'use client';
 
 import { useState, useEffect, useContext } from 'react';
-import { FiCheckCircle, FiXCircle, FiTrash2, FiTool, FiCreditCard, FiSearch, FiEye } from 'react-icons/fi';
+import { 
+  CheckCircle, XCircle, Trash2, Edit2, X, CreditCard, 
+  Search, Filter, Download, Plus, MapPin, HardHat, Eye, User, Phone, Briefcase
+} from 'lucide-react';
 import { AdminContext } from '../layout';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
+import { exportToCSV } from '@/lib/utils/export';
+
+const tableVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05
+    }
+  }
+};
+
+const rowVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 }
+};
+
+const modalOverlayVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+  exit: { opacity: 0 }
+};
+
+const modalContentVariants = {
+  hidden: { opacity: 0, y: 50, scale: 0.95 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: { type: 'spring', damping: 25, stiffness: 300 }
+  },
+  exit: { 
+    opacity: 0, 
+    y: 50, 
+    scale: 0.95,
+    transition: { duration: 0.2 } 
+  }
+};
 
 export default function AdminLabourPage() {
   const [labourers, setLabourers] = useState([]);
@@ -13,6 +55,10 @@ export default function AdminLabourPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('ALL'); // ALL, APPROVED, PENDING
+  
+  const [form, setForm] = useState({ name: '', phone: '', skill: '', dailyRate: '', address: '', aadhaarNumber: '', bloodGroup: '', state: '', district: '' });
   const admin = useContext(AdminContext);
 
   useEffect(() => {
@@ -50,7 +96,7 @@ export default function AdminLabourPage() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Profile ${!currentStatus ? 'approved' : 'unapproved'}`);
+        toast.success(`Profile ${!currentStatus ? 'approved' : 'unapproved'} successfully`);
         setLabourers(labourers.map(l => l._id === id ? { ...l, isApproved: !currentStatus } : l));
       } else {
         toast.error(data.message || 'Failed to update');
@@ -61,12 +107,12 @@ export default function AdminLabourPage() {
   };
 
   const deleteLabour = async (id) => {
-    if (!confirm('Are you sure you want to delete this labour profile?')) return;
+    if (!confirm('Are you sure you want to permanently delete this labour profile? This action cannot be undone.')) return;
     try {
       const res = await fetch(`/api/admin/labour/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
-        toast.success('Profile deleted');
+        toast.success('Profile deleted successfully');
         setLabourers(labourers.filter(l => l._id !== id));
       } else {
         toast.error(data.message || 'Failed to delete');
@@ -88,7 +134,8 @@ export default function AdminLabourPage() {
       const json = await res.json();
       if (json.success) {
         toast.success('Labourer created successfully');
-        setForm({ name: '', phone: '', skill: '', dailyRate: '', address: '' });
+        setForm({ name: '', phone: '', skill: '', dailyRate: '', address: '', aadhaarNumber: '', bloodGroup: '', state: '', district: '' });
+        setIsCreateModalOpen(false);
         fetchLabourers();
       } else {
         toast.error(json.message || 'Failed to create labourer');
@@ -100,147 +147,333 @@ export default function AdminLabourPage() {
     }
   };
 
+  const filteredLabourers = labourers.filter(l => {
+    if (activeTab === 'APPROVED') return l.isApproved;
+    if (activeTab === 'PENDING') return !l.isApproved;
+    return true;
+  });
+
+  const handleExportCSV = () => {
+    const dataToExport = filteredLabourers.map(l => ({
+      Labour_ID: l.lwfId || 'N/A',
+      Name: l.name,
+      Profession: l.profession || 'N/A',
+      Phone: l.phone,
+      Aadhaar: l.aadhaarNumber || 'N/A',
+      Status: l.isApproved ? 'Approved' : 'Pending',
+      Location: l.location || 'N/A',
+      Experience: l.experience || 'N/A'
+    }));
+    exportToCSV(dataToExport, `labour_export_${new Date().toISOString().split('T')[0]}.csv`);
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-2xl font-bold text-slate-800">Labour Management</h1>
-        <div className="relative w-full md:w-72">
-          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input 
-            type="text"
-            placeholder="Search by Aadhaar, Name, Profession..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none"
-          />
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+      
+      {/* Premium Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Labour Workforce</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Manage blue-collar workers, verifications, and ID cards.</p>
         </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h2 className="text-lg font-bold text-slate-900 mb-4">Add New Labourer</h2>
-        <form onSubmit={handleCreate} className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Name</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Skill (Category)</label>
-            <input required type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.skill} onChange={e => setForm({...form, skill: e.target.value})} />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Daily Rate (₹)</label>
-            <input type="number" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.dailyRate} onChange={e => setForm({...form, dailyRate: e.target.value})} />
-          </div>
-          <div className="sm:col-span-2">
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Area / Address</label>
-            <input type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
-          </div>
-          <button type="submit" disabled={creating} className="sm:col-span-2 md:col-span-4 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition-colors disabled:opacity-50">
-            {creating ? 'Creating...' : 'Create Labourer'}
-          </button>
-        </form>
-      </div>
-
-      {loading ? (
-        <div className="animate-pulse space-y-4">
-          {[1,2,3,4].map(i => <div key={i} className="h-16 bg-slate-200 rounded-xl"></div>)}
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 text-slate-500 uppercase font-semibold">
-                <tr>
-                  <th className="px-6 py-4">Worker Info</th>
-                  <th className="px-6 py-4">Profession & Area</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {labourers.map(labour => (
-                  <tr key={labour._id} className="hover:bg-slate-50 transition">
-                    <td className="px-6 py-4">
-                      <div className="font-bold text-slate-900 flex items-center gap-2">
-                        <span className="p-1.5 bg-orange-100 text-orange-600 rounded-md"><FiTool /></span>
-                        {labour.name}
-                      </div>
-                      <div className="text-slate-500 text-xs mt-1">{labour.phone}</div>
-                      {labour.aadhaarNumber && (
-                        <div className="mt-2 inline-flex items-center gap-2 bg-slate-100 border border-slate-200 px-2 py-1 rounded">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase">Aadhaar</span>
-                          <span className="text-xs font-mono font-bold">{labour.aadhaarNumber}</span>
-                          {labour.aadhaarImage && (
-                            <button onClick={() => setSelectedImage(labour.aadhaarImage)} className="text-indigo-600 hover:text-indigo-800 ml-1">
-                              <FiEye />
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-slate-700">{labour.profession}</div>
-                      <div className="text-xs text-slate-500">{labour.location}</div>
-                      {labour.experience && <div className="text-xs text-slate-500">Exp: {labour.experience}</div>}
-                    </td>
-                    <td className="px-6 py-4">
-                      {labour.isApproved ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold text-xs bg-emerald-100 px-2 py-1 rounded">
-                          <FiCheckCircle /> Approved
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-amber-600 font-semibold text-xs bg-amber-100 px-2 py-1 rounded">
-                          <FiXCircle /> Pending
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 space-x-2 whitespace-nowrap">
-                      <button 
-                        onClick={() => toggleApproval(labour._id, labour.isApproved)} 
-                        className={`px-3 py-1.5 rounded-lg font-semibold text-white transition ${labour.isApproved ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'}`}
-                      >
-                        {labour.isApproved ? 'Revoke' : 'Approve'}
-                      </button>
-                      {labour.status === 'APPROVED' || labour.isApproved ? (
-                        <Link href={`/admin/labour/${labour._id}/id-card`} className="px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 font-semibold hover:bg-indigo-200 transition inline-flex items-center gap-1">
-                          <FiCreditCard /> ID Card
-                        </Link>
-                      ) : null}
-                      {admin?.role === 'SUPER_ADMIN' && (
-                        <button onClick={() => deleteLabour(labour._id)} className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" title="Delete">
-                          <FiTrash2 className="text-lg" />
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-                {labourers.length === 0 && (
-                  <tr><td colSpan="4" className="p-8 text-center text-slate-500">No labour profiles found.</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* Image Modal */}
-      {selectedImage && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelectedImage(null)}>
-          <div className="relative max-w-4xl w-full bg-white p-2 rounded-2xl shadow-2xl">
-            <img src={selectedImage} alt="Verification Document" className="w-full h-auto max-h-[80vh] object-contain rounded-xl" />
-            <button 
-              onClick={() => setSelectedImage(null)}
-              className="absolute -top-4 -right-4 bg-white text-slate-900 rounded-full p-2 shadow-lg hover:bg-slate-100 font-bold"
+        <div className="flex items-center gap-3">
+          <motion.button 
+            onClick={handleExportCSV}
+            whileHover={{ scale: 1.02 }} 
+            whileTap={{ scale: 0.98 }} 
+            className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm"
+          >
+            <Download className="w-4 h-4" /> Export CSV
+          </motion.button>
+          
+          {admin?.role === 'SUPER_ADMIN' && (
+            <motion.button 
+              whileHover={{ scale: 1.02 }} 
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-600/20 transition-all"
             >
-              Close
+              <Plus className="w-5 h-5" /> Add Worker
+            </motion.button>
+          )}
+        </div>
+      </div>
+
+      {/* Enterprise Data Table Wrapper */}
+      <div className="bg-white dark:bg-[#0B0F19] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col">
+        
+        {/* Table Toolbar */}
+        <div className="p-4 md:p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50 dark:bg-[#05080f]/50">
+          
+          {/* Tabs */}
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl w-max">
+            {['ALL', 'APPROVED', 'PENDING'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                  activeTab === tab 
+                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                }`}
+              >
+                {tab === 'ALL' ? 'All Workers' : tab.charAt(0) + tab.slice(1).toLowerCase()}
+              </button>
+            ))}
+          </div>
+
+          {/* Search & Filter */}
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Search by Aadhaar, Name, ID..." 
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="w-full sm:w-64 pl-9 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+              />
+            </div>
+            <button className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm">
+              <Filter className="w-4 h-4" />
             </button>
           </div>
         </div>
-      )}
+
+        {/* The Data Table */}
+        <div className="overflow-x-auto min-h-[400px]">
+          {loading ? (
+            <div className="flex flex-col gap-4 p-6">
+              {[1,2,3,4,5].map(i => <div key={i} className="h-16 bg-slate-100 dark:bg-slate-800/50 rounded-xl animate-pulse"></div>)}
+            </div>
+          ) : (
+            <table className="w-full text-left border-collapse whitespace-nowrap">
+              <thead>
+                <tr className="bg-white dark:bg-[#0B0F19] border-b border-slate-200 dark:border-slate-800">
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Worker Identity</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Profession & Area</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Verification</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <motion.tbody 
+                variants={tableVariants}
+                initial="hidden"
+                animate="visible"
+                className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-[#0B0F19]"
+              >
+                {filteredLabourers.map(labour => (
+                  <motion.tr variants={rowVariants} key={labour._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-500/10 flex items-center justify-center text-orange-600 dark:text-orange-400 shrink-0 border border-orange-100 dark:border-orange-500/20">
+                          <HardHat className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            {labour.name}
+                            {labour.lwfId && (
+                              <span className="text-[10px] font-mono bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                                {labour.lwfId}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-slate-500 dark:text-slate-400 text-xs mt-0.5 font-medium flex items-center gap-1.5">
+                            <Phone className="w-3 h-3" /> {labour.phone}
+                          </div>
+                          {labour.aadhaarNumber && (
+                            <div className="mt-1.5 flex items-center gap-2">
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 uppercase">
+                                Aadhaar <span className="font-mono">{labour.aadhaarNumber}</span>
+                              </span>
+                              {labour.aadhaarImage && (
+                                <button onClick={() => setSelectedImage(labour.aadhaarImage)} className="text-indigo-500 hover:text-indigo-700 transition" title="View Document">
+                                  <Eye className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2">
+                          <Briefcase className="w-4 h-4 text-slate-400" /> {labour.profession || 'Unspecified Worker'}
+                        </span>
+                        <span className="text-slate-500 dark:text-slate-400 text-xs flex items-center gap-1.5">
+                          <MapPin className="w-3 h-3" /> {labour.location || 'Unknown Location'}
+                        </span>
+                        {labour.experience && (
+                          <span className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+                            Experience: <strong className="text-slate-700 dark:text-slate-300">{labour.experience}</strong>
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {labour.isApproved ? (
+                        <span className="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold text-xs bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2.5 py-1.5 rounded-lg">
+                          <CheckCircle className="w-4 h-4" /> Approved
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-400 font-bold text-xs bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-2.5 py-1.5 rounded-lg">
+                          <XCircle className="w-4 h-4" /> Pending
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {admin?.role === 'SUPER_ADMIN' && (
+                          <button 
+                            onClick={() => toggleApproval(labour._id, labour.isApproved)} 
+                            className={`p-2 rounded-lg font-semibold transition ${labour.isApproved ? 'text-amber-600 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20' : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20'}`}
+                            title={labour.isApproved ? 'Revoke Approval' : 'Approve Profile'}
+                          >
+                            {labour.isApproved ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+                          </button>
+                        )}
+                        
+                        {(labour.status === 'APPROVED' || labour.isApproved) && (
+                          <Link href={`/admin/labour/${labour._id}/id-card`} className="p-2 rounded-lg bg-indigo-50 text-indigo-600 font-semibold hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 transition" title="Generate ID Card">
+                            <CreditCard className="w-4 h-4" />
+                          </Link>
+                        )}
+                        
+                        {admin?.role === 'SUPER_ADMIN' && (
+                          <button onClick={() => deleteLabour(labour._id)} className="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20 transition" title="Delete Permanently">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+                {filteredLabourers.length === 0 && (
+                  <tr>
+                    <td colSpan="4" className="p-12 text-center">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 mb-4 text-slate-400">
+                        <HardHat className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">No Workers Found</h3>
+                      <p className="text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">We couldn't find any labour profiles matching your current filters or search query.</p>
+                    </td>
+                  </tr>
+                )}
+              </motion.tbody>
+            </table>
+          )}
+        </div>
+        
+        {/* Pagination Mockup */}
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#05080f]/50 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
+          <span>Showing {filteredLabourers.length} entries</span>
+          <div className="flex gap-1">
+            <button className="px-3 py-1 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 disabled:opacity-50">Prev</button>
+            <button className="px-3 py-1 rounded-md bg-indigo-600 text-white font-medium">1</button>
+            <button className="px-3 py-1 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {/* Image Modal for Aadhaar */}
+        {selectedImage && (
+          <motion.div 
+            variants={modalOverlayVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-[110] bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <motion.div 
+              variants={modalContentVariants}
+              className="relative max-w-4xl w-full bg-white dark:bg-slate-900 p-2 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800"
+            >
+              <img src={selectedImage} alt="Verification Document" className="w-full h-auto max-h-[80vh] object-contain rounded-xl" />
+              <button 
+                onClick={() => setSelectedImage(null)}
+                className="absolute -top-4 -right-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-full p-2.5 shadow-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Create Labourer Modal */}
+        {isCreateModalOpen && (
+          <motion.div 
+            variants={modalOverlayVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-sm sm:p-4"
+          >
+            <motion.div 
+              variants={modalContentVariants}
+              className="bg-white dark:bg-slate-900 rounded-t-[32px] sm:rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[85vh] border-t sm:border border-slate-200 dark:border-slate-800"
+            >
+              {/* Mobile Drag Indicator */}
+              <div className="sm:hidden w-full flex justify-center pt-3 pb-1">
+                <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+              </div>
+
+              <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center"><Plus className="w-5 h-5"/></div> 
+                  Register New Worker
+                </h3>
+                <button onClick={() => setIsCreateModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-6 overflow-y-auto custom-scrollbar">
+                <form id="createLabourForm" onSubmit={handleCreate} className="grid gap-5 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Full Name</label>
+                    <input required type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Phone Number</label>
+                    <input required type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Skill (Profession)</label>
+                    <input required type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.skill} onChange={e => setForm({...form, skill: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Aadhaar Number</label>
+                    <input type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.aadhaarNumber} onChange={e => setForm({...form, aadhaarNumber: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Blood Group</label>
+                    <input type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.bloodGroup} onChange={e => setForm({...form, bloodGroup: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">State</label>
+                    <input type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.state} onChange={e => setForm({...form, state: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">District</label>
+                    <input type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.district} onChange={e => setForm({...form, district: e.target.value})} />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Area / Address</label>
+                    <input type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
+                  </div>
+                </form>
+              </div>
+              <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex justify-end gap-3 mb-safe pb-8 sm:pb-6">
+                <button onClick={() => setIsCreateModalOpen(false)} className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancel</button>
+                <button type="submit" form="createLabourForm" disabled={creating} className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-600/20 disabled:opacity-50">
+                  {creating ? 'Registering...' : 'Register Worker'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

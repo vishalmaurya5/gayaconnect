@@ -2,6 +2,7 @@ import { Inter, Sora } from 'next/font/google'
 import { AuthProvider } from '@/contexts/AuthContext'
 import Navbar from '@/components/ui/Navbar'
 import Footer from '@/components/ui/Footer'
+import { ThemeProvider } from '@/components/ThemeProvider'
 import { Toaster } from 'react-hot-toast'
 import Script from 'next/script'
 import './globals.css'
@@ -86,19 +87,19 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} ${inter.variable} ${sora.variable}`}>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        <AuthProvider>
-          <Navbar />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-          <Toaster position="top-right" />
-        </AuthProvider>
+      <head>
+      </head>
+      <body className={`${inter.className} ${inter.variable} ${sora.variable} bg-white dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 transition-colors duration-300`} suppressHydrationWarning>
+        <ThemeProvider>
+          <AuthProvider>
+            <Navbar />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+            <Toaster position="top-right" />
+          </AuthProvider>
+        </ThemeProvider>
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       </body>
     </html>

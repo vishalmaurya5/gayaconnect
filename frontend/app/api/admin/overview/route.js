@@ -10,6 +10,7 @@ import Labourer from '@/lib/db/models/Labourer'
 import Vehicle from '@/lib/db/models/Vehicle'
 import CallLog from '@/lib/db/models/CallLog'
 import Job from '@/lib/db/models/Job'
+import PopupAd from '@/lib/db/models/PopupAd'
 import { verifyAdminRequest } from '@/lib/utils/adminAuth'
 
 export const dynamic = 'force-dynamic'
@@ -42,7 +43,9 @@ export async function GET(request) {
       roleAgg,
       chartAgg,
       calls,
-      jobs
+      jobs,
+      popups,
+      todayUsersCount
     ] = await Promise.all([
       User.find().select('-password').sort({ createdAt: -1 }).lean(),
       Vendor.find().sort({ createdAt: -1 }).lean(),
@@ -67,14 +70,16 @@ export async function GET(request) {
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "Asia/Kolkata" } },
             revenue: { $sum: '$amount' }
           }
         },
         { $sort: { _id: 1 } }
       ]),
       CallLog.find().sort({ createdAt: -1 }).lean(),
-      Job.find().populate('vendorId', 'name').sort({ createdAt: -1 }).lean()
+      Job.find().populate('vendorId', 'name').sort({ createdAt: -1 }).lean(),
+      PopupAd.find().sort({ createdAt: -1 }).lean(),
+      User.countDocuments({ createdAt: { $gte: todayStart } })
     ])
 
     // Fill in missing days for the chart
@@ -91,6 +96,10 @@ export async function GET(request) {
     }
 
     const now = new Date()
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const thisMonthRevenueAgg = payments.filter(p => new Date(p.createdAt) >= thisMonthStart && (p.status === 'success' || p.status === 'paid'));
+    const monthlyRevenue = thisMonthRevenueAgg.reduce((sum, p) => sum + p.amount, 0);
+
     const stats = {
       users: users.length,
       vendors: vendors.length,
@@ -100,6 +109,8 @@ export async function GET(request) {
       activeOffers: offers.filter((offer) => offer.isActive).length,
       banners: banners.length,
       activeBanners: banners.filter((banner) => banner.isActive && new Date(banner.endDate) > now).length,
+      popups: popups.length,
+      activePopups: popups.filter((p) => p.isActive).length,
       blogs: blogs.length,
       labourers: labourers.length,
       vehicles: vehicles.length,
@@ -107,6 +118,8 @@ export async function GET(request) {
       calls: calls.length,
       jobs: jobs.length,
       revenue: revenueAgg[0]?.total || 0,
+      monthlyRevenue,
+      todayUsers: todayUsersCount || 0,
       paidPayments: revenueAgg[0]?.count || 0,
     }
 
@@ -117,6 +130,7 @@ export async function GET(request) {
       vendors,
       offers,
       banners,
+      popups,
       payments,
       blogs,
       labourers,

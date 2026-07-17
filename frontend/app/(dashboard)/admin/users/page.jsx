@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FiEdit2, FiTrash2, FiClock, FiCheckCircle, FiXCircle, FiX } from 'react-icons/fi';
+import { 
+  CheckCircle, XCircle, Trash2, Edit2, X, Plus, 
+  Search, Filter, Download, User, Mail, Phone, Calendar, Clock, RotateCcw
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 
@@ -14,6 +17,7 @@ export default function AdminUsersPage() {
   const [creating, setCreating] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -91,12 +95,12 @@ export default function AdminUsersPage() {
   };
 
   const deleteUser = async (id) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+    if (!confirm('Are you sure you want to permanently delete this user? This action cannot be undone.')) return;
     try {
       const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
-        toast.success('User deleted');
+        toast.success('User deleted successfully');
         setUsers(users.filter(u => u._id !== id));
       } else {
         toast.error(data.message || 'Failed to delete');
@@ -156,6 +160,7 @@ export default function AdminUsersPage() {
       if (json.success) {
         toast.success('User created successfully');
         resetCreate();
+        setIsCreateModalOpen(false);
         fetchUsers(filter, search);
       } else {
         toast.error(json.message || 'Failed to create user');
@@ -170,183 +175,314 @@ export default function AdminUsersPage() {
   const isSubscribed = (u) => u.subscriptionActive && u.subscriptionExpiry && new Date(u.subscriptionExpiry) > new Date();
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center flex-wrap gap-4">
-        <h1 className="text-2xl font-bold text-slate-800">User Management</h1>
-        <div className="relative">
-          <input 
-            type="text" 
-            placeholder="Search name, email, phone, Aadhaar..." 
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full sm:w-80 rounded-xl border border-slate-300 px-4 py-2 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-          />
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+      
+      {/* Premium Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">User Management</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Manage platform users, subscriptions, and account access.</p>
         </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h2 className="text-lg font-bold text-slate-900 mb-4">Add New User</h2>
-        <form onSubmit={handleCreateSubmit(onCreate)} className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Name</label>
-            <input {...regCreate('name', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
-            <input {...regCreate('email', { required: true })} type="email" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
-            <input {...regCreate('phone', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Temporary Password</label>
-            <input {...regCreate('password', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-emerald-500" />
-          </div>
-          <button type="submit" disabled={creating} className="sm:col-span-2 md:col-span-4 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition-colors disabled:opacity-50">
-            {creating ? 'Creating...' : 'Create User'}
+        <div className="flex items-center gap-3">
+          <button className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm">
+            <Download className="w-4 h-4" /> Export CSV
           </button>
-        </form>
-      </div>
-
-      <div className="flex gap-2 flex-wrap">
-        <button onClick={() => setFilter('all')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${filter === 'all' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}>All Users</button>
-        <button onClick={() => setFilter('subscribed')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${filter === 'subscribed' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}>Subscribed</button>
-        <button onClick={() => setFilter('unsubscribed')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${filter === 'unsubscribed' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}>Unsubscribed</button>
-        <button onClick={() => setFilter('deleted')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${filter === 'deleted' ? 'bg-red-600 text-white' : 'bg-white text-red-600 hover:bg-red-50 border border-red-200'}`}>Deleted Accounts</button>
-      </div>
-
-      {loading ? (
-        <div className="animate-pulse space-y-4">
-          {[1,2,3,4].map(i => <div key={i} className="h-16 bg-slate-200 rounded-xl"></div>)}
+          <button 
+            onClick={() => setIsCreateModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-600/20 transition-all"
+          >
+            <Plus className="w-5 h-5" /> Add User
+          </button>
         </div>
-      ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 text-slate-500 uppercase font-semibold">
-                <tr>
-                  <th className="px-6 py-4">Name / Contact</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Joined</th>
-                  <th className="px-6 py-4">Actions</th>
+      </div>
+
+      {/* Enterprise Data Table Wrapper */}
+      <div className="bg-white dark:bg-[#0B0F19] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col">
+        
+        {/* Table Toolbar */}
+        <div className="p-4 md:p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50 dark:bg-[#05080f]/50">
+          
+          {/* Tabs / Filters */}
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl w-max overflow-x-auto">
+            {[
+              { id: 'all', label: 'All Users' },
+              { id: 'subscribed', label: 'Subscribed' },
+              { id: 'unsubscribed', label: 'Unsubscribed' },
+              { id: 'deleted', label: 'Deleted' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setFilter(tab.id)}
+                className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${
+                  filter === tab.id 
+                    ? tab.id === 'deleted' 
+                      ? 'bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm' 
+                      : 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Search & Utility */}
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Search name, email, phone..." 
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="w-full sm:w-64 pl-9 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+              />
+            </div>
+            <button className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm">
+              <Filter className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* The Data Table */}
+        <div className="overflow-x-auto min-h-[400px]">
+          {loading ? (
+            <div className="flex flex-col gap-4 p-6">
+              {[1,2,3,4,5].map(i => <div key={i} className="h-16 bg-slate-100 dark:bg-slate-800/50 rounded-xl animate-pulse"></div>)}
+            </div>
+          ) : (
+            <table className="w-full text-left border-collapse whitespace-nowrap">
+              <thead>
+                <tr className="bg-white dark:bg-[#0B0F19] border-b border-slate-200 dark:border-slate-800">
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Account Details</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Subscription Status</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Joined Date</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-[#0B0F19]">
                 {users.map(user => {
                   const active = isSubscribed(user);
                   return (
-                    <tr key={user._id} className="hover:bg-slate-50 transition">
+                    <tr key={user._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group">
                       <td className="px-6 py-4">
-                        <div className="font-bold text-slate-900">{user.name}</div>
-                        <div className="text-slate-500">{user.email}</div>
-                        <div className="text-slate-500 text-xs">{user.phone}</div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 border border-indigo-100 dark:border-indigo-500/20">
+                            <User className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                              {user.name}
+                              {user.role === 'admin' && (
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 uppercase tracking-wider">Admin</span>
+                              )}
+                            </div>
+                            <div className="text-slate-500 dark:text-slate-400 text-xs mt-0.5 font-medium flex items-center gap-1.5">
+                              <Mail className="w-3 h-3" /> {user.email}
+                            </div>
+                            <div className="text-slate-500 dark:text-slate-400 text-xs mt-0.5 font-medium flex items-center gap-1.5">
+                              <Phone className="w-3 h-3" /> {user.phone}
+                            </div>
+                          </div>
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         {user.isDeleted ? (
-                          <span className="inline-flex items-center gap-1 text-red-600 bg-red-100 px-2 py-1 rounded font-semibold text-xs">
-                            <FiTrash2 /> Deleted
+                          <span className="inline-flex items-center gap-1.5 text-rose-700 dark:text-rose-400 font-bold text-xs bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 px-2.5 py-1.5 rounded-lg">
+                            <Trash2 className="w-3.5 h-3.5" /> Deleted Account
                           </span>
                         ) : active ? (
-                          <div>
-                            <span className="inline-flex items-center gap-1 text-emerald-600 bg-emerald-100 px-2 py-1 rounded font-semibold text-xs mb-1">
-                              <FiCheckCircle /> Active
+                          <div className="flex flex-col gap-1.5 items-start">
+                            <span className="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold text-xs bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2.5 py-1.5 rounded-lg">
+                              <CheckCircle className="w-3.5 h-3.5" /> Premium Active
                             </span>
-                            <div className="text-xs text-slate-500">Exp: {new Date(user.subscriptionExpiry).toLocaleDateString()}</div>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium">
+                              <Calendar className="w-3 h-3" /> Expires: {new Date(user.subscriptionExpiry).toLocaleDateString()}
+                            </span>
                           </div>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-slate-500 bg-slate-100 px-2 py-1 rounded font-semibold text-xs">
-                            <FiXCircle /> Inactive
+                          <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-400 font-bold text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 rounded-lg">
+                            <XCircle className="w-3.5 h-3.5" /> Free Tier
                           </span>
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        {new Date(user.createdAt).toLocaleDateString()}
+                        <span className="text-sm text-slate-600 dark:text-slate-300 font-medium">
+                          {new Date(user.createdAt).toLocaleDateString()}
+                        </span>
                       </td>
-                      <td className="px-6 py-4 space-x-2 whitespace-nowrap">
-                        <button onClick={() => openEditModal(user)} className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition inline-flex items-center gap-1" title="Edit Full Profile">
-                          <FiEdit2 /> Edit
-                        </button>
-                        {!user.isDeleted ? (
-                          <button onClick={() => extendSub(user._id)} className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 font-semibold hover:bg-blue-100 transition inline-flex items-center gap-1" title="Extend 30 Days">
-                            <FiClock /> +30 Days
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            onClick={() => openEditModal(user)} 
+                            className="p-2 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition" 
+                            title="Edit User Settings"
+                          >
+                            <Edit2 className="w-4 h-4" />
                           </button>
-                        ) : (
-                          <button onClick={() => restoreUser(user._id)} className="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 font-semibold hover:bg-emerald-100 transition inline-flex items-center gap-1" title="Restore Account">
-                            <FiCheckCircle /> Restore
+                          
+                          {!user.isDeleted ? (
+                            <button 
+                              onClick={() => extendSub(user._id)} 
+                              className="p-2 rounded-lg bg-indigo-50 text-indigo-600 font-semibold hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 transition" 
+                              title="Extend Subscription (+30 Days)"
+                            >
+                              <Clock className="w-4 h-4" />
+                            </button>
+                          ) : (
+                            <button 
+                              onClick={() => restoreUser(user._id)} 
+                              className="p-2 rounded-lg bg-emerald-50 text-emerald-600 font-semibold hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20 transition" 
+                              title="Restore Account"
+                            >
+                              <RotateCcw className="w-4 h-4" />
+                            </button>
+                          )}
+
+                          <button 
+                            onClick={() => deleteUser(user._id)} 
+                            className="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20 transition" 
+                            title={user.isDeleted ? "Permanently Delete" : "Soft Delete"}
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </button>
-                        )}
-                        <button onClick={() => deleteUser(user._id)} className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" title={user.isDeleted ? "Permanently Delete" : "Delete"}>
-                          <FiTrash2 className="text-lg" />
-                        </button>
+                        </div>
                       </td>
                     </tr>
                   )
                 })}
                 {users.length === 0 && (
-                  <tr><td colSpan="4" className="p-8 text-center text-slate-500">No users found.</td></tr>
+                  <tr>
+                    <td colSpan="4" className="p-12 text-center">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 mb-4 text-slate-400">
+                        <User className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">No Users Found</h3>
+                      <p className="text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">We couldn't find any users matching your current filters or search query.</p>
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
+          )}
+        </div>
+        
+        {/* Pagination Mockup */}
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#05080f]/50 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
+          <span>Showing {users.length} entries</span>
+          <div className="flex gap-1">
+            <button className="px-3 py-1 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 disabled:opacity-50">Prev</button>
+            <button className="px-3 py-1 rounded-md bg-indigo-600 text-white font-medium">1</button>
+            <button className="px-3 py-1 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50">Next</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Create User Modal */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-slate-800">
+            <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center"><Plus className="w-5 h-5"/></div> 
+                Register New User
+              </h3>
+              <button onClick={() => setIsCreateModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto custom-scrollbar">
+              <form id="createUserForm" onSubmit={handleCreateSubmit(onCreate)} className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Full Name</label>
+                  <input {...regCreate('name', { required: true })} type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>
+                  <input {...regCreate('email', { required: true })} type="email" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Phone Number</label>
+                  <input {...regCreate('phone', { required: true })} type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Temporary Password</label>
+                  <input {...regCreate('password', { required: true })} type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" />
+                </div>
+              </form>
+            </div>
+            <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex justify-end gap-3">
+              <button onClick={() => setIsCreateModalOpen(false)} className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancel</button>
+              <button type="submit" form="createUserForm" disabled={creating} className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-600/20 disabled:opacity-50">
+                {creating ? 'Registering...' : 'Register User'}
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Edit Modal */}
       {editingUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-              <h3 className="text-xl font-bold text-slate-900">Edit User Profile</h3>
-              <button onClick={closeEditModal} className="text-slate-400 hover:text-slate-600"><FiX className="text-xl" /></button>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-slate-800">
+            <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center"><Edit2 className="w-4 h-4"/></div> 
+                Edit User Settings
+              </h3>
+              <button onClick={closeEditModal} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <div className="p-6 overflow-y-auto">
+            <div className="p-6 overflow-y-auto custom-scrollbar">
               <form id="editUserForm" onSubmit={handleEditSubmit(onUpdate)} className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Name</label>
-                  <input {...regEdit('name', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Full Name</label>
+                  <input {...regEdit('name', { required: true })} type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
-                  <input {...regEdit('email', { required: true })} type="email" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>
+                  <input {...regEdit('email', { required: true })} type="email" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
-                  <input {...regEdit('phone', { required: true })} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Phone Number</label>
+                  <input {...regEdit('phone', { required: true })} type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">New Password <span className="text-slate-400 font-normal">(Leave blank to keep)</span></label>
-                  <input {...regEdit('password')} type="text" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">New Password <span className="text-slate-400 dark:text-slate-500 font-normal text-xs">(Leave blank to keep)</span></label>
+                  <input {...regEdit('password')} type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" />
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Role</label>
-                  <select {...regEdit('role', { required: true })} className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-                    <option value="user">User</option>
-                    <option value="vendor">Vendor</option>
-                    <option value="admin">Admin</option>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">System Role</label>
+                  <select {...regEdit('role', { required: true })} className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all">
+                    <option value="user">Standard User</option>
+                    <option value="vendor">Vendor / Business Owner</option>
+                    <option value="admin">System Administrator</option>
                   </select>
                 </div>
-                <div className="sm:col-span-2 border-t border-slate-100 pt-5 mt-2">
-                  <h4 className="text-sm font-bold text-slate-800 mb-4 uppercase tracking-wider">Subscription Details</h4>
+                <div className="sm:col-span-2 border-t border-slate-100 dark:border-slate-800 pt-6 mt-2">
+                  <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-4 uppercase tracking-wider flex items-center gap-2">
+                    <Calendar className="w-4 h-4" /> Subscription Controls
+                  </h4>
                   <div className="grid gap-5 sm:grid-cols-2">
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1">Subscription Active</label>
-                      <select {...regEdit('subscriptionActive')} className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Subscription Status</label>
+                      <select {...regEdit('subscriptionActive')} className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all">
+                        <option value="true">Active Premium</option>
+                        <option value="false">Inactive / Free</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1">Expiry Date</label>
-                      <input {...regEdit('subscriptionExpiry')} type="date" className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Expiry Date</label>
+                      <input {...regEdit('subscriptionExpiry')} type="date" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" />
                     </div>
                   </div>
                 </div>
               </form>
             </div>
-            <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
-              <button onClick={closeEditModal} className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 transition">Cancel</button>
-              <button type="submit" form="editUserForm" disabled={updating} className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition disabled:opacity-50">
+            <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex justify-end gap-3">
+              <button onClick={closeEditModal} className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancel</button>
+              <button type="submit" form="editUserForm" disabled={updating} className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-600/20 disabled:opacity-50">
                 {updating ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
