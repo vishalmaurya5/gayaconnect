@@ -80,10 +80,10 @@ export default function Navbar() {
           </div>
           <div className="flex flex-col justify-center pt-0.5">
             <div className="font-extrabold text-[22px] md:text-[26px] leading-[0.9] flex items-center tracking-tight text-slate-900 dark:text-white">
-              Gaya<span className="text-indigo-600 ml-0.5">Seva</span>
+              Gaya<span className="text-amber-500 ml-0.5">Seva</span>
             </div>
-            <div className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] mt-1 text-slate-500 dark:text-slate-400">
-              Digital Gateway
+            <div className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] mt-1 text-slate-800 dark:text-slate-300">
+              ZARURAT AAPKI, SEVA HAMARA
             </div>
           </div>
         </Link>
