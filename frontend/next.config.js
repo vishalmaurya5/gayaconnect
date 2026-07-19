@@ -9,6 +9,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
     ],
   },
+  allowedDevOrigins: ['192.168.1.9'],
 }
 
 module.exports = nextConfig

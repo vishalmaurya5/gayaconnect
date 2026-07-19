@@ -317,8 +317,8 @@ export default function AdminLayout({ children }) {
         {/* Sidebar Header */}
         <div className="h-16 flex items-center justify-between px-4 lg:px-6 border-b border-slate-200 dark:border-slate-800 shrink-0">
           <div className={`flex items-center gap-3 overflow-hidden ${!sidebarOpen && 'lg:justify-center'}`}>
-            <div className="bg-indigo-600 p-1.5 rounded-lg shadow-md shadow-indigo-600/20 shrink-0">
-              <img src="/logo2.png" alt="Gaya Seva" className="h-6 w-6 object-contain filter brightness-0 invert" />
+            <div className="bg-white p-0.5 rounded-full shadow-md shadow-indigo-600/10 shrink-0 border border-slate-200 dark:border-slate-700">
+              <img src="/gaya_seva_app_icon.png" alt="Gaya Seva Logo" className="h-8 w-8 object-cover rounded-full" />
             </div>
             {(sidebarOpen || mobileSidebarOpen) && (
               <span className="font-bold text-xl tracking-tight text-slate-800 dark:text-white whitespace-nowrap">

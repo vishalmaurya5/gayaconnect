@@ -75,8 +75,8 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 shrink-0 group">
-          <div className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 bg-white overflow-hidden">
-            <img src="/gaya_seva_app_icon.png" alt="Gaya Seva Logo" className="w-full h-full object-cover" />
+          <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 rounded-full shadow-md border-2 border-slate-100 dark:border-slate-700 bg-white overflow-hidden p-0.5">
+            <img src="/gaya_seva_app_icon.png" alt="Gaya Seva Logo" className="w-full h-full object-cover rounded-full" />
           </div>
           <div className="flex flex-col justify-center pt-0.5">
             <div className="font-extrabold text-[22px] md:text-[26px] leading-[0.9] flex items-center tracking-tight text-slate-900 dark:text-white">

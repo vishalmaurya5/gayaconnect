@@ -85,7 +85,7 @@ export default function Footer() {
                   <div className="lg:col-span-3 space-y-6">
                       <Link href="/" className="block">
                           <div className="flex items-center gap-3">
-                              <img src="/gaya_seva_app_icon.png" alt="Gaya Seva Logo" className="w-9 h-9 object-cover rounded-xl shadow-sm border border-slate-100" />
+                              <img src="/gaya_seva_app_icon.png" alt="Gaya Seva Logo" className="w-12 h-12 md:w-14 md:h-14 object-cover rounded-full shadow-md border-2 border-slate-100 bg-white p-0.5" />
                               <div className="font-sora text-3xl font-extrabold tracking-tight">
                                   <span className="text-black">Gaya</span>
                                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-500">Seva</span>
