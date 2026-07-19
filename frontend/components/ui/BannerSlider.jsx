@@ -15,6 +15,10 @@ export default function BannerSlider({ position = 'home_top' }) {
   const fetchBanners = async () => {
     try {
       const res = await fetch(`/api/banners?position=${position}`)
+      if (!res.ok) {
+        const text = await res.text()
+        throw new Error(`API returned ${res.status}: ${text.substring(0, 100)}...`)
+      }
       const data = await res.json()
       if (data.success && data.banners && data.banners.length > 0) {
         setBanners(data.banners)

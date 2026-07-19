@@ -27,7 +27,13 @@ export function AuthProvider({ children }) {
         
         // Fetch fresh user data in the background to keep subscription status updated
         fetch(`/api/profile?t=${Date.now()}`)
-          .then(res => res.json())
+          .then(async res => {
+            if (!res.ok) {
+              const text = await res.text();
+              throw new Error(`Profile API error ${res.status}: ${text.substring(0, 100)}`);
+            }
+            return res.json();
+          })
           .then(data => {
             if (data.success && data.user) {
               setUser(data.user);

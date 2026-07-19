@@ -12,6 +12,10 @@ export default function JobPreviewSection() {
     const fetchJobs = async () => {
       try {
         const res = await fetch('/api/jobs');
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`API returned ${res.status}: ${text.substring(0, 100)}...`);
+        }
         const data = await res.json();
         if (data.success) {
           // Only show 3 latest approved jobs

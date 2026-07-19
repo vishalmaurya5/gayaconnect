@@ -15,6 +15,10 @@ export default function PopupAd() {
     const timer = setTimeout(async () => {
       try {
         const res = await fetch('/api/admin/popups');
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`API returned ${res.status}: ${text.substring(0, 100)}...`);
+        }
         const data = await res.json();
         
         if (data.success && data.popups && data.popups.length > 0) {

@@ -110,7 +110,7 @@ export default function AboutGaya() {
       {selectedPlace && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedPlace(null)}>
           <div 
-            className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl relative transform transition-all animate-in fade-in zoom-in duration-300" 
+            className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto overflow-x-hidden shadow-2xl relative transform transition-all animate-in fade-in zoom-in duration-300" 
             onClick={e => e.stopPropagation()}
           >
             <button 

@@ -22,6 +22,11 @@ export default function EnquiryForm() {
         body: JSON.stringify(data),
       });
 
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`API returned ${response.status}: ${text.substring(0, 100)}...`);
+      }
+      
       const result = await response.json();
 
       if (response.ok && result.success) {

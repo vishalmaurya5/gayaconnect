@@ -21,6 +21,10 @@ export default function Testimonials() {
   const fetchFeedbacks = async () => {
     try {
       const res = await fetch('/api/feedback?type=website&status=approved&limit=6');
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`API returned ${res.status}: ${text.substring(0, 100)}...`);
+      }
       const data = await res.json();
       if (data.success && data.data.length > 0) {
         setFeedbacks(data.data);
