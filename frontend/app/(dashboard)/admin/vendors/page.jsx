@@ -58,6 +58,7 @@ export default function AdminVendorsPage() {
   const [editingVendor, setEditingVendor] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('ALL'); // ALL, APPROVED, PENDING
+  const [selectedCity, setSelectedCity] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -118,12 +119,12 @@ export default function AdminVendorsPage() {
   };
 
   useEffect(() => {
-    fetchVendors(search);
-  }, [search]);
+    fetchVendors(search, selectedCity);
+  }, [search, selectedCity]);
 
-  const fetchVendors = async (s = '') => {
+  const fetchVendors = async (s = '', city = '') => {
     try {
-      const res = await fetch(`/api/admin/vendors?search=${s}`);
+      const res = await fetch(`/api/admin/vendors?search=${s}&city=${city}`);
       const data = await res.json();
       if (data.success) {
         setVendors(data.vendors || []);
@@ -271,6 +272,19 @@ export default function AdminVendorsPage() {
 
           {/* Search & Filter */}
           <div className="flex items-center gap-3">
+            {admin?.role === 'SUPER_ADMIN' && (
+              <select 
+                value={selectedCity} 
+                onChange={(e) => setSelectedCity(e.target.value)}
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-slate-700 dark:text-slate-300"
+              >
+                <option value="">All Cities</option>
+                <option value="Gaya">Gaya</option>
+                <option value="Patna">Patna</option>
+                <option value="Nawada">Nawada</option>
+                <option value="Delhi">Delhi</option>
+              </select>
+            )}
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input 

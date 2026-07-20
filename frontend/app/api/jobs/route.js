@@ -5,6 +5,7 @@ import Vendor from '@/lib/db/models/Vendor';
 import { getAuthenticatedUser } from '@/lib/security/auth';
 import { validateImageDataUrl } from '@/lib/utils/imageUpload';
 import { isValidJobSaleCategory, DEFAULT_JOB_SALE_CATEGORY } from '@/lib/utils/jobSaleCategories';
+import { verifyAdminRequest, buildCityQuery } from '@/lib/utils/adminAuth';
 
 export async function GET(request) {
   try {
@@ -17,7 +18,16 @@ export async function GET(request) {
     const search = searchParams.get('search');
     const sort = searchParams.get('sort') || 'newest';
 
+    const adminData = verifyAdminRequest(request);
     const query = { isActive: true };
+    
+    // Apply Admin City Isolation
+    if (adminData && adminData.role !== 'SUPER_ADMIN') {
+      const cityQuery = buildCityQuery(adminData, null, 'location');
+      if (cityQuery['location']) {
+        query['location'] = cityQuery['location'];
+      }
+    }
     if (type && type !== 'all') query.type = type;
     if (vendorId) query.vendorId = vendorId;
     if (location) query.location = { $regex: location, $options: 'i' };
@@ -78,13 +88,19 @@ export async function POST(request) {
       vendorId = vendor._id;
     }
 
+    let finalLocation = body.location;
+    const adminData = verifyAdminRequest(request);
+    if (user.role === 'admin' && adminData && adminData.role !== 'SUPER_ADMIN' && adminData.assignedCities?.length > 0) {
+      finalLocation = adminData.assignedCities[0];
+    }
+
     const job = new Job({
       title: body.title,
       description: body.description,
       type: body.type, // 'job' or 'sale'
       category: isValidJobSaleCategory(body.category) ? body.category : DEFAULT_JOB_SALE_CATEGORY,
       salaryOrPrice: body.salaryOrPrice,
-      location: body.location,
+      location: finalLocation,
       vendorId: vendorId,
       postedByAdmin: user.role === 'admin',
       isActive: true,

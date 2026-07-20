@@ -14,7 +14,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 
 export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState("Gaya");
+  const [location, setLocation] = useState("");
   const [category, setCategory] = useState("");
   const { openSubscriptionModal } = useAuth();
   const router = useRouter();
@@ -80,7 +80,7 @@ export default function HeroSection() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
               </span>
-              <span className="text-xs font-semibold text-slate-700 tracking-wide">Gaya's Most Trusted Digital Platform</span>
+              <span className="text-xs font-semibold text-slate-700 tracking-wide">Premium Global Digital Platform</span>
             </motion.div>
 
             {/* Heading */}
@@ -88,9 +88,9 @@ export default function HeroSection() {
               variants={fadeUp}
               className="font-extrabold text-[42px] sm:text-[52px] lg:text-[64px] text-slate-900 leading-[1.05] tracking-tight w-full max-w-3xl"
             >
-              Your Local Gateway <br className="hidden md:block" />
+              One Platform. <br className="hidden md:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-500 to-teal-500">
-                to Everything Gaya
+                Unlimited Services.
               </span>
             </motion.h1>
 
@@ -99,7 +99,7 @@ export default function HeroSection() {
               variants={fadeUp}
               className="mt-6 text-lg sm:text-xl text-slate-500 max-w-2xl leading-relaxed font-medium"
             >
-              Discover verified businesses, skilled professionals, local jobs, and exclusive offers—all connected in one premium ecosystem.
+              Discover verified businesses, skilled professionals, trusted workforce, jobs and services through one intelligent digital platform built for individuals, businesses and communities.
             </motion.p>
 
             {/* Advanced Search Bar (SaaS Interface) */}
@@ -144,7 +144,7 @@ export default function HeroSection() {
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    placeholder="Gaya"
+                    placeholder="Location (Optional)"
                     className="w-full text-[14px] font-semibold text-slate-900 outline-none placeholder:text-slate-400 bg-transparent"
                   />
                 </div>
@@ -205,7 +205,7 @@ export default function HeroSection() {
                       </div>
                       <div>
                         <h4 className="text-slate-900 font-bold text-sm">Verified Experts</h4>
-                        <p className="text-slate-500 text-xs font-medium">Ready to serve Gaya</p>
+                        <p className="text-slate-500 text-xs font-medium">Ready to hire</p>
                       </div>
                     </div>
                     <div className="bg-amber-50 px-2 py-1 rounded-lg flex items-center gap-1 border border-amber-100">

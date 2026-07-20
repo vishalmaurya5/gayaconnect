@@ -47,7 +47,12 @@ export async function POST(request) {
 
     // Generate JWT
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { 
+        userId: user._id, 
+        role: user.role, 
+        adminRole: user.adminRole || (user.role === 'admin' ? 'SUPER_ADMIN' : 'NONE'),
+        assignedCities: user.assignedCities || []
+      },
       process.env.JWT_SECRET || "fallback_secret_key",
       { expiresIn: "7d" }
     );
@@ -60,9 +65,10 @@ export async function POST(request) {
     // Set HTTP-only cookies for Server Components
     await createUserSession(response, user, true);
     
-    // Automatically grant admin dashboard access if the user is an admin
-    if (user.role === "admin") {
-      setAdminCookie(response);
+    // Automatically grant admin dashboard access if the user is an admin or sub-admin
+    if (user.role === "admin" || user.adminRole !== "NONE") {
+      const actualAdminRole = user.adminRole && user.adminRole !== 'NONE' ? user.adminRole : 'SUPER_ADMIN';
+      setAdminCookie(response, user._id.toString(), actualAdminRole, user.assignedCities || [], user.email, user.name);
     }
 
     return response;

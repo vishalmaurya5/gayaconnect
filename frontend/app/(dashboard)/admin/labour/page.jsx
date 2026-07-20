@@ -57,6 +57,7 @@ export default function AdminLabourPage() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('ALL'); // ALL, APPROVED, PENDING
+  const [selectedCity, setSelectedCity] = useState('');
   
   const [form, setForm] = useState({ name: '', phone: '', skill: '', dailyRate: '', address: '', aadhaarNumber: '', bloodGroup: '', state: '', district: '' });
   const admin = useContext(AdminContext);
@@ -69,13 +70,13 @@ export default function AdminLabourPage() {
   }, [searchInput]);
 
   useEffect(() => {
-    fetchLabourers(searchTerm);
-  }, [searchTerm]);
+    fetchLabourers(searchTerm, selectedCity);
+  }, [searchTerm, selectedCity]);
 
-  const fetchLabourers = async (s = '') => {
+  const fetchLabourers = async (s = '', city = '') => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/labour?search=${s}`);
+      const res = await fetch(`/api/admin/labour?search=${s}&city=${city}`);
       const data = await res.json();
       if (data.success) {
         setLabourers(data.labourers || []);
@@ -224,6 +225,19 @@ export default function AdminLabourPage() {
 
           {/* Search & Filter */}
           <div className="flex items-center gap-3">
+            {admin?.role === 'SUPER_ADMIN' && (
+              <select 
+                value={selectedCity} 
+                onChange={(e) => setSelectedCity(e.target.value)}
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-slate-700 dark:text-slate-300"
+              >
+                <option value="">All Cities</option>
+                <option value="Gaya">Gaya</option>
+                <option value="Patna">Patna</option>
+                <option value="Nawada">Nawada</option>
+                <option value="Delhi">Delhi</option>
+              </select>
+            )}
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input 

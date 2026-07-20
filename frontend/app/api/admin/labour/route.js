@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db/mongodb'
-import { verifyAdminRequest } from '@/lib/utils/adminAuth'
+import { verifyAdminRequest, buildCityQuery } from '@/lib/utils/adminAuth'
 import Labourer from '@/lib/db/models/Labourer'
 import AuditLog from '@/lib/db/models/AuditLog'
 
@@ -14,7 +14,13 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')
+    const selectedCity = searchParams.get('city')
     let query = {}
+
+    const cityQuery = buildCityQuery(adminUser, selectedCity, 'district');
+    if (cityQuery['district']) {
+      query['district'] = cityQuery['district'];
+    }
 
     if (search) {
       const searchRegex = { $regex: search, $options: 'i' }
@@ -48,6 +54,11 @@ export async function POST(request) {
     const count = await Labourer.countDocuments({ lwfId: { $exists: true } });
     const lwfId = `GS-LWF-${String(count + 1).padStart(6, '0')}`;
 
+    let finalDistrict = body.district;
+    if (adminUser.role !== 'SUPER_ADMIN' && adminUser.assignedCities?.length > 0) {
+      finalDistrict = adminUser.assignedCities[0];
+    }
+
     const labour = new Labourer({
       name: body.name,
       profession: body.profession,
@@ -57,7 +68,7 @@ export async function POST(request) {
       aadhaarNumber: body.aadhaarNumber,
       bloodGroup: body.bloodGroup,
       state: body.state,
-      district: body.district,
+      district: finalDistrict,
       isApproved: true,
       status: 'APPROVED',
       lwfId

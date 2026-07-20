@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db/mongodb'
-import { verifyAdminRequest } from '@/lib/utils/adminAuth'
+import { verifyAdminRequest, buildCityQuery } from '@/lib/utils/adminAuth'
 import Vendor from '@/lib/db/models/Vendor'
 import User from '@/lib/db/models/User'
 import AuditLog from '@/lib/db/models/AuditLog'
@@ -15,8 +15,14 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')
+    const selectedCity = searchParams.get('city')
 
     let query = {}
+
+    const cityQuery = buildCityQuery(adminUser, selectedCity, 'address');
+    if (cityQuery['address']) {
+      query['address'] = cityQuery['address'];
+    }
 
     if (search) {
       const searchRegex = { $regex: search, $options: 'i' }
@@ -67,11 +73,16 @@ export async function POST(request) {
     })
     await user.save()
 
+    let finalAddress = body.address;
+    if (adminUser.role !== 'SUPER_ADMIN' && adminUser.assignedCities?.length > 0) {
+      finalAddress = `${body.address ? body.address + ', ' : ''}${adminUser.assignedCities[0]}`;
+    }
+
     const vendor = new Vendor({
       userId: user._id,
       name: body.businessName || body.name,
       category: body.category,
-      address: body.address,
+      address: finalAddress,
       description: body.description,
       isApproved: true,
       isActive: true

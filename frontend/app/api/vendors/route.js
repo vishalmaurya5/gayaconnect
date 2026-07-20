@@ -2,10 +2,12 @@ import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic';
 import { connectDB } from '@/lib/db/mongodb'
 import Vendor from '@/lib/db/models/Vendor'
+import { verifyAdminRequest, buildCityQuery } from '@/lib/utils/adminAuth'
 
 export async function GET(request) {
   try {
     await connectDB()
+    const adminData = verifyAdminRequest(request);
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
     const subCategory = searchParams.get('subCategory')
@@ -23,8 +25,16 @@ export async function GET(request) {
     if (status === 'all') {
       delete query.isApproved
     } else if (status) {
-      query.status = status // e.g. 'PENDING'
-      delete query.isApproved // 'isApproved' might be derived, but usually status is PENDING, APPROVED, REJECTED
+      query.status = status 
+      delete query.isApproved 
+    }
+
+    // Apply Admin City Isolation
+    if (adminData && adminData.role !== 'SUPER_ADMIN') {
+      const cityQuery = buildCityQuery(adminData, null, 'address.city');
+      if (cityQuery['address.city']) {
+        query['address.city'] = cityQuery['address.city'];
+      }
     }
 
     if (category) query.category = category
@@ -104,7 +114,14 @@ export async function POST(request) {
   try {
     await connectDB()
     const body = await request.json()
-    // Need auth for real usage, assuming client provides userId
+    const adminData = verifyAdminRequest(request);
+    
+    // Auto-assign city if created by City Admin
+    if (adminData && adminData.role !== 'SUPER_ADMIN' && adminData.assignedCities?.length > 0) {
+      if (!body.address) body.address = {};
+      body.address.city = adminData.assignedCities[0];
+    }
+
     const vendor = new Vendor({
       ...body,
       isApproved: false,

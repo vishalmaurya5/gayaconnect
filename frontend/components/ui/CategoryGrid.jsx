@@ -9,31 +9,29 @@ import {
 } from 'react-icons/fi'
 import { SERVICE_CATEGORIES, slugifyService } from '@/lib/utils/serviceCategories'
 
-const categoryStyles = {
-  'Home Services': { icon: FiHome, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100', shadow: 'hover:shadow-[0_8px_30px_rgb(37,99,235,0.12)]' },
-  'Education Services': { icon: FiBookOpen, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100', shadow: 'hover:shadow-[0_8px_30px_rgb(79,70,229,0.12)]' },
-  'Beauty & Personal Care': { icon: FiScissors, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100', shadow: 'hover:shadow-[0_8px_30px_rgb(225,29,72,0.12)]' },
-  'Health & Medical': { icon: FiActivity, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100', shadow: 'hover:shadow-[0_8px_30px_rgb(16,185,129,0.12)]' },
-  'Food & Restaurant': { icon: FiCoffee, color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-100', shadow: 'hover:shadow-[0_8px_30px_rgb(234,88,12,0.12)]' },
-  'Repair & Technical Services': { icon: FiTool, color: 'text-cyan-600', bg: 'bg-cyan-50', border: 'border-cyan-100', shadow: 'hover:shadow-[0_8px_30px_rgb(8,145,178,0.12)]' },
-  'Automotive & Vehicles': { icon: FiTruck, color: 'text-slate-700', bg: 'bg-slate-100', border: 'border-slate-200', shadow: 'hover:shadow-[0_8px_30px_rgb(51,65,85,0.12)]' },
-  'Shopping & Retail': { icon: FiShoppingBag, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100', shadow: 'hover:shadow-[0_8px_30px_rgb(147,51,234,0.12)]' },
-  'Event & Wedding Services': { icon: FiCamera, color: 'text-pink-600', bg: 'bg-pink-50', border: 'border-pink-100', shadow: 'hover:shadow-[0_8px_30px_rgb(219,39,119,0.12)]' },
-  'Real Estate & Property': { icon: FiMap, color: 'text-teal-600', bg: 'bg-teal-50', border: 'border-teal-100', shadow: 'hover:shadow-[0_8px_30px_rgb(13,148,136,0.12)]' },
-  'Daily Need Services': { icon: FiClock, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100', shadow: 'hover:shadow-[0_8px_30px_rgb(217,119,6,0.12)]' },
-  'Digital & Online Services': { icon: FiGlobe, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100', shadow: 'hover:shadow-[0_8px_30px_rgb(124,58,237,0.12)]' },
-}
+const HOME_CATEGORIES = [
+  { name: 'Home Services', count: 120, icon: FiHome, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100', shadow: 'hover:shadow-[0_8px_30px_rgb(37,99,235,0.12)]' },
+  { name: 'Healthcare', count: 85, icon: FiActivity, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100', shadow: 'hover:shadow-[0_8px_30px_rgb(16,185,129,0.12)]' },
+  { name: 'Education', count: 64, icon: FiBookOpen, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100', shadow: 'hover:shadow-[0_8px_30px_rgb(79,70,229,0.12)]' },
+  { name: 'Technology', count: 150, icon: FiGlobe, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100', shadow: 'hover:shadow-[0_8px_30px_rgb(124,58,237,0.12)]' },
+  { name: 'Construction', count: 45, icon: FiTool, color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-100', shadow: 'hover:shadow-[0_8px_30px_rgb(234,88,12,0.12)]' },
+  { name: 'Automotive', count: 90, icon: FiTruck, color: 'text-slate-700', bg: 'bg-slate-100', border: 'border-slate-200', shadow: 'hover:shadow-[0_8px_30px_rgb(51,65,85,0.12)]' },
+  { name: 'Beauty & Wellness', count: 110, icon: FiScissors, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100', shadow: 'hover:shadow-[0_8px_30px_rgb(225,29,72,0.12)]' },
+  { name: 'Business Services', count: 70, icon: FiShoppingBag, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100', shadow: 'hover:shadow-[0_8px_30px_rgb(147,51,234,0.12)]' },
+  { name: 'Repair & Maintenance', count: 95, icon: FiTool, color: 'text-cyan-600', bg: 'bg-cyan-50', border: 'border-cyan-100', shadow: 'hover:shadow-[0_8px_30px_rgb(8,145,178,0.12)]' },
+  { name: 'Legal', count: 40, icon: FiCheckCircle, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100', shadow: 'hover:shadow-[0_8px_30px_rgb(217,119,6,0.12)]' },
+  { name: 'Finance', count: 55, icon: FiActivity, color: 'text-teal-600', bg: 'bg-teal-50', border: 'border-teal-100', shadow: 'hover:shadow-[0_8px_30px_rgb(13,148,136,0.12)]' },
+  { name: 'Hospitality', count: 130, icon: FiCoffee, color: 'text-pink-600', bg: 'bg-pink-50', border: 'border-pink-100', shadow: 'hover:shadow-[0_8px_30px_rgb(219,39,119,0.12)]' },
+]
 
 export default function CategoryGrid() {
   const router = useRouter()
-  // Ensure we get exactly 12 categories for a perfect grid
-  const categories = SERVICE_CATEGORIES.slice(0, 12)
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-5 relative z-10">
-      {categories.map((category, index) => {
-        const style = categoryStyles[category.name] || { icon: FiCheckCircle, color: 'text-slate-600', bg: 'bg-slate-50', border: 'border-slate-200', shadow: 'hover:shadow-[0_8px_30px_rgb(100,116,139,0.12)]' }
-        const Icon = style.icon
+      {HOME_CATEGORIES.map((category, index) => {
+        const Icon = category.icon
+        const style = { bg: category.bg, border: category.border, shadow: category.shadow, color: category.color };
         
         return (
           <motion.button
@@ -63,7 +61,7 @@ export default function CategoryGrid() {
               <div className="flex items-center gap-1.5">
                 <span className={`w-1.5 h-1.5 rounded-full ${style.bg.replace('bg-', 'bg-').replace('50', '400')}`}></span>
                 <p className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">
-                  {category.subcategories.length} Services
+                  {category.count}+ Providers
                 </p>
               </div>
             </div>

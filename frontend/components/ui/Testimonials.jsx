@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react';
 import FeedbackModal from './FeedbackModal';
 
 const staticTestimonials = [
-  { text: "Found a good electrician within 10 minutes for my house wiring work. The subscription for ₹11 is literally nothing compared to the time it saves.", name: "Rajeev Verma", role: "Resident, Gaya City", initials: "RV", bg: "bg-indigo-50" },
-  { text: "As a vendor, I got 3 new customers in the first week of listing. The offer posting feature really helped promote my shop during festivals.", name: "Amit Sharma", role: "Vendor, Bodh Gaya", initials: "AS", bg: "bg-teal-50" },
-  { text: "Needed a local worker for construction. Found Ramesh Mistri on GayaSeva in minutes. Professional, punctual, excellent work.", name: "Priya Kumari", role: "Homeowner, Tekari Road", initials: "PK", bg: "bg-amber-50" },
+  { text: "Found an excellent professional within 10 minutes for our office. The premium membership is incredibly valuable and saves us hours of searching.", name: "Rajeev Verma", role: "Platform User", initials: "RV", bg: "bg-indigo-50" },
+  { text: "As a business owner, our visibility skyrocketed in the first week of listing. The smart discovery tools help us connect with high-intent customers consistently.", name: "Amit Sharma", role: "Verified Business", initials: "AS", bg: "bg-teal-50" },
+  { text: "Needed skilled professionals for our latest project. Connected with top-rated talent on the platform in minutes. Seamless, professional, and reliable.", name: "Priya Kumari", role: "Registered Customer", initials: "PK", bg: "bg-amber-50" },
 ];
 
 export default function Testimonials() {

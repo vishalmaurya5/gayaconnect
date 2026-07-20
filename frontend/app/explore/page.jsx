@@ -44,7 +44,8 @@ const indiaCities = [
   { id: 'varanasi', name: 'Varanasi', state: 'Uttar Pradesh', active: false, desc: 'The spiritual capital of India, situated on the banks of the Ganges.' },
   { id: 'delhi', name: 'New Delhi', state: 'Delhi', active: false, desc: 'The vibrant capital city blending history with modern infrastructure.' },
   { id: 'mumbai', name: 'Mumbai', state: 'Maharashtra', active: false, desc: 'The city of dreams and the financial powerhouse of India.' },
-  { id: 'bangalore', name: 'Bangalore', state: 'Karnataka', active: false, desc: 'The Silicon Valley of India, known for its parks and IT.' }
+  { id: 'bangalore', name: 'Bangalore', state: 'Karnataka', active: false, desc: 'The Silicon Valley of India, known for its parks and IT.' },
+  { id: 'newada', name: 'Nawada', state: 'Bihar', active: false, desc: 'Known for Kakolat Waterfall and rich spiritual history.' }
 ];
 
 export default function ExplorePage() {

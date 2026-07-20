@@ -9,32 +9,32 @@ export default function AboutGaya() {
 
   const highlights = [
     {
-      title: "Mahabodhi Temple",
-      desc: "The sacred site where Lord Buddha attained enlightenment under the Bodhi Tree.",
-      longDesc: "The Mahabodhi Temple Complex is one of the four holy sites related to the life of the Lord Buddha, and particularly to the attainment of Enlightenment. Built originally by Emperor Ashoka in the 3rd century B.C., the present temple dates from the 5th or 6th centuries. It is a UNESCO World Heritage Site and the most revered destination for Buddhists worldwide.",
+      title: "Digital Trust",
+      desc: "A secure ecosystem where every business and professional is verified.",
+      longDesc: "We prioritize your safety and satisfaction. Every service provider, vendor, and professional on our platform goes through a comprehensive verification process to ensure authentic and high-quality services for our community.",
       image: "/images/gaya/mahabodhi.png",
-      link: "https://en.wikipedia.org/wiki/Mahabodhi_Temple"
+      link: ""
     },
     {
-      title: "Vishnupad Temple",
-      desc: "A major Hindu pilgrimage center on the banks of Falgu river, famous for Pind Daan rituals.",
-      longDesc: "Dedicated to Lord Vishnu, this ancient temple houses a 40-centimeter-long footprint of Lord Vishnu incised into a block of basalt, known as Dharmasila. It is the center of the world-famous Pitrapaksha Mela, where Hindus from all over the world come to perform Pind Daan for the salvation of their ancestors.",
+      title: "Smart Discovery",
+      desc: "Find the exact service you need instantly with our intelligent search.",
+      longDesc: "Our modern platform is designed for seamless discovery. Whether you need a local contractor, a freelance professional, or a trusted business, our advanced matching connects you with the best options in seconds.",
       image: "/images/gaya/vishnupad.png",
-      link: "https://en.wikipedia.org/wiki/Vishnupad_Temple"
+      link: ""
     },
     {
-      title: "Sacred Falgu River",
-      desc: "The holy river holding deep spiritual significance where thousands come to offer prayers.",
-      longDesc: "The Falgu River is central to Hindu beliefs regarding the afterlife. According to the epic Ramayana, Goddess Sita cursed the river to run below the surface. Hence, for most of the year, the riverbed appears dry and sandy, but digging just a little reveals pure, flowing water used for sacred rituals.",
+      title: "Business Growth",
+      desc: "Empowering businesses with enterprise-grade digital tools.",
+      longDesc: "We provide businesses with a powerful digital storefront to reach more customers, manage bookings, and build a trusted reputation online through verified customer reviews and transparent ratings.",
       image: "/images/gaya/falgu_river.png",
-      link: "https://en.wikipedia.org/wiki/Phalgu"
+      link: ""
     },
     {
-      title: "Mangla Gauri Temple",
-      desc: "One of the 18 Maha Shaktipeeths, this ancient and highly revered temple is dedicated to Goddess Shakti.",
-      longDesc: "Perched on the Manglagauri hill, this temple is one of the 18 Maha Shaktipeethas in India. According to Hindu mythology, it is believed to be the place where a part of Goddess Sati's body fell. The temple is especially crowded during the Navratri festival, attracting thousands of devotees seeking blessings.",
+      title: "Community Marketplace",
+      desc: "Building stronger communities through reliable digital connections.",
+      longDesc: "More than just a marketplace, we are a digital community. We bring together skilled professionals and individuals, creating a thriving ecosystem of trusted services and mutual growth.",
       image: "/images/gaya/mangla_gauri.png",
-      link: "https://en.wikipedia.org/wiki/Mangla_Gauri_Temple"
+      link: ""
     }
   ];
 
@@ -56,18 +56,18 @@ export default function AboutGaya() {
               <h2 className="font-sora text-3xl md:text-4xl lg:text-5xl font-[800] text-[#0F172A] tracking-tight leading-tight mb-6">
                 About <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-500">
-                  Gaya Seva
+                  Our Platform
                 </span>
               </h2>
               <p className="text-slate-500 text-[16px] leading-relaxed mb-8">
-                Gaya Seva is a trusted digital platform connecting citizens with verified businesses, skilled professionals, local jobs, rentals, exclusive offers, and everyday services. Our mission is to simplify daily life while helping local businesses and professionals grow together.
+                A trusted digital ecosystem connecting businesses, professionals and customers through one modern intelligent platform. Our mission is to simplify digital discovery while empowering businesses and professionals to scale seamlessly.
               </p>
               
               <div className="flex flex-wrap gap-4">
-                <span className="px-4 py-2 bg-orange-50 text-orange-700 font-semibold text-sm rounded-full border border-orange-100">#PindDaan</span>
-                <span className="px-4 py-2 bg-amber-50 text-amber-700 font-semibold text-sm rounded-full border border-amber-100">#Enlightenment</span>
-                <span className="px-4 py-2 bg-indigo-50 text-indigo-700 font-semibold text-sm rounded-full border border-indigo-100">#Heritage</span>
-                <span className="px-4 py-2 bg-rose-50 text-rose-700 font-semibold text-sm rounded-full border border-rose-100">#Tilkut</span>
+                <span className="px-4 py-2 bg-orange-50 text-orange-700 font-semibold text-sm rounded-full border border-orange-100">#DigitalTrust</span>
+                <span className="px-4 py-2 bg-amber-50 text-amber-700 font-semibold text-sm rounded-full border border-amber-100">#SmartDiscovery</span>
+                <span className="px-4 py-2 bg-indigo-50 text-indigo-700 font-semibold text-sm rounded-full border border-indigo-100">#Verified</span>
+                <span className="px-4 py-2 bg-rose-50 text-rose-700 font-semibold text-sm rounded-full border border-rose-100">#Growth</span>
               </div>
             </div>
 
@@ -99,8 +99,8 @@ export default function AboutGaya() {
           
           {/* Explore More Button */}
           <div className="mt-16 text-center">
-            <Link href="/explore" className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-bold text-[16px] px-8 py-4 rounded-full shadow-lg shadow-orange-600/30 hover:-translate-y-1 transition-all duration-300">
-              Explore All Places in Gaya <FiArrowRight className="w-5 h-5" />
+            <Link href="/services" className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-bold text-[16px] px-8 py-4 rounded-full shadow-lg shadow-orange-600/30 hover:-translate-y-1 transition-all duration-300">
+              Explore Platform Features <FiArrowRight className="w-5 h-5" />
             </Link>
           </div>
         </div>
@@ -135,12 +135,12 @@ export default function AboutGaya() {
               
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-slate-100">
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                  <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedPlace.title + ' Gaya Bihar')}`} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold px-6 py-3 rounded-xl transition-colors text-[14px]">
-                    <FiMapPin /> View on Map
-                  </a>
+                  <Link href="/register-vendor" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold px-6 py-3 rounded-xl transition-colors text-[14px]">
+                    <FiArrowRight /> Get Started
+                  </Link>
                   {selectedPlace.link && (
                     <a href={selectedPlace.link} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-6 py-3 rounded-xl transition-colors text-[14px]">
-                      Read more on Wikipedia <FiArrowRight />
+                      Read more <FiArrowRight />
                     </a>
                   )}
                 </div>

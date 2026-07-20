@@ -18,11 +18,11 @@ export default function VendorCTA() {
         
         <h2 className="font-sora text-4xl md:text-5xl lg:text-[64px] font-[800] mt-4 mb-6 leading-[1.15] text-white relative z-10 tracking-tight">
             Grow Your Business<br className="hidden md:block" />
-            <span className="bg-gradient-to-r from-teal-300 via-indigo-300 to-purple-300 bg-clip-text text-transparent"> with Gaya Seva.</span> 
+            <span className="bg-gradient-to-r from-teal-300 via-indigo-300 to-purple-300 bg-clip-text text-transparent"> with Our Platform.</span> 
         </h2>
         
         <p className="text-slate-400 mt-2 max-w-3xl text-[16px] md:text-[20px] leading-[1.6] relative z-10 font-medium">
-          Join thousands of local professionals who are managing their listings, posting offers, and skyrocketing their revenue through Gaya Seva.
+          Join thousands of professionals who are managing their listings, posting offers, and skyrocketing their revenue through our digital platform.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 mt-10 relative z-10 w-full sm:w-auto">

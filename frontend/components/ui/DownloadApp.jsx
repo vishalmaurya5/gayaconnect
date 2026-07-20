@@ -24,14 +24,14 @@ export default function DownloadApp() {
             </div>
             
             <h2 className="font-sora text-3xl md:text-5xl font-[800] text-white tracking-tight leading-[1.1] mb-6">
-              Gaya Seva <br />
+              The Official <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400">
                 Mobile App
               </span>
             </h2>
             
             <p className="text-slate-300 text-[16px] md:text-[18px] leading-relaxed mb-10 max-w-lg mx-auto lg:mx-0">
-              Take Gaya's most trusted digital platform wherever you go. Book services, hire professionals, and unlock exclusive deals on the move.
+              Take the most trusted digital platform wherever you go. Book services, hire professionals, and unlock exclusive deals on the move.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">

@@ -135,9 +135,9 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
             <div>
               <div className="text-teal-600 text-[11px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
-                <span className="w-8 h-[2px] bg-teal-600 rounded-full"></span> Discover trusted local businesses with verified profiles, genuine customer reviews, and quality services.
+                <span className="w-8 h-[2px] bg-teal-600 rounded-full"></span> Discover trusted businesses with verified profiles, genuine customer reviews, and quality services.
               </div>
-              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Verified Businesses</h2>
+              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Featured Verified Businesses</h2>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/map" className="hidden sm:flex text-indigo-600 font-bold text-[14px] items-center gap-2 hover:text-indigo-800 transition-colors bg-indigo-50 px-5 py-2.5 rounded-full border border-indigo-100 hover:border-indigo-200">
@@ -187,7 +187,7 @@ export default function HomePage() {
               <div className="text-amber-500 text-[11px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
                 <span className="w-8 h-[2px] bg-amber-500 rounded-full"></span> Find trusted and verified professionals for every type of work.
               </div>
-              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Hire Skilled Professionals</h2>
+              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Verified Skilled Professionals</h2>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/map" className="hidden sm:flex text-indigo-600 font-bold text-[14px] items-center gap-2 hover:text-indigo-800 transition-colors bg-indigo-50 px-5 py-2.5 rounded-full border border-indigo-100 hover:border-indigo-200">
@@ -211,7 +211,7 @@ export default function HomePage() {
               <div className="text-blue-500 text-[11px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
                 <span className="w-8 h-[2px] bg-blue-500 rounded-full"></span> Careers
               </div>
-              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Latest Local Jobs</h2>
+              <h2 className="font-sora text-3xl md:text-4xl font-[800] text-[#0F172A] tracking-tight">Job Marketplace</h2>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/jobs" className="text-[#0F172A] font-bold text-[14px] flex items-center gap-2 hover:text-blue-600 transition-colors bg-white px-5 py-2.5 rounded-full border border-slate-200 shadow-sm">
@@ -223,7 +223,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why Choose Gaya Seva */}
+      {/* Why Choose Our Platform */}
       <WhyChooseUs />
 
       {/* How it Works Section */}

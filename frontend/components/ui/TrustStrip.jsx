@@ -19,7 +19,7 @@ export default function TrustStrip() {
     },
     { 
       icon: <Star className="w-6 h-6 text-amber-500" />, 
-      title: "Trusted by Gaya", 
+      title: "Trusted Community", 
       subtitle: "Thousands of users",
     },
     { 

@@ -9,23 +9,23 @@ const steps = [
     icon: "🔍"
   },
   {
+    title: "Compare",
+    desc: "Evaluate profiles, ratings, and portfolios.",
+    icon: "📊"
+  },
+  {
     title: "Connect",
     desc: "Get instant access to contact details.",
     icon: "📞"
   },
   {
-    title: "Book",
-    desc: "Schedule services at your convenience.",
-    icon: "📅"
-  },
-  {
-    title: "Get Work Done",
-    desc: "Experience reliable and quality service.",
+    title: "Hire",
+    desc: "Book services securely and seamlessly.",
     icon: "✅"
   },
   {
-    title: "Rate Experience",
-    desc: "Leave reviews to help the community.",
+    title: "Review",
+    desc: "Leave feedback to help the community.",
     icon: "⭐"
   }
 ];

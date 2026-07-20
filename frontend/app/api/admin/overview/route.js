@@ -11,14 +11,20 @@ import Vehicle from '@/lib/db/models/Vehicle'
 import CallLog from '@/lib/db/models/CallLog'
 import Job from '@/lib/db/models/Job'
 import PopupAd from '@/lib/db/models/PopupAd'
-import { verifyAdminRequest } from '@/lib/utils/adminAuth'
+import { verifyAdminRequest, buildCityQuery } from '@/lib/utils/adminAuth'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request) {
-  if (!verifyAdminRequest(request)) {
+  const adminData = verifyAdminRequest(request);
+  if (!adminData) {
     return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
   }
+
+  const selectedCity = request.nextUrl.searchParams.get('city');
+  const addressQuery = buildCityQuery(adminData, selectedCity, 'address');
+  const locationQuery = buildCityQuery(adminData, selectedCity, 'location');
+  const assignedCitiesQuery = buildCityQuery(adminData, selectedCity, 'assignedCities');
 
   try {
     await connectDB()
@@ -47,20 +53,23 @@ export async function GET(request) {
       popups,
       todayUsersCount
     ] = await Promise.all([
-      User.find().select('-password').sort({ createdAt: -1 }).lean(),
-      Vendor.find().sort({ createdAt: -1 }).lean(),
+      User.find(assignedCitiesQuery).select('-password').sort({ createdAt: -1 }).lean(),
+      Vendor.find(addressQuery).sort({ createdAt: -1 }).lean(),
       Offer.find().populate('vendorId', 'name category subCategory').sort({ createdAt: -1 }).lean(),
       Banner.find().sort({ createdAt: -1 }).lean(),
       Payment.find().sort({ createdAt: -1 }).lean(),
       Blog.find().sort({ createdAt: -1 }).lean(),
-      Labourer.find().sort({ createdAt: -1 }).lean(),
+      Labourer.find(addressQuery).sort({ createdAt: -1 }).lean(),
       Vehicle.find().sort({ createdAt: -1 }).lean(),
       Payment.aggregate([
         { $match: { status: { $in: ['success', 'paid'] } } },
         { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } },
       ]),
       Payment.aggregate([{ $group: { _id: '$status', count: { $sum: 1 }, amount: { $sum: '$amount' } } }]),
-      User.aggregate([{ $group: { _id: '$role', count: { $sum: 1 } } }]),
+      User.aggregate([
+        { $match: assignedCitiesQuery },
+        { $group: { _id: '$role', count: { $sum: 1 } } }
+      ]),
       Payment.aggregate([
         { 
           $match: { 
@@ -77,9 +86,9 @@ export async function GET(request) {
         { $sort: { _id: 1 } }
       ]),
       CallLog.find().sort({ createdAt: -1 }).lean(),
-      Job.find().populate('vendorId', 'name').sort({ createdAt: -1 }).lean(),
+      Job.find(locationQuery).populate('vendorId', 'name').sort({ createdAt: -1 }).lean(),
       PopupAd.find().sort({ createdAt: -1 }).lean(),
-      User.countDocuments({ createdAt: { $gte: todayStart } })
+      User.countDocuments({ ...assignedCitiesQuery, createdAt: { $gte: todayStart } })
     ])
 
     // Fill in missing days for the chart

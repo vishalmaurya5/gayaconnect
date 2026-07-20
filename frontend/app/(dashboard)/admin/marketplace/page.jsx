@@ -7,8 +7,11 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { JOB_SALE_CATEGORIES } from '@/lib/utils/jobSaleCategories';
+import { AdminContext } from '../layout';
+import { useContext } from 'react';
 
 export default function AdminMarketplacePage() {
+  const admin = useContext(AdminContext);
   const [sales, setSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,6 +19,7 @@ export default function AdminMarketplacePage() {
   const [form, setForm] = useState({ title: '', description: '', type: 'sale', category: '', salaryOrPrice: '', location: '' });
   const [posting, setPosting] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedCity, setSelectedCity] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -25,14 +29,15 @@ export default function AdminMarketplacePage() {
   }, [searchInput]);
 
   useEffect(() => {
-    fetchSales(searchTerm);
-  }, [searchTerm]);
+    fetchSales(searchTerm, selectedCity);
+  }, [searchTerm, selectedCity]);
 
-  const fetchSales = async (s = '') => {
+  const fetchSales = async (s = '', city = '') => {
     try {
       const url = new URL('/api/jobs', window.location.origin);
       url.searchParams.append('type', 'sale');
       if (s) url.searchParams.append('search', s);
+      if (city) url.searchParams.append('location', city);
       const res = await fetch(url.toString());
       const data = await res.json();
       if (data.success) {
@@ -118,7 +123,20 @@ export default function AdminMarketplacePage() {
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full sm:w-auto mt-3 sm:mt-0">
+            {admin?.role === 'SUPER_ADMIN' && (
+              <select 
+                value={selectedCity} 
+                onChange={(e) => setSelectedCity(e.target.value)}
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-slate-700 dark:text-slate-300"
+              >
+                <option value="">All Cities</option>
+                <option value="Gaya">Gaya</option>
+                <option value="Patna">Patna</option>
+                <option value="Nawada">Nawada</option>
+                <option value="Delhi">Delhi</option>
+              </select>
+            )}
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input 

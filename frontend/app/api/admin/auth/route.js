@@ -8,7 +8,16 @@ export async function GET(request) {
     return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
   }
 
-  return NextResponse.json({ success: true, admin: { userId: admin.sub, role: admin.adminRole || 'SUPER_ADMIN' } })
+  return NextResponse.json({ 
+    success: true, 
+    admin: { 
+      userId: admin.id, 
+      role: admin.role || 'SUPER_ADMIN',
+      assignedCities: admin.assignedCities || [],
+      name: admin.name || '',
+      email: admin.email || ''
+    } 
+  })
 }
 
 export async function POST(request) {
@@ -24,8 +33,14 @@ export async function POST(request) {
 
   return setAdminCookie(NextResponse.json({
     success: true,
-    admin: { userId: authResult.userId, role: authResult.role },
-  }), authResult.userId, authResult.role)
+    admin: { 
+      userId: authResult.userId, 
+      role: authResult.role,
+      assignedCities: authResult.assignedCities || [],
+      name: authResult.name || '',
+      email: authResult.email || ''
+    },
+  }), authResult.userId, authResult.role, authResult.assignedCities || [], authResult.email || '', authResult.name || '')
 }
 
 export async function DELETE() {

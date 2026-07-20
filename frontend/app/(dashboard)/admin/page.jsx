@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { 
   Users, ShoppingBag, Wrench, AlertCircle, CheckCircle, 
   MapPin, Briefcase, DollarSign, TrendingUp, UserPlus, 
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
+import { AdminContext } from './layout';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -36,6 +37,7 @@ ChartJS.register(
 );
 
 export default function AdminDashboardPage() {
+  const adminDetails = useContext(AdminContext);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedCity, setSelectedCity] = useState('');
@@ -210,16 +212,23 @@ export default function AdminDashboardPage() {
             <option value="30d">Last 30 Days</option>
             <option value="1y">This Year</option>
           </select>
-          <select 
-            value={selectedCity} 
-            onChange={(e) => setSelectedCity(e.target.value)}
-            className="bg-indigo-600 border border-indigo-600 rounded-xl px-4 py-2 text-sm font-medium text-white outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer hover:bg-indigo-700"
-          >
-            <option value="">Global View</option>
-            <option value="Gaya">Gaya</option>
-            <option value="Patna">Patna</option>
-            <option value="Delhi">Delhi</option>
-          </select>
+          {adminDetails?.role === 'SUPER_ADMIN' ? (
+            <select 
+              value={selectedCity} 
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className="bg-indigo-600 border border-indigo-600 rounded-xl px-4 py-2 text-sm font-medium text-white outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer hover:bg-indigo-700"
+            >
+              <option value="">Global View</option>
+              <option value="Gaya">Gaya</option>
+              <option value="Patna">Patna</option>
+              <option value="Nawada">Nawada</option>
+              <option value="Delhi">Delhi</option>
+            </select>
+          ) : (
+            <div className="bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-xl px-4 py-2 text-sm font-bold shadow-sm">
+              {adminDetails?.assignedCities?.[0] || 'Local'} Dashboard
+            </div>
+          )}
         </div>
       </div>
 

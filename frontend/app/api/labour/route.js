@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db/mongodb";
 import Labour from "@/lib/db/models/Labourer";
 import { checkSubscription } from "@/lib/security/subscription";
 import { validateImageDataUrl } from "@/lib/utils/imageUpload";
+import { verifyAdminRequest, buildCityQuery } from "@/lib/utils/adminAuth";
 
 // ─── GET /api/labour — List approved workers ──────────────────────────────────
 export async function GET(request) {
@@ -23,8 +24,18 @@ export async function GET(request) {
     const limit      = Math.min(50, Number(searchParams.get("limit")) || 12);
     const skip       = (page - 1) * limit;
 
+    const adminData = verifyAdminRequest(request);
+
     // Build query
     const query = { isApproved: true };
+
+    // Apply Admin City Isolation
+    if (adminData && adminData.role !== 'SUPER_ADMIN') {
+      const cityQuery = buildCityQuery(adminData, null, 'district');
+      if (cityQuery['district']) {
+        query['district'] = cityQuery['district'];
+      }
+    }
 
     if (search) {
       query.$or = [
@@ -111,6 +122,12 @@ export async function POST(request) {
     } = body;
 
     const actualRole = role || category;
+    const adminData = verifyAdminRequest(request);
+
+    let finalDistrict = district || 'Gaya';
+    if (adminData && adminData.role !== 'SUPER_ADMIN' && adminData.assignedCities?.length > 0) {
+      finalDistrict = adminData.assignedCities[0];
+    }
 
     // Basic validation
     if (!name || !phone || !actualRole || !area || !aadhaarNumber || !aadhaarImage) {
@@ -177,7 +194,7 @@ export async function POST(request) {
       area,
       address,
       pincode,
-      district: district || 'Gaya', // fallback for old forms if needed
+      district: finalDistrict,
       state: state || 'Bihar', // fallback
       bloodGroup,
       dailyRate: dailyRate ? Number(dailyRate) : null,

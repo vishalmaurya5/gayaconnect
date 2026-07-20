@@ -76,17 +76,17 @@ export async function saveAdminPassword(newPassword) {
   )
 }
 
-export function createAdminToken(userId, role = 'SUPER_ADMIN') {
+export function createAdminToken(userId, role = 'SUPER_ADMIN', assignedCities = [], email = '', name = '') {
   if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required')
   return jwt.sign(
-    { sub: userId, role: 'admin', adminRole: role, scope: 'admin-panel' },
+    { sub: userId, role: 'admin', adminRole: role, scope: 'admin-panel', assignedCities, email, name },
     process.env.JWT_SECRET,
     { expiresIn: ADMIN_TOKEN_TTL }
   )
 }
 
-export function setAdminCookie(response, userId, role = 'SUPER_ADMIN') {
-  response.cookies.set(ADMIN_COOKIE, createAdminToken(userId, role), {
+export function setAdminCookie(response, userId, role = 'SUPER_ADMIN', assignedCities = [], email = '', name = '') {
+  response.cookies.set(ADMIN_COOKIE, createAdminToken(userId, role, assignedCities, email, name), {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
@@ -116,8 +116,36 @@ export function verifyAdminRequest(request) {
     if (decoded.role !== 'admin' || decoded.scope !== 'admin-panel') {
       return null
     }
-    return decoded // Contains { sub, role, adminRole, scope }
+    return {
+      id: decoded.sub,
+      role: decoded.adminRole,
+      assignedCities: decoded.assignedCities || [],
+      email: decoded.email || '',
+      name: decoded.name || ''
+    }
   } catch {
     return null
   }
+}
+
+export function buildCityQuery(admin, selectedCity, addressField = 'address') {
+  if (!admin) return {};
+  
+  let cityToQuery = null;
+  if (admin.role === 'SUPER_ADMIN') {
+    if (selectedCity && selectedCity.trim() !== '') {
+      cityToQuery = selectedCity;
+    }
+  } else {
+    // City admin forces their assigned city
+    if (admin.assignedCities && admin.assignedCities.length > 0) {
+      cityToQuery = admin.assignedCities[0];
+    }
+  }
+
+  if (cityToQuery) {
+    return { [addressField]: { $regex: cityToQuery, $options: 'i' } };
+  }
+  
+  return {};
 }

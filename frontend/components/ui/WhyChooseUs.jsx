@@ -56,13 +56,13 @@ export default function WhyChooseUs() {
       <div className="max-w-[1440px] mx-auto px-5 lg:px-10 relative z-10">
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <div className="text-indigo-600 text-[11px] font-bold uppercase tracking-widest mb-3 flex items-center justify-center gap-2">
-            <span className="w-8 h-[2px] bg-indigo-600 rounded-full"></span> The Gaya Seva Advantage <span className="w-8 h-[2px] bg-indigo-600 rounded-full"></span>
+            <span className="w-8 h-[2px] bg-indigo-600 rounded-full"></span> The Platform Advantage <span className="w-8 h-[2px] bg-indigo-600 rounded-full"></span>
           </div>
           <h2 className="font-sora text-3xl md:text-4xl lg:text-5xl font-[800] text-[#0F172A] tracking-tight">
-            Why Choose Gaya Seva?
+            Why Choose Our Platform?
           </h2>
           <p className="mt-4 text-[15px] md:text-base text-slate-500 leading-relaxed">
-            We are building the most trusted digital ecosystem for Gaya. Here is why thousands of citizens and businesses choose us every day.
+            We are building the most trusted digital ecosystem. Here is why thousands of individuals and businesses choose us every day.
           </p>
         </div>
 

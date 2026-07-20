@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db/mongodb'
-import { verifyAdminRequest } from '@/lib/utils/adminAuth'
+import { verifyAdminRequest, buildCityQuery } from '@/lib/utils/adminAuth'
 import User from '@/lib/db/models/User'
 import AuditLog from '@/lib/db/models/AuditLog'
 
@@ -20,6 +20,14 @@ export async function GET(request) {
       $or: [{ role: 'user' }, { role: { $exists: false } }]
     }
     
+    // Apply Admin City Isolation
+    if (adminUser && adminUser.role !== 'SUPER_ADMIN') {
+      const cityQuery = buildCityQuery(adminUser, null, 'assignedCities');
+      if (cityQuery['assignedCities']) {
+        query['assignedCities'] = cityQuery['assignedCities'];
+      }
+    }
+
     if (filter === 'deleted') {
       query.isDeleted = true
     } else {
