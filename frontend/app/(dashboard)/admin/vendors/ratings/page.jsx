@@ -1,40 +1,29 @@
 'use client';
-
-import { Star, Filter, Search } from 'lucide-react';
+import { Star, Search, Filter, MessageSquare } from 'lucide-react';
 
 export default function VendorRatingsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Vendor Ratings & Reviews</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Monitor customer feedback and business ratings across the platform.</p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Vendor Ratings & Reviews</h1>
+        <p className="text-slate-500 mt-1">Monitor customer feedback and maintain service quality standards.</p>
       </div>
 
-      <div className="bg-white dark:bg-[#0B0F19] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col">
-        <div className="p-4 md:p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50 dark:bg-[#05080f]/50">
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div className="relative w-full sm:w-auto">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input type="text" placeholder="Search business or review..." className="w-full sm:w-64 pl-9 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-indigo-500 transition-all" />
-            </div>
-            <button className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 hover:bg-slate-50 transition-all shadow-sm shrink-0">
-              <Filter className="w-4 h-4" />
-            </button>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col">
+        <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          <div className="relative w-full max-w-sm">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input type="text" placeholder="Search reviews..." className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-indigo-500" />
           </div>
-          <select className="px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-indigo-500 text-slate-600 dark:text-slate-300 w-full sm:w-auto">
-            <option>All Ratings</option>
-            <option>5 Stars</option>
-            <option>Under 3 Stars</option>
-          </select>
+          <button className="p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"><Filter className="w-4 h-4" /></button>
         </div>
-        <div className="p-12 flex flex-col items-center text-center">
-          <div className="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center mb-4">
-            <Star className="w-8 h-8" />
+
+        <div className="p-12 flex flex-col items-center text-center min-h-[400px] justify-center">
+          <div className="w-16 h-16 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 flex items-center justify-center mb-4">
+            <Star className="w-8 h-8 fill-current" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">Review Dashboard</h3>
-          <p className="text-slate-500 mt-1">Customer reviews and vendor ratings will be populated here.</p>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">Review System Initializing</h3>
+          <p className="text-slate-500 mt-1 max-w-sm mx-auto">The vendor ratings and review aggregation module is currently accumulating data and will be populated soon.</p>
         </div>
       </div>
     </div>

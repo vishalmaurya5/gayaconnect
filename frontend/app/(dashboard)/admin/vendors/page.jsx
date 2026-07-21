@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useContext } from 'react';
 import { 
-  CheckCircle, XCircle, Trash2, Edit2, X, FileText, 
+  CheckCircle, XCircle, Trash2, Edit2, X, FileText, QrCode,
   Search, Filter, Download, Plus, MoreVertical, ShieldCheck, Mail, Phone, MapPin, Building
 } from 'lucide-react';
 import { AdminContext } from '../layout';
@@ -392,9 +392,14 @@ export default function AdminVendorsPage() {
                         </button>
                         
                         {(vendor.status === 'APPROVED' || vendor.isApproved) && (
-                          <Link href={`/admin/vendors/${vendor._id}/certificate`} className="p-2 rounded-lg bg-indigo-50 text-indigo-600 font-semibold hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 transition" title="Generate Certificate">
-                            <FileText className="w-4 h-4" />
-                          </Link>
+                          <>
+                            <Link href={`/admin/vendors/${vendor._id}/qr`} className="p-2 rounded-lg bg-orange-50 text-orange-600 font-semibold hover:bg-orange-100 dark:bg-orange-500/10 dark:text-orange-400 dark:hover:bg-orange-500/20 transition" title="Generate QR Standee">
+                              <QrCode className="w-4 h-4" />
+                            </Link>
+                            <Link href={`/admin/vendors/${vendor._id}/certificate`} className="p-2 rounded-lg bg-indigo-50 text-indigo-600 font-semibold hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 transition" title="Generate Certificate">
+                              <FileText className="w-4 h-4" />
+                            </Link>
+                          </>
                         )}
                         
                         {admin?.role === 'SUPER_ADMIN' && (

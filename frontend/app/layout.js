@@ -69,7 +69,7 @@ export default function RootLayout({ children }) {
     "image": "https://gayaseva.com/gaya_seva_app_icon.png",
     "description": "Discover verified businesses, trusted professionals, skilled workforce and jobs through one intelligent digital marketplace designed for modern communities.",
     "telephone": "+919117588242",
-    "email": "thegayaseva@gmail.com",
+    "email": "supportgayaseva@gmail.com",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "Gaya City",
@@ -79,9 +79,8 @@ export default function RootLayout({ children }) {
       "addressCountry": "IN"
     },
     "sameAs": [
-      "https://www.instagram.com/thegayaseva",
-      "https://www.instagram.com/gayaconnect",
-      "https://www.facebook.com/profile.php?id=61591230812726"
+      "https://www.instagram.com/gayasevabr02?igsh=MTRyMGZxNHdzZ2V1NA%3D%3D&utm_source=qr",
+      "https://www.facebook.com/share/197hhkzBL6/?mibextid=wwXIfr"
     ]
   };
 

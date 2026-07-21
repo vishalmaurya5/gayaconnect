@@ -108,26 +108,19 @@ export default function Footer() {
                           <a href="tel:+918544491413" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
                               <FiPhone size={18} /> <span className="text-sm font-medium">+91 85444 91413</span>
                           </a>
-                          <a href="mailto:thegayaseva@gmail.com" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
-                              <FiMail size={18} /> <span className="text-sm font-medium">thegayaseva@gmail.com</span>
-                          </a>
+
                           <a href="mailto:supportgayaseva@gmail.com" className="flex items-center gap-2 text-neutral-600 hover:text-emerald-500 transition-colors w-max">
                               <FiMail size={18} /> <span className="text-sm font-medium">supportgayaseva@gmail.com</span>
                           </a>
                           <div className="flex flex-wrap items-center gap-3 mt-2">
-                              <a href="https://www.instagram.com/thegayaseva?igsh=MTRyMGZxNHdzZ2V1NA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-neutral-800 px-4 py-3 rounded-2xl transition-all shadow-sm hover:shadow-md group">
+                              <a href="https://www.instagram.com/gayasevabr02?igsh=MTRyMGZxNHdzZ2V1NA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-neutral-800 px-4 py-3 rounded-2xl transition-all shadow-sm hover:shadow-md group">
                                   <div className="bg-gradient-to-tr from-yellow-400 via-rose-500 to-purple-600 p-1.5 rounded-lg text-white group-hover:scale-110 transition-transform">
                                       <FiInstagram size={20} />
                                   </div>
-                                  <span className="text-[15px] font-bold">Follow @thegayaseva</span>
+                                  <span className="text-[15px] font-bold">Follow @gayasevabr02</span>
                               </a>
-                              <a href="https://www.instagram.com/gayaconnect/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-neutral-800 px-4 py-3 rounded-2xl transition-all shadow-sm hover:shadow-md group">
-                                  <div className="bg-gradient-to-tr from-yellow-400 via-rose-500 to-purple-600 p-1.5 rounded-lg text-white group-hover:scale-110 transition-transform">
-                                      <FiInstagram size={20} />
-                                  </div>
-                                  <span className="text-[15px] font-bold">Follow @gayaconnect</span>
-                              </a>
-                              <a href="https://www.facebook.com/profile.php?id=61591230812726&sk=directory_contact_info" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-neutral-800 px-4 py-3 rounded-2xl transition-all shadow-sm hover:shadow-md group">
+
+                              <a href="https://www.facebook.com/share/197hhkzBL6/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-neutral-800 px-4 py-3 rounded-2xl transition-all shadow-sm hover:shadow-md group">
                                   <div className="bg-blue-600 p-1.5 rounded-lg text-white group-hover:scale-110 transition-transform">
                                       <FiFacebook size={20} />
                                   </div>
@@ -169,7 +162,7 @@ export default function Footer() {
                               <li><Link href="/about" className="hover:text-emerald-600 transition-colors">About</Link></li>
                               <li><Link href="/privacy" className="hover:text-emerald-600 transition-colors">Privacy policy</Link></li>
                               <li><Link href="/terms" className="hover:text-emerald-600 transition-colors">Terms of service</Link></li>
-                              <li><a href="mailto:thegayaseva@gmail.com" className="hover:text-emerald-600 transition-colors">Contact Us</a></li>
+                              <li><a href="mailto:supportgayaseva@gmail.com" className="hover:text-emerald-600 transition-colors">Contact Us</a></li>
                           </ul>
                       </div>
                   </div>

@@ -90,7 +90,7 @@ export default function EnquiryForm() {
                 </div>
                 <div>
                   <p className="text-[12px] text-slate-400 font-medium">Email Us</p>
-                  <p className="font-bold text-white">thegayaseva@gmail.com</p>
+                  <p className="font-bold text-white">supportgayaseva@gmail.com</p>
                 </div>
               </div>
             </div>

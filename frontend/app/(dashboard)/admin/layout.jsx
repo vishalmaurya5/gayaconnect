@@ -177,10 +177,16 @@ const SIDEBAR_STRUCTURE = [
     title: 'Finance',
     icon: DollarSign,
     items: [
-      { name: 'Payments', path: '/admin/payments' },
+      { name: 'Dashboard', path: '/admin/finance' },
+      { name: 'Create Payment', path: '/admin/finance/create-payment' },
+      { name: 'Manual Payments', path: '/admin/finance/manual-payments' },
       { name: 'Invoices', path: '/admin/finance/invoices' },
-      { name: 'Revenue', path: '/admin/finance/revenue' },
-      { name: 'GST Reports', path: '/admin/finance/gst' },
+      { name: 'Receipts', path: '/admin/finance/receipts' },
+      { name: 'Transactions', path: '/admin/finance/transactions' },
+      { name: 'Service Pricing', path: '/admin/finance/pricing' },
+      { name: 'Payment Reports', path: '/admin/finance/reports' },
+      { name: 'Customers', path: '/admin/finance/customers' },
+      { name: 'Settings', path: '/admin/finance/settings' }
     ]
   },
   {

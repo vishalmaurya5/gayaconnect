@@ -4,6 +4,12 @@ import { asyncHandler, slugify } from '../utils/helpers.js';
 import { hasActiveContactAccess, redactVendorContact } from '../utils/contactAccess.js';
 import { clearCache } from '../middleware/cache.js';
 
+export const getMyVendorProfile = asyncHandler(async (req, res) => {
+  const vendor = await Vendor.findOne({ $or: [{ user: req.user._id }, { userId: req.user._id }] });
+  if (!vendor) return res.status(404).json({ message: 'Vendor profile not found' });
+  res.json(vendor);
+});
+
 export const createVendor = asyncHandler(async (req, res) => {
   const vendor = await Vendor.create({ ...req.body, user: req.user._id, slug: slugify(req.body.businessName) });
   await clearCache('vendors');

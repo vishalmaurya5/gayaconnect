@@ -10,10 +10,12 @@ import {
   nearbyVendors,
   approveVendor,
   rejectVendor,
+  getMyVendorProfile,
 } from '../controllers/vendorController.js';
 
 const router = express.Router();
 
+router.get('/me', protect, authorize('vendor', 'admin'), getMyVendorProfile);
 router.get('/', optionalProtect, cacheResponse('vendors', 600), getVendors);
 router.get('/nearby', optionalProtect, nearbyVendors);
 router.get('/:slug', optionalProtect, cacheResponse('vendor-slug', 600), getVendorBySlug);

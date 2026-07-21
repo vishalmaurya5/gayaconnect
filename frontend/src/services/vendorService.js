@@ -8,3 +8,4 @@ export const updateVendorApi = async (id, payload) => (await api.put(`/vendors/$
 export const deleteVendorApi = async (id) => (await api.delete(`/vendors/${id}`)).data;
 export const approveVendorApi = async (id) => (await api.patch(`/vendors/${id}/approve`)).data;
 export const rejectVendorApi = async (id, reason) => (await api.patch(`/vendors/${id}/reject`, { reason })).data;
+export const getMyVendorProfileApi = async () => (await api.get('/vendors/me')).data;

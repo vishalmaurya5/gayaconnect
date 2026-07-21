@@ -3,13 +3,15 @@
 import { useState, useEffect, useContext } from 'react';
 import { 
   CheckCircle, XCircle, Trash2, Edit2, X, CreditCard, 
-  Search, Filter, Download, Plus, MapPin, HardHat, Eye, User, Phone, Briefcase
+  Search, Filter, Download, Plus, MapPin, HardHat, Eye, User, Phone, Briefcase, Upload
 } from 'lucide-react';
 import { AdminContext } from '../layout';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { exportToCSV } from '@/lib/utils/export';
+
+const CATEGORIES = ['Mason (Raj Mistri)', 'Helper', 'Painter', 'Carpenter', 'Welder', 'Driver', 'House Help', 'Farm Labour', 'Plumber', 'Electrician', 'Mechanic', 'Cleaner', 'Other'];
 
 const tableVariants = {
   hidden: { opacity: 0 },
@@ -56,10 +58,13 @@ export default function AdminLabourPage() {
   const [searchInput, setSearchInput] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [activeTab, setActiveTab] = useState('ALL'); // ALL, APPROVED, PENDING
   const [selectedCity, setSelectedCity] = useState('');
   
-  const [form, setForm] = useState({ name: '', phone: '', skill: '', dailyRate: '', address: '', aadhaarNumber: '', bloodGroup: '', state: '', district: '' });
+  const initialFormState = { name: '', phone: '', category: '', customCategory: '', dailyRate: '', address: '', aadhaarNumber: '', bloodGroup: '', state: '', district: '', aadhaarImage: '', photo: '' };
+  const [form, setForm] = useState(initialFormState);
   const admin = useContext(AdminContext);
 
   useEffect(() => {
@@ -86,6 +91,42 @@ export default function AdminLabourPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAadhaarImage = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
+      toast.error('Only JPG and JPEG images are allowed for Aadhaar Card');
+      return;
+    }
+    if (file.size > 100 * 1024) {
+      toast.error('Aadhaar Card image must be under 100 KB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => setForm({ ...form, aadhaarImage: reader.result });
+    reader.readAsDataURL(file);
+  };
+
+  const handlePhoto = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
+      toast.error('Only JPG and JPEG images are allowed');
+      return;
+    }
+    if (file.size > 150 * 1024) {
+      toast.error('Image must be under 150 KB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => setForm({ ...form, photo: reader.result });
+    reader.readAsDataURL(file);
   };
 
   const toggleApproval = async (id, currentStatus) => {
@@ -125,17 +166,18 @@ export default function AdminLabourPage() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
+    const finalCategory = form.category === 'Other' ? form.customCategory : form.category;
     setCreating(true);
     try {
       const res = await fetch('/api/admin/create-account', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'labourer', ...form })
+        body: JSON.stringify({ type: 'labourer', ...form, skill: finalCategory })
       });
       const json = await res.json();
       if (json.success) {
         toast.success('Labourer created successfully');
-        setForm({ name: '', phone: '', skill: '', dailyRate: '', address: '', aadhaarNumber: '', bloodGroup: '', state: '', district: '' });
+        setForm(initialFormState);
         setIsCreateModalOpen(false);
         fetchLabourers();
       } else {
@@ -143,6 +185,68 @@ export default function AdminLabourPage() {
       }
     } catch (error) {
       toast.error('Error creating labourer');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const openEditModal = (labour) => {
+    const role = labour.profession || labour.role || labour.category || '';
+    const isOther = role && !CATEGORIES.includes(role);
+    setForm({
+      name: labour.name || '',
+      phone: labour.phone || '',
+      category: isOther ? 'Other' : (role || ''),
+      customCategory: isOther ? role : '',
+      dailyRate: labour.dailyRate || '',
+      address: labour.area || labour.location || '',
+      aadhaarNumber: labour.aadhaarNumber || '',
+      bloodGroup: labour.bloodGroup || '',
+      state: labour.state || '',
+      district: labour.district || '',
+      aadhaarImage: labour.aadhaarImage || '',
+      photo: labour.photo || ''
+    });
+    setEditingId(labour._id);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEdit = async (e) => {
+    e.preventDefault();
+    setCreating(true);
+    const finalCategory = form.category === 'Other' ? form.customCategory : form.category;
+    try {
+      const payload = {
+        name: form.name,
+        phone: form.phone,
+        role: finalCategory,
+        category: finalCategory,
+        area: form.address,
+        dailyRate: form.dailyRate,
+        aadhaarNumber: form.aadhaarNumber,
+        bloodGroup: form.bloodGroup,
+        state: form.state,
+        district: form.district,
+        aadhaarImage: form.aadhaarImage,
+        photo: form.photo
+      };
+      
+      const res = await fetch(`/api/admin/labour/${editingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Worker profile updated successfully');
+        setForm(initialFormState);
+        setIsEditModalOpen(false);
+        fetchLabourers();
+      } else {
+        toast.error(data.message || 'Failed to update profile');
+      }
+    } catch (error) {
+      toast.error('Error updating profile');
     } finally {
       setCreating(false);
     }
@@ -313,10 +417,10 @@ export default function AdminLabourPage() {
                     <td className="px-6 py-4">
                       <div className="flex flex-col gap-1">
                         <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2">
-                          <Briefcase className="w-4 h-4 text-slate-400" /> {labour.profession || 'Unspecified Worker'}
+                          <Briefcase className="w-4 h-4 text-slate-400" /> {labour.profession || labour.role || labour.category || 'Unspecified Worker'}
                         </span>
                         <span className="text-slate-500 dark:text-slate-400 text-xs flex items-center gap-1.5">
-                          <MapPin className="w-3 h-3" /> {labour.location || 'Unknown Location'}
+                          <MapPin className="w-3 h-3" /> {labour.location || labour.address || labour.district || 'Unknown Location'}
                         </span>
                         {labour.experience && (
                           <span className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
@@ -352,6 +456,12 @@ export default function AdminLabourPage() {
                           <Link href={`/admin/labour/${labour._id}/id-card`} className="p-2 rounded-lg bg-indigo-50 text-indigo-600 font-semibold hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 transition" title="Generate ID Card">
                             <CreditCard className="w-4 h-4" />
                           </Link>
+                        )}
+
+                        {admin?.role === 'SUPER_ADMIN' && (
+                          <button onClick={() => openEditModal(labour)} className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20 transition" title="Edit Profile">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
                         )}
                         
                         {admin?.role === 'SUPER_ADMIN' && (
@@ -444,6 +554,27 @@ export default function AdminLabourPage() {
               </div>
               <div className="p-6 overflow-y-auto custom-scrollbar">
                 <form id="createLabourForm" onSubmit={handleCreate} className="grid gap-5 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Profile Photo (Optional)</label>
+                    <div className="flex items-center gap-4">
+                      {form.photo ? (
+                        <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-200 dark:border-slate-700">
+                          <img src={form.photo} alt="Preview" className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400">
+                          <User className="w-6 h-6" />
+                        </div>
+                      )}
+                      <div>
+                        <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition">
+                          <Upload className="w-4 h-4" /> Choose Image
+                          <input type="file" accept="image/jpeg, image/jpg" onChange={handlePhoto} className="hidden" />
+                        </label>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Max size: 150 KB. Only JPG/JPEG allowed.</p>
+                      </div>
+                    </div>
+                  </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Full Name</label>
                     <input required type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
@@ -452,9 +583,32 @@ export default function AdminLabourPage() {
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Phone Number</label>
                     <input required type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
                   </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Skill (Profession)</label>
-                    <input required type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.skill} onChange={e => setForm({...form, skill: e.target.value})} />
+                  <div className="flex flex-col gap-2">
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">Category (Profession) *</label>
+                    <select required className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all appearance-none" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
+                      <option value="">Select Category</option>
+                      {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    {form.category === 'Other' && (
+                      <input required type="text" placeholder="Specify profession" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all mt-1" value={form.customCategory} onChange={e => setForm({...form, customCategory: e.target.value})} />
+                    )}
+                  </div>
+                  <div className="sm:col-span-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+                    <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-2">Upload Aadhaar Card *</label>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Must be clear, under 100 KB, and in JPG/JPEG format for verification.</p>
+                    <div className="flex items-center gap-4">
+                      {form.aadhaarImage ? (
+                        <div className="h-12 flex items-center px-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg text-emerald-700 dark:text-emerald-400 text-sm font-bold">
+                          <CheckCircle className="mr-2 w-4 h-4" /> Uploaded Successfully
+                        </div>
+                      ) : (
+                        <label className="cursor-pointer flex-1 flex flex-col items-center justify-center h-20 border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition">
+                          <Upload className="text-xl text-slate-400 dark:text-slate-500 mb-1 w-5 h-5" />
+                          <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Select File</span>
+                          <input type="file" required accept="image/jpeg, image/jpg" onChange={handleAadhaarImage} className="hidden" />
+                        </label>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Aadhaar Number</label>
@@ -482,6 +636,121 @@ export default function AdminLabourPage() {
                 <button onClick={() => setIsCreateModalOpen(false)} className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancel</button>
                 <button type="submit" form="createLabourForm" disabled={creating} className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-600/20 disabled:opacity-50">
                   {creating ? 'Registering...' : 'Register Worker'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Edit Labourer Modal */}
+        {isEditModalOpen && (
+          <motion.div 
+            variants={modalOverlayVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-sm sm:p-4"
+          >
+            <motion.div 
+              variants={modalContentVariants}
+              className="bg-white dark:bg-slate-900 rounded-t-[32px] sm:rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[85vh] border-t sm:border border-slate-200 dark:border-slate-800"
+            >
+              <div className="sm:hidden w-full flex justify-center pt-3 pb-1">
+                <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+              </div>
+              <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center"><Edit2 className="w-5 h-5"/></div> 
+                  Edit Worker Profile
+                </h3>
+                <button onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-6 overflow-y-auto custom-scrollbar">
+                <form id="editLabourForm" onSubmit={handleEdit} className="grid gap-5 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Profile Photo (Optional)</label>
+                    <div className="flex items-center gap-4">
+                      {form.photo ? (
+                        <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-200 dark:border-slate-700">
+                          <img src={form.photo} alt="Preview" className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400">
+                          <User className="w-6 h-6" />
+                        </div>
+                      )}
+                      <div>
+                        <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition">
+                          <Upload className="w-4 h-4" /> Choose Image
+                          <input type="file" accept="image/jpeg, image/jpg" onChange={handlePhoto} className="hidden" />
+                        </label>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Max size: 150 KB. Only JPG/JPEG allowed.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Full Name</label>
+                    <input required type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Phone Number</label>
+                    <input required type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">Category (Profession) *</label>
+                    <select required className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all appearance-none" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
+                      <option value="">Select Category</option>
+                      {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    {form.category === 'Other' && (
+                      <input required type="text" placeholder="Specify profession" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all mt-1" value={form.customCategory} onChange={e => setForm({...form, customCategory: e.target.value})} />
+                    )}
+                  </div>
+                  <div className="sm:col-span-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+                    <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-2">Upload Aadhaar Card *</label>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Must be clear, under 100 KB, and in JPG/JPEG format for verification.</p>
+                    <div className="flex items-center gap-4">
+                      {form.aadhaarImage ? (
+                        <div className="h-12 flex items-center px-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg text-emerald-700 dark:text-emerald-400 text-sm font-bold">
+                          <CheckCircle className="mr-2 w-4 h-4" /> Uploaded Successfully
+                        </div>
+                      ) : (
+                        <label className="cursor-pointer flex-1 flex flex-col items-center justify-center h-20 border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition">
+                          <Upload className="text-xl text-slate-400 dark:text-slate-500 mb-1 w-5 h-5" />
+                          <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Select File</span>
+                          <input type="file" required accept="image/jpeg, image/jpg" onChange={handleAadhaarImage} className="hidden" />
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Aadhaar Number</label>
+                    <input type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.aadhaarNumber} onChange={e => setForm({...form, aadhaarNumber: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Blood Group</label>
+                    <input type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.bloodGroup} onChange={e => setForm({...form, bloodGroup: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">State</label>
+                    <input type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.state} onChange={e => setForm({...form, state: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">District</label>
+                    <input type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.district} onChange={e => setForm({...form, district: e.target.value})} />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Area / Address</label>
+                    <input type="text" className="w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white transition-all" value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
+                  </div>
+                </form>
+              </div>
+              <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex justify-end gap-3 mb-safe pb-8 sm:pb-6">
+                <button onClick={() => setIsEditModalOpen(false)} className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancel</button>
+                <button type="submit" form="editLabourForm" disabled={creating} className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 disabled:opacity-50">
+                  {creating ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </motion.div>

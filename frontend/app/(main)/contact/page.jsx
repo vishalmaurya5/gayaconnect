@@ -79,10 +79,7 @@ export default function ContactPage() {
                 <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">Email Communications</h3>
                 <p className="text-slate-500 dark:text-slate-400 mt-1 leading-relaxed text-sm">Guaranteed response within 24 hours.</p>
                 <div className="mt-4 flex flex-col gap-3">
-                  <a href="mailto:thegayaseva@gmail.com" className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
-                    <span className="w-5 flex justify-center text-indigo-400 dark:text-indigo-500"><FiMail /></span>
-                    thegayaseva@gmail.com
-                  </a>
+
                   <a href="mailto:supportgayaseva@gmail.com" className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
                     <span className="w-5 flex justify-center text-indigo-400 dark:text-indigo-500"><FiMail /></span>
                     supportgayaseva@gmail.com
@@ -121,10 +118,10 @@ export default function ContactPage() {
                 <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">Social Connect</h3>
                 <p className="text-slate-500 dark:text-slate-400 mt-1 leading-relaxed text-sm">Follow us for updates and exclusive offers.</p>
                 <div className="mt-4 flex flex-row gap-3">
-                  <a href="https://www.instagram.com/thegayaseva" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white font-bold p-3 rounded-xl transition-all shadow-md hover:shadow-lg hover:scale-105">
+                  <a href="https://www.instagram.com/gayasevabr02?igsh=MTRyMGZxNHdzZ2V1NA%3D%3D&utm_source=qr" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white font-bold p-3 rounded-xl transition-all shadow-md hover:shadow-lg hover:scale-105">
                     <FiInstagram className="text-xl" />
                   </a>
-                  <a href="https://www.facebook.com/profile.php?id=61591230812726" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-[#1877F2] text-white font-bold p-3 rounded-xl transition-all shadow-md hover:shadow-lg hover:scale-105">
+                  <a href="https://www.facebook.com/share/197hhkzBL6/?mibextid=wwXIfr" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-[#1877F2] text-white font-bold p-3 rounded-xl transition-all shadow-md hover:shadow-lg hover:scale-105">
                     <FiFacebook className="text-xl" />
                   </a>
                 </div>

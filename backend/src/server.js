@@ -7,7 +7,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import hpp from 'hpp';
 import xss from 'xss-clean';
 
-import { connectDB } from './config/database.js';
+import { connectDB } from './config/database.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
 
 import authRoutes from './routes/auth.js';
@@ -19,6 +19,7 @@ import categoryRoutes from './routes/categories.js';
 import communityRoutes from './routes/community.js';
 import adminRoutes from './routes/admin.js';
 import reviewRoutes from './routes/reviews.js';
+import financeRoutes from './routes/finance.js';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -65,6 +66,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/finance', financeRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);
