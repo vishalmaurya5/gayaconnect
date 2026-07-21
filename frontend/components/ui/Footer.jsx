@@ -168,12 +168,30 @@ export default function Footer() {
                   </div>
               </div>
 
-              <div className="max-w-7xl mx-auto mt-12 pt-4 border-t border-neutral-300 flex flex-col md:flex-row justify-between items-center gap-4">
-                  <p className="text-neutral-600 text-sm">© {new Date().getFullYear()} GayaSeva. Premium Local Discovery.</p>
-                  
-                  <div className="flex flex-wrap gap-3">
-                    <span className="flex items-center gap-1.5 bg-neutral-100 border border-neutral-200 px-3 py-1.5 rounded-full text-neutral-600 text-xs font-medium"><FiShield className="text-emerald-500" /> 100% Secure Payments</span>
-                    <span className="flex items-center gap-1.5 bg-neutral-100 border border-neutral-200 px-3 py-1.5 rounded-full text-neutral-600 text-xs font-medium"><FiMap className="text-emerald-500" /> Proudly in Gaya, Bihar</span>
+              <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-300 flex flex-col gap-8">
+                  {/* Udyam Registration */}
+                  <div className="flex flex-col md:flex-row items-center justify-center gap-4 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 px-6 py-5 rounded-2xl w-full shadow-sm">
+                      <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm shrink-0 border border-emerald-100 relative overflow-hidden">
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Gov of India" className="h-8 w-8 opacity-90 relative z-10" />
+                          <FiShield className="text-emerald-600 text-2xl absolute opacity-20" />
+                      </div>
+                      <div className="text-center md:text-left">
+                          <p className="text-emerald-950 font-bold text-[15px] tracking-wide mb-1">GOVERNMENT OF INDIA REGISTERED ENTERPRISE</p>
+                          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs font-medium text-emerald-800/80">
+                              <span>UDYAM REGISTRATION CERTIFICATE</span>
+                              <span className="hidden sm:inline">•</span>
+                              <span>NUMBER: <span className="font-bold text-emerald-900 bg-emerald-100/50 px-2 py-0.5 rounded border border-emerald-200/50">UDYAM-BR-12-0049000</span></span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                      <p className="text-neutral-600 text-sm">© {new Date().getFullYear()} GayaSeva. Premium Local Discovery.</p>
+                      
+                      <div className="flex flex-wrap gap-3 justify-center">
+                        <span className="flex items-center gap-1.5 bg-neutral-100 border border-neutral-200 px-3 py-1.5 rounded-full text-neutral-600 text-xs font-medium"><FiShield className="text-emerald-500" /> 100% Secure Payments</span>
+                        <span className="flex items-center gap-1.5 bg-neutral-100 border border-neutral-200 px-3 py-1.5 rounded-full text-neutral-600 text-xs font-medium"><FiMap className="text-emerald-500" /> Proudly in Gaya, Bihar</span>
+                      </div>
                   </div>
               </div>
               <div className="relative">
