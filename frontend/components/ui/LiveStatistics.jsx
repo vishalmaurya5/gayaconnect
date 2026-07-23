@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, animate } from 'framer-motion';
 
 const StatCounter = ({ value, label, suffix = "+", duration = 2000 }) => {
   const [count, setCount] = useState(0);
@@ -10,33 +10,18 @@ const StatCounter = ({ value, label, suffix = "+", duration = 2000 }) => {
 
   useEffect(() => {
     if (!isInView) return;
-    
-    let startTime;
-    let animationFrame;
 
-    const animate = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const progress = timestamp - startTime;
-      const percentage = Math.min(progress / duration, 1);
-      
-      // Easing out quint
-      const easeOut = 1 - Math.pow(1 - percentage, 5);
-      
-      setCount(Math.floor(easeOut * value));
-
-      if (progress < duration) {
-        animationFrame = requestAnimationFrame(animate);
-      } else {
-        setCount(value);
+    const controls = animate(0, value, {
+      duration: duration / 1000,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate(latest) {
+        setCount(Math.floor(latest));
       }
-    };
+    });
 
-    animationFrame = requestAnimationFrame(animate);
-
-    return () => cancelAnimationFrame(animationFrame);
+    return () => controls.stop();
   }, [isInView, value, duration]);
 
-  // Format number with commas
   const formattedCount = count.toLocaleString('en-IN');
 
   return (
@@ -62,7 +47,7 @@ export default function LiveStatistics() {
   ];
 
   return (
-    <section className="bg-white py-16 md:py-24 border-y border-slate-100 relative overflow-hidden">
+    <section className="bg-white py-16 md:py-24 border-y border-slate-100 relative overflow-hidden font-inter">
       {/* Decorative Elements */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full blur-[80px]"></div>
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-50/50 rounded-full blur-[80px]"></div>

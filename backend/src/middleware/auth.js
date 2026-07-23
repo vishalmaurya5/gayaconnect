@@ -38,3 +38,6 @@ export const authorize = (...roles) => (req, res, next) => {
   }
   next();
 };
+
+export const admin = authorize('admin', 'superadmin');
+export const superAdmin = authorize('superadmin');

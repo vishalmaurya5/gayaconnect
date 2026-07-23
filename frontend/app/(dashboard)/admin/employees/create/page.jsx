@@ -140,7 +140,7 @@ export default function CreateEmployeePage() {
                 onClick={() => {
                   const portalUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/employee/login`;
                   navigator.clipboard.writeText(portalUrl);
-                  toast.success('Employee Login URL copied!');
+                  toast.success('Employee Login URL copied: ' + portalUrl);
                 }}
                 className="text-amber-300 font-bold hover:underline block text-xs mt-1 truncate"
               >

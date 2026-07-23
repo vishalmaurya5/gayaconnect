@@ -116,9 +116,11 @@ export function verifyAdminRequest(request) {
     if (decoded.role !== 'admin' || decoded.scope !== 'admin-panel') {
       return null
     }
+    const effectiveRole = decoded.adminRole || decoded.role || 'SUPER_ADMIN'
     return {
       id: decoded.sub,
-      role: decoded.adminRole,
+      role: effectiveRole,
+      adminRole: effectiveRole,
       assignedCities: decoded.assignedCities || [],
       email: decoded.email || '',
       name: decoded.name || ''

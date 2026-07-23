@@ -7,7 +7,7 @@ import {
   Search, Bell, User, Settings, LogOut, Menu, X, ChevronDown, ChevronRight,
   LayoutDashboard, Users, Briefcase, UserCheck, ShoppingBag, Wrench, Car, 
   Store, Globe, Building2, Megaphone, DollarSign, MessageSquare,
-  FileText, Award, BarChart3, Sliders, Shield, Sun, Moon, Link as LinkIcon
+  FileText, Award, BarChart3, Sliders, Shield, Sun, Moon, Link as LinkIcon, ShieldAlert, Lock
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -34,9 +34,9 @@ const SIDEBAR_STRUCTURE = [
     icon: Users,
     items: [
       { name: 'All Users', path: '/admin/users' },
-      { name: 'System Admins', path: '/admin/users/admins' },
+      { name: 'System Admins', path: '/admin/users/admins', superAdminOnly: true },
       { name: 'Roles & Permissions', path: '/admin/roles' },
-      { name: 'Employees', path: '/admin/employees' },
+      { name: 'Employees', path: '/admin/employees', superAdminOnly: true },
       { name: 'Active Members', path: '/admin/members' },
       { name: 'Pending Verification', path: '/admin/users/pending' },
       { name: 'Blocked Users', path: '/admin/users/blocked' },
@@ -47,6 +47,7 @@ const SIDEBAR_STRUCTURE = [
   {
     title: 'Employee Management',
     icon: Briefcase,
+    superAdminOnly: true,
     items: [
       { name: 'Create Employee', path: '/admin/employees/create' },
       { name: 'Departments', path: '/admin/employees/departments' },
@@ -186,7 +187,7 @@ const SIDEBAR_STRUCTURE = [
       { name: 'Service Pricing', path: '/admin/finance/pricing' },
       { name: 'Payment Reports', path: '/admin/finance/reports' },
       { name: 'Customers', path: '/admin/finance/customers' },
-      { name: 'Settings', path: '/admin/finance/settings' }
+      { name: 'Settings', path: '/admin/finance/settings', superAdminOnly: true }
     ]
   },
   {
@@ -202,12 +203,15 @@ const SIDEBAR_STRUCTURE = [
   {
     title: 'Content Management',
     icon: FileText,
+    superAdminOnly: true,
     items: [
-      { name: 'Homepage', path: '/admin/content/home' },
+      { name: 'Homepage', path: '/admin/content/homepage' },
+      { name: 'Explore & City Tourism', path: '/admin/content/explore' },
       { name: 'Blogs', path: '/admin/content/blogs' },
       { name: 'SEO', path: '/admin/content/seo' },
       { name: 'Media Library', path: '/admin/content/media' },
-      { name: 'Legal Pages', path: '/admin/content/legal' },
+      { name: 'FAQ', path: '/admin/content/faq' },
+      { name: 'Pages', path: '/admin/content/pages' },
     ]
   },
   {
@@ -221,12 +225,23 @@ const SIDEBAR_STRUCTURE = [
     ]
   },
   {
-    title: 'Settings',
-    icon: Sliders,
+    title: 'Analytics & Reports',
+    icon: BarChart3,
     items: [
-      { name: 'General', path: '/admin/settings' },
-      { name: 'Security', path: '/admin/settings/security' },
-      { name: 'Theme', path: '/admin/settings/theme' },
+      { name: 'System Analytics', path: '/admin/analytics' },
+      { name: 'User Growth', path: '/admin/analytics/users' },
+      { name: 'Revenue Reports', path: '/admin/analytics/revenue' },
+      { name: 'Audit Logs', path: '/admin/logs' },
+    ]
+  },
+  {
+    title: 'Settings',
+    icon: Settings,
+    superAdminOnly: true,
+    items: [
+      { name: 'General Settings', path: '/admin/settings' },
+      { name: 'Security & Auth', path: '/admin/settings/security' },
+      { name: 'Theme & Branding', path: '/admin/settings/theme' },
       { name: 'API Keys', path: '/admin/settings/api' },
       { name: 'Maintenance Mode', path: '/admin/settings/maintenance' },
     ]
@@ -247,7 +262,6 @@ export default function AdminLayout({ children }) {
 
   useEffect(() => {
     checkAuth();
-    // Search focus on Ctrl+K
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
@@ -258,14 +272,39 @@ export default function AdminLayout({ children }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const isSuperAdmin = adminDetails.role === 'SUPER_ADMIN';
+
+  // Check if current route is restricted for Assigned City Admin (Non-SuperAdmin)
+  const isRestrictedRouteForCityAdmin = !isSuperAdmin && (
+    pathname.startsWith('/admin/employees') ||
+    pathname.startsWith('/admin/content') ||
+    pathname.startsWith('/admin/settings') ||
+    pathname === '/admin/users/admins' ||
+    pathname === '/admin/finance/settings'
+  );
+
+  const filteredSidebar = SIDEBAR_STRUCTURE.map(group => {
+    if (group.superAdminOnly && !isSuperAdmin) {
+      return null;
+    }
+    const filteredItems = group.items.filter(item => {
+      if (item.superAdminOnly && !isSuperAdmin) return false;
+      return true;
+    });
+    if (filteredItems.length === 0) return null;
+    return {
+      ...group,
+      items: filteredItems
+    };
+  }).filter(Boolean);
+
   useEffect(() => {
-    // Auto-open accordion based on current path
-    SIDEBAR_STRUCTURE.forEach(group => {
+    filteredSidebar.forEach(group => {
       if (group.items.some(item => pathname === item.path || (pathname.startsWith(item.path) && item.path !== '/admin'))) {
         setOpenAccordion(group.title);
       }
     });
-  }, [pathname]);
+  }, [pathname, isSuperAdmin]);
 
   const checkAuth = async () => {
     try {
@@ -279,15 +318,26 @@ export default function AdminLayout({ children }) {
       }
     } catch (err) {
       setAuthenticated(false);
-    } finally {
+    } fontally: {
       setLoading(false);
     }
   };
 
   const logout = async () => {
-    await fetch('/api/admin/auth', { method: 'DELETE' });
+    try {
+      await fetch('/api/admin/auth', { method: 'DELETE' });
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      console.error(e);
+    }
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('gc_token');
+      localStorage.removeItem('gc_user');
+      localStorage.removeItem('employee_session');
+    }
     setAuthenticated(false);
     toast.success('Logged out successfully');
+    window.location.href = '/login';
   };
 
   const toggleTheme = () => {
@@ -301,7 +351,22 @@ export default function AdminLayout({ children }) {
   }
 
   if (!authenticated) {
-    return <AdminLogin onLogin={() => setAuthenticated(true)} />;
+    return (
+      <div className="min-h-screen bg-[#050811] text-white flex flex-col items-center justify-center p-6 text-center font-sans relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[150px] pointer-events-none"></div>
+        <div className="relative z-10 space-y-4 max-w-md">
+          <h1 className="text-8xl font-black text-slate-800 tracking-widest select-none">404</h1>
+          <div className="inline-block bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 px-3 py-1 text-xs font-black rounded-full uppercase tracking-widest">
+            Page Not Found
+          </div>
+          <h2 className="text-2xl font-black text-white">404 - NOT FOUND</h2>
+          <p className="text-slate-400 text-xs leading-relaxed">The requested URL was not found on this server.</p>
+          <a href="/" className="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-xl shadow-lg transition">
+            Go Back to Homepage
+          </a>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -339,12 +404,7 @@ export default function AdminLayout({ children }) {
         
         {/* Sidebar Navigation */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar py-4 px-3 space-y-1">
-          {SIDEBAR_STRUCTURE.map((group) => {
-            
-            // Enforce RBAC
-            if (adminDetails.role === 'JOBS_MANAGER' && !['Jobs Management', 'Dashboard', 'Settings'].includes(group.title)) return null;
-            if (adminDetails.role === 'MARKETPLACE_MANAGER' && !['Marketplace Management', 'Dashboard', 'Settings'].includes(group.title)) return null;
-
+          {filteredSidebar.map((group) => {
             const isOpen = openAccordion === group.title;
             const hasActiveChild = group.items.some(item => pathname === item.path || (pathname.startsWith(item.path) && item.path !== '/admin'));
 
@@ -356,7 +416,6 @@ export default function AdminLayout({ children }) {
                   >
                     <group.icon className="w-5 h-5" />
                   </div>
-                  {/* Tooltip for collapsed mode */}
                   <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-3 py-1.5 bg-slate-800 text-white text-xs font-medium rounded opacity-0 invisible group-hover/mini:opacity-100 group-hover/mini:visible whitespace-nowrap z-50">
                     {group.title}
                   </div>
@@ -433,7 +492,6 @@ export default function AdminLayout({ children }) {
               <Menu className="w-5 h-5" />
             </button>
             
-            {/* Breadcrumb */}
             <div className="hidden md:flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 font-medium">
               <span>Admin</span>
               <ChevronRight className="w-4 h-4" />
@@ -444,7 +502,6 @@ export default function AdminLayout({ children }) {
           </div>
 
           <div className="flex items-center gap-3 lg:gap-5">
-            {/* Global Search Button */}
             <div className="hidden md:flex items-center relative">
               <Search className="w-4 h-4 absolute left-3 text-slate-400" />
               <button 
@@ -456,7 +513,6 @@ export default function AdminLayout({ children }) {
               </button>
             </div>
 
-            {/* Quick Actions & Notifications */}
             <div className="flex items-center gap-2 border-r border-slate-200 dark:border-slate-700 pr-3 lg:pr-5">
               <button onClick={toggleTheme} className="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-white rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                 {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
@@ -465,14 +521,13 @@ export default function AdminLayout({ children }) {
               <NotificationCenter />
             </div>
 
-            {/* User Profile */}
             <div className="flex items-center gap-3 cursor-pointer">
               <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-200 dark:border-indigo-800">
-                A
+                {isSuperAdmin ? 'SA' : 'CA'}
               </div>
               <div className="hidden lg:block">
                 <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-tight">
-                  {adminDetails.role === 'SUPER_ADMIN' ? 'Super Admin' : adminDetails.role === 'JOBS_MANAGER' ? 'Jobs Manager' : adminDetails.role === 'MARKETPLACE_MANAGER' ? 'Marketplace Manager' : 'Admin'}
+                  {isSuperAdmin ? 'Super Admin' : 'Assigned City Admin'}
                 </p>
                 <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online
@@ -484,95 +539,34 @@ export default function AdminLayout({ children }) {
         
         <main className="flex-1 overflow-auto p-4 lg:p-8 relative">
           <AdminContext.Provider value={adminDetails}>
-            {children}
+            {isRestrictedRouteForCityAdmin ? (
+              <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6 space-y-4 max-w-lg mx-auto font-sans">
+                <div className="w-16 h-16 bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 rounded-3xl flex items-center justify-center shadow-xl border border-red-200 dark:border-red-800">
+                  <ShieldAlert className="w-8 h-8" />
+                </div>
+                <span className="px-3.5 py-1 bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+                  SUPER ADMIN PRIVILEGES REQUIRED
+                </span>
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white">Restricted Section for City Admin</h2>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  This feature is reserved exclusively for Master Super Admins. Assigned City Admins do not have access to System Admins, Employee Management, Content Management, System Settings, or Finance Settings.
+                </p>
+                <button 
+                  onClick={() => router.push('/admin')}
+                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-600/20 transition"
+                >
+                  Return to Admin Dashboard
+                </button>
+              </div>
+            ) : (
+              children
+            )}
           </AdminContext.Provider>
           
           <QuickActions />
-          <GlobalSearch sidebarStructure={SIDEBAR_STRUCTURE} />
+          <GlobalSearch sidebarStructure={filteredSidebar} />
         </main>
       </div>
     </div>
   );
 }
-
-function AdminLogin({ onLogin }) {
-  const [credentials, setCredentials] = useState({ userId: 'admin', password: '' });
-  const [loading, setLoading] = useState(false);
-
-  const login = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch('/api/admin/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials)
-      });
-      const data = await res.json();
-      if (data.success) {
-        toast.success('Access granted');
-        onLogin();
-      } else {
-        toast.error(data.message || 'Invalid credentials');
-      }
-    } catch (err) {
-      toast.error('Login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Ornaments */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px]"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-teal-600/20 rounded-full blur-[120px]"></div>
-
-      <div className="w-full max-w-[420px] relative z-10">
-        <div className="bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-slate-800 shadow-2xl p-8 lg:p-10">
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-600/20">
-              <Shield className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-white text-center">Gaya Seva Workspace</h1>
-            <p className="text-slate-400 text-sm mt-2 text-center">Enter your credentials to access the enterprise control center.</p>
-          </div>
-
-          <form onSubmit={login} className="space-y-5">
-            <div>
-              <label className="text-sm font-medium text-slate-300 block mb-2">Workspace ID</label>
-              <input 
-                required
-                className="w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition" 
-                placeholder="admin"
-                value={credentials.userId} 
-                onChange={e => setCredentials({...credentials, userId: e.target.value})} 
-              />
-            </div>
-            <div>
-              <div className="flex justify-between mb-2">
-                <label className="text-sm font-medium text-slate-300">Password</label>
-                <a href="#" className="text-xs text-indigo-400 hover:text-indigo-300 font-medium">Forgot?</a>
-              </div>
-              <input 
-                required
-                type="password" 
-                className="w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition" 
-                placeholder="••••••••"
-                value={credentials.password} 
-                onChange={e => setCredentials({...credentials, password: e.target.value})} 
-              />
-            </div>
-            <button 
-              disabled={loading} 
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-3.5 font-semibold shadow-lg shadow-indigo-600/25 transition disabled:opacity-70 flex items-center justify-center gap-2 mt-2"
-            >
-              {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : 'Sign In to Workspace'}
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-}
-

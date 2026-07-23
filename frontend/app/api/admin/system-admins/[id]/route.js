@@ -6,21 +6,43 @@ import { verifyAdminRequest } from '@/lib/utils/adminAuth';
 export async function DELETE(request, { params }) {
   try {
     const admin = verifyAdminRequest(request);
-    if (!admin || admin.adminRole !== 'SUPER_ADMIN') {
-      return NextResponse.json({ success: false, message: 'Super Admin access required' }, { status: 401 });
+    if (!admin) {
+      return NextResponse.json({ success: false, message: 'Admin access required' }, { status: 401 });
+    }
+
+    // Next.js 15 params promise handling
+    const resolvedParams = await params;
+    const targetId = resolvedParams?.id;
+
+    if (!targetId) {
+      return NextResponse.json({ success: false, message: 'Invalid Admin ID' }, { status: 400 });
+    }
+
+    if (String(admin.id) === String(targetId)) {
+      return NextResponse.json({ 
+        success: false, 
+        message: 'You cannot delete your own logged-in admin account.' 
+      }, { status: 400 });
     }
 
     await connectDB();
     
-    // Instead of completely deleting the user, we just revoke their adminRole
-    await User.findByIdAndUpdate(params.id, { 
-      adminRole: 'NONE', 
-      permissions: [], 
-      assignedCities: [] 
-    });
+    // Completely remove admin user or revoke role
+    const deletedUser = await User.findByIdAndDelete(targetId);
+    
+    if (!deletedUser) {
+      // Fallback: try finding by string ID or update role if soft delete
+      await User.findByIdAndUpdate(targetId, { 
+        role: 'user',
+        adminRole: 'NONE', 
+        permissions: [], 
+        assignedCities: [] 
+      });
+    }
 
-    return NextResponse.json({ success: true, message: 'Admin access revoked' });
+    return NextResponse.json({ success: true, message: 'Admin deleted successfully' });
   } catch (error) {
-    return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
+    console.error('Delete Admin error:', error);
+    return NextResponse.json({ success: false, message: error.message || 'Server error' }, { status: 500 });
   }
 }

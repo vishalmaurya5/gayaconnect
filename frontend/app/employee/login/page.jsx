@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, LogIn, ShieldCheck, Eye, EyeOff, Sparkles, ArrowRight, UserCheck } from 'lucide-react';
+import { Mail, Lock, LogIn, ShieldCheck, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
@@ -140,7 +140,7 @@ export default function EmployeeLoginPage() {
         <div className="text-center text-xs text-slate-500 font-semibold space-y-1">
           <p>© GayaSeva Enterprise Network • Staff Portal</p>
           <a href="/login" className="text-indigo-400 hover:underline inline-flex items-center gap-1">
-            Admin / User Login <ArrowRight className="w-3 h-3" />
+            User Login <ArrowRight className="w-3 h-3" />
           </a>
         </div>
       </motion.div>

@@ -43,6 +43,11 @@ export async function POST(request) {
   }), authResult.userId, authResult.role, authResult.assignedCities || [], authResult.email || '', authResult.name || '')
 }
 
+import { clearUserSession } from '@/lib/security/auth'
+
 export async function DELETE() {
-  return clearAdminCookie(NextResponse.json({ success: true }))
+  const response = NextResponse.json({ success: true })
+  clearAdminCookie(response)
+  clearUserSession(response)
+  return response
 }

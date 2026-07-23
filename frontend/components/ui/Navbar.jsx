@@ -6,6 +6,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import { usePathname } from 'next/navigation'
 import { UserIcon } from '@heroicons/react/24/outline'
 import { useTheme } from '@/components/ThemeProvider'
+import { FiPhone } from 'react-icons/fi'
+import { FaWhatsapp } from 'react-icons/fa'
 
 function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
@@ -13,7 +15,7 @@ function ThemeToggle() {
   
   useEffect(() => setMounted(true), []);
   
-  if (!mounted) return <div className="w-9 h-9" />; // Placeholder to avoid layout shift
+  if (!mounted) return <div className="w-9 h-9" />;
 
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
@@ -72,7 +74,7 @@ export default function Navbar() {
       </div>
 
       {/* Main Navbar */}
-      <nav className={`sticky top-0 w-full flex items-center justify-between px-2 md:px-4 lg:px-4 xl:px-6 transition-all duration-300 z-50 ${isScrolled ? "bg-white/80 dark:bg-[#0B0F19]/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 shadow-sm py-3" : "bg-white/50 dark:bg-[#0B0F19]/50 backdrop-blur-md border-b border-transparent py-4"}`}>
+      <nav className={`sticky top-0 w-full flex items-center justify-between px-2 md:px-4 lg:px-4 xl:px-6 transition-all duration-300 z-50 ${isScrolled ? "bg-white/80 dark:bg-[#0B0F19]/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 shadow-sm py-2" : "bg-white/50 dark:bg-[#0B0F19]/50 backdrop-blur-md border-b border-transparent py-2.5"}`}>
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 shrink-0 group">
@@ -180,80 +182,63 @@ export default function Navbar() {
           <MobileNavLink href="/marketplace" onClick={() => setIsMenuOpen(false)}>Marketplace</MobileNavLink>
           <MobileNavLink href="/contact" onClick={() => setIsMenuOpen(false)}>Contact</MobileNavLink>
 
-          <div className="flex flex-col gap-4 mt-8 w-full max-w-[240px]">
-            {user ? (
-              <>
-                <Link
-                  href={user.role === 'admin' ? '/admin' : user.role === 'vendor' ? '/vendor/dashboard' : '/profile'}
-                  className="w-full text-center text-sm font-bold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl py-3.5 flex items-center justify-center gap-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <UserIcon className="h-5 w-5" />
-                  Profile ({user.name})
-                </Link>
-                <button
-                  onClick={() => {
-                    logout()
-                    setIsMenuOpen(false)
-                  }}
-                  className="w-full text-center text-sm font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 rounded-xl py-3.5"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="block w-full text-center text-sm font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-xl py-3.5"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Sign in
-                </Link>
-                <button
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    openSubscriptionModal();
-                  }}
-                  className="block w-full text-center bg-indigo-600 text-white font-bold rounded-xl py-3.5 shadow-lg shadow-indigo-600/20"
-                >
-                  Subscribe ₹11/mo
-                </button>
-              </>
-            )}
+          {!user ? (
+            <div className="flex flex-col gap-3 w-full max-w-xs mt-4">
+              <Link
+                href="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className="w-full text-center font-bold py-3 px-6 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+              >
+                Sign in
+              </Link>
+              <button
+                onClick={() => { setIsMenuOpen(false); openSubscriptionModal(); }}
+                className="w-full text-center font-bold py-3 px-6 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition flex items-center justify-center gap-2"
+              >
+                Subscribe for ₹11/mo
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => { setIsMenuOpen(false); logout(); }}
+              className="w-full max-w-xs text-center font-bold py-3 px-6 rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 hover:bg-rose-100 transition mt-4"
+            >
+              Logout ({user.name})
+            </button>
+          )}
+
           </div>
         </div>
-        </div>
+
       </nav>
     </>
   )
 }
 
-function NavLink({ href, children, currentPath }) {
+function NavLink({ href, currentPath, children }) {
   const isActive = currentPath === href || (href !== '/' && currentPath?.startsWith(href));
-  
   return (
-    <Link
-      href={href}
-      className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all duration-200 ${
+    <Link 
+      href={href} 
+      className={`px-3 xl:px-4 py-2 rounded-full text-xs font-bold transition-all duration-300 flex items-center whitespace-nowrap ${
         isActive 
-          ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-md' 
-          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+          ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm" 
+          : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-700/50"
       }`}
     >
       {children}
     </Link>
-  )
+  );
 }
 
 function MobileNavLink({ href, onClick, children }) {
   return (
-    <Link
-      href={href}
+    <Link 
+      href={href} 
       onClick={onClick}
-      className="block py-2 text-2xl font-bold text-slate-800 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors tracking-tight"
+      className="text-lg font-bold text-slate-800 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors py-1"
     >
       {children}
     </Link>
-  )
+  );
 }

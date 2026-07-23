@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Sliders, Save, Key, DollarSign, Lock, ShieldCheck, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminSettingsPage() {
@@ -25,6 +26,7 @@ export default function AdminSettingsPage() {
   }, []);
 
   const fetchSettings = async () => {
+    setLoading(true);
     try {
       const res = await fetch('/api/admin/settings');
       const data = await res.json();
@@ -38,7 +40,8 @@ export default function AdminSettingsPage() {
     }
   };
 
-  const saveSettings = async () => {
+  const saveSettings = async (e) => {
+    e?.preventDefault();
     setSaving(true);
     try {
       const res = await fetch('/api/admin/settings', {
@@ -48,7 +51,7 @@ export default function AdminSettingsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success('Settings updated successfully');
+        toast.success('Platform pricing settings updated successfully');
       } else {
         toast.error(data.message || 'Failed to update settings');
       }
@@ -59,7 +62,8 @@ export default function AdminSettingsPage() {
     }
   };
 
-  const changeAdminPassword = async () => {
+  const changeAdminPassword = async (e) => {
+    e?.preventDefault();
     if (pwForm.newPassword.length < 8) {
       toast.error('New password must be at least 8 characters');
       return;
@@ -80,7 +84,7 @@ export default function AdminSettingsPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        toast.success('Admin password updated');
+        toast.success('Admin password updated successfully!');
         setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       } else {
         toast.error(data.message || 'Failed to update password');
@@ -92,163 +96,200 @@ export default function AdminSettingsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="animate-pulse space-y-4 max-w-2xl">
-        <div className="h-8 bg-slate-200 rounded w-1/4"></div>
-        <div className="h-64 bg-slate-200 rounded-xl"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6 max-w-2xl">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-slate-800">Platform Settings</h1>
+    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans">
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white">General Platform Settings</h1>
+          <p className="text-slate-500 text-xs mt-1">Configure platform pricing tiers, vendor fees, and master admin credentials.</p>
+        </div>
+
+        <button 
+          onClick={fetchSettings}
+          className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+        </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h2 className="text-lg font-bold text-slate-900 mb-6">Pricing & Fees (in INR)</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <div className="space-y-5">
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Monthly Subscription Price</label>
-            <input 
-              type="number" 
-              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition" 
-              value={form.subscription} 
-              onChange={(e) => setForm({ ...form, subscription: Number(e.target.value) })} 
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Banner Advertisement Price</label>
-            <input 
-              type="number" 
-              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition" 
-              value={form.banner} 
-              onChange={(e) => setForm({ ...form, banner: Number(e.target.value) })} 
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Vehicle Listing Price</label>
-            <input 
-              type="number" 
-              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition" 
-              value={form.vehicle} 
-              onChange={(e) => setForm({ ...form, vehicle: Number(e.target.value) })} 
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Vendor Registration Fee</label>
-            <input 
-              type="number" 
-              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition" 
-              value={form.vendorRegistration} 
-              onChange={(e) => setForm({ ...form, vendorRegistration: Number(e.target.value) })} 
-            />
-          </div>
+        {/* Left Card: Pricing & Fee Structure */}
+        <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+          <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+            <DollarSign className="w-4 h-4 text-emerald-500" /> Platform Pricing Tiers (INR ₹)
+          </h2>
 
-          <div className="border-t border-slate-100 pt-6 mt-6">
-            <h3 className="text-md font-bold text-slate-800 mb-4">Promotional Offer Plans</h3>
-            <div className="grid sm:grid-cols-3 gap-5">
+          <form onSubmit={saveSettings} className="space-y-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">7 Days Plan</label>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 uppercase tracking-wider">
+                  Monthly Subscription Fee (₹)
+                </label>
                 <input 
                   type="number" 
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition" 
-                  value={form.offer7Days} 
-                  onChange={(e) => setForm({ ...form, offer7Days: Number(e.target.value) })} 
+                  value={form.subscription}
+                  onChange={e => setForm({ ...form, subscription: Number(e.target.value) })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 font-bold text-slate-900 dark:text-white outline-none focus:border-indigo-500"
                 />
               </div>
+
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">30 Days Plan</label>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 uppercase tracking-wider">
+                  Banner Ad Price (₹)
+                </label>
                 <input 
                   type="number" 
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition" 
-                  value={form.offer30Days} 
-                  onChange={(e) => setForm({ ...form, offer30Days: Number(e.target.value) })} 
+                  value={form.banner}
+                  onChange={e => setForm({ ...form, banner: Number(e.target.value) })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 font-bold text-slate-900 dark:text-white outline-none focus:border-indigo-500"
                 />
               </div>
+
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">365 Days Plan</label>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 uppercase tracking-wider">
+                  Vehicle Listing Price (₹)
+                </label>
                 <input 
                   type="number" 
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition" 
-                  value={form.offer365Days} 
-                  onChange={(e) => setForm({ ...form, offer365Days: Number(e.target.value) })} 
+                  value={form.vehicle}
+                  onChange={e => setForm({ ...form, vehicle: Number(e.target.value) })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 font-bold text-slate-900 dark:text-white outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 uppercase tracking-wider">
+                  Vendor Registration Fee (₹)
+                </label>
+                <input 
+                  type="number" 
+                  value={form.vendorRegistration}
+                  onChange={e => setForm({ ...form, vendorRegistration: Number(e.target.value) })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 font-bold text-slate-900 dark:text-white outline-none focus:border-indigo-500"
                 />
               </div>
             </div>
-          </div>
 
-          <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+              <span className="font-black text-slate-800 dark:text-slate-200 block uppercase tracking-wider text-[11px]">Promotional Offers Pricing:</span>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-500 mb-1">7 Days Plan</label>
+                  <input 
+                    type="number" 
+                    value={form.offer7Days}
+                    onChange={e => setForm({ ...form, offer7Days: Number(e.target.value) })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-500 mb-1">30 Days Plan</label>
+                  <input 
+                    type="number" 
+                    value={form.offer30Days}
+                    onChange={e => setForm({ ...form, offer30Days: Number(e.target.value) })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-500 mb-1">365 Days Plan</label>
+                  <input 
+                    type="number" 
+                    value={form.offer365Days}
+                    onChange={e => setForm({ ...form, offer365Days: Number(e.target.value) })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div>
+                <p className="font-extrabold text-slate-900 dark:text-white">Charge Vendor Registration Fee</p>
+                <p className="text-[11px] text-slate-500 font-medium">Require Razorpay payment during vendor signup.</p>
+              </div>
+              <input 
+                type="checkbox" 
+                checked={form.chargeVendorRegistration} 
+                onChange={e => setForm({ ...form, chargeVendorRegistration: e.target.checked })} 
+                className="w-5 h-5 accent-indigo-600 rounded cursor-pointer"
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={saving}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 rounded-xl shadow-lg shadow-indigo-600/20 transition disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+            >
+              <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Save Pricing Tiers'}
+            </button>
+          </form>
+        </div>
+
+        {/* Right Card: Master Admin Password Change */}
+        <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+          <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+            <Lock className="w-4 h-4 text-indigo-500" /> Master Admin Password Reset
+          </h2>
+
+          <form onSubmit={changeAdminPassword} className="space-y-4 text-xs">
             <div>
-              <p className="font-bold text-slate-800">Charge Vendor Registration Fee</p>
-              <p className="text-sm text-slate-500 mt-1 max-w-sm">If enabled, new vendors will have to pay the registration fee during sign-up via Razorpay.</p>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 uppercase tracking-wider">
+                Current Password *
+              </label>
+              <input 
+                required
+                type="password" 
+                value={pwForm.currentPassword}
+                onChange={e => setPwForm({ ...pwForm, currentPassword: e.target.value })}
+                placeholder="Enter current master admin password"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500"
+              />
             </div>
-            <label className="relative inline-flex items-center cursor-pointer shrink-0">
-              <input type="checkbox" className="sr-only peer" checked={form.chargeVendorRegistration} onChange={(e) => setForm({ ...form, chargeVendorRegistration: e.target.checked })} />
-              <div className="w-14 h-7 bg-slate-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-emerald-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-600"></div>
-            </label>
-          </div>
 
-          <button 
-            onClick={saveSettings} 
-            disabled={saving}
-            className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-md disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save Settings'}
-          </button>
+            <div>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 uppercase tracking-wider">
+                New Admin Password *
+              </label>
+              <input 
+                required
+                type="password" 
+                value={pwForm.newPassword}
+                onChange={e => setPwForm({ ...pwForm, newPassword: e.target.value })}
+                placeholder="At least 8 characters"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 uppercase tracking-wider">
+                Confirm New Password *
+              </label>
+              <input 
+                required
+                type="password" 
+                value={pwForm.confirmPassword}
+                onChange={e => setPwForm({ ...pwForm, confirmPassword: e.target.value })}
+                placeholder="Re-enter new password"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 font-mono text-slate-900 dark:text-white outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={pwSaving}
+              className="w-full bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-black py-3 rounded-xl shadow-md transition disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
+            >
+              <Key className="w-4 h-4 text-amber-400" /> {pwSaving ? 'Updating...' : 'Update Master Admin Password'}
+            </button>
+          </form>
         </div>
+
       </div>
 
-      {/* Admin Password */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h2 className="text-lg font-bold text-slate-900 mb-1">Admin Password</h2>
-        <p className="text-sm text-slate-500 mb-6">Change the password used to sign in to this admin panel.</p>
-
-        <div className="space-y-5">
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Current Password</label>
-            <input
-              type="password"
-              autoComplete="current-password"
-              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition"
-              value={pwForm.currentPassword}
-              onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">New Password</label>
-            <input
-              type="password"
-              autoComplete="new-password"
-              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition"
-              value={pwForm.newPassword}
-              onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })}
-            />
-            <p className="text-xs text-slate-400 mt-1">At least 8 characters.</p>
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Confirm New Password</label>
-            <input
-              type="password"
-              autoComplete="new-password"
-              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-emerald-500 focus:ring-emerald-500 outline-none transition"
-              value={pwForm.confirmPassword}
-              onChange={(e) => setPwForm({ ...pwForm, confirmPassword: e.target.value })}
-            />
-          </div>
-
-          <button
-            onClick={changeAdminPassword}
-            disabled={pwSaving}
-            className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition-all shadow-md disabled:opacity-50"
-          >
-            {pwSaving ? 'Updating...' : 'Update Admin Password'}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

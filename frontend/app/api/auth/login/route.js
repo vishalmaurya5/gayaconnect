@@ -34,8 +34,8 @@ export async function POST(request) {
       return NextResponse.json({ error: "Account has been deleted" }, { status: 403 });
     }
 
-    // Role check (allow admin to login from anywhere)
-    if (role && user.role !== role && user.role !== "admin") {
+    // Role check (allow admin and employee to login from main portal)
+    if (role && user.role !== role && user.role !== "admin" && user.role !== "employee") {
       return NextResponse.json({ error: `Account exists but not registered as a ${role}` }, { status: 403 });
     }
 

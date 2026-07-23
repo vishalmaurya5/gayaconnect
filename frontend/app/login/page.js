@@ -23,9 +23,17 @@ export default function LoginPage() {
       return;
     }
 
-    const res = await login(identifier, password, "user");
+    const res = await login(identifier, password);
     if (res.success) {
-      router.push("/profile");
+      if (res.user?.role === 'employee') {
+        router.push("/employee/dashboard");
+      } else if (res.user?.role === 'admin') {
+        router.push("/admin");
+      } else if (res.user?.role === 'vendor') {
+        router.push("/vendor/dashboard");
+      } else {
+        router.push("/profile");
+      }
     } else {
       setError(res.error || "Failed to login. Please try again.");
     }

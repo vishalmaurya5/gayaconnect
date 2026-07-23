@@ -2,6 +2,7 @@ import { Inter, Sora } from 'next/font/google'
 import { AuthProvider } from '@/contexts/AuthContext'
 import Navbar from '@/components/ui/Navbar'
 import Footer from '@/components/ui/Footer'
+import FloatingContactButtons from '@/components/ui/FloatingContactButtons'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { Toaster } from 'react-hot-toast'
 import Script from 'next/script'
@@ -96,6 +97,7 @@ export default function RootLayout({ children }) {
               {children}
             </main>
             <Footer />
+            <FloatingContactButtons />
             <Toaster position="top-right" />
           </AuthProvider>
         </ThemeProvider>

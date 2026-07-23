@@ -71,6 +71,7 @@ export function AuthProvider({ children }) {
     if (user && isAuthPage) {
       if (user.role === 'vendor') router.push("/vendor/dashboard");
       else if (user.role === 'admin') router.push("/admin");
+      else if (user.role === 'employee') router.push("/employee/dashboard");
       else router.push("/profile");
     }
 
@@ -91,9 +92,12 @@ export function AuthProvider({ children }) {
       // Store in localStorage
       localStorage.setItem("gc_token", data.token);
       localStorage.setItem("gc_user", JSON.stringify(data.user));
+      if (data.user?.role === 'employee') {
+        localStorage.setItem("employee_session", JSON.stringify(data.user));
+      }
       
       setUser(data.user);
-      return { success: true };
+      return { success: true, user: data.user };
     } catch (error) {
       return { success: false, error: error.message };
     } finally {
@@ -124,13 +128,17 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
+      await fetch("/api/admin/auth", { method: "DELETE" });
     } catch (e) {
       console.error(e);
     }
-    localStorage.removeItem("gc_token");
-    localStorage.removeItem("gc_user");
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem("gc_token");
+      localStorage.removeItem("gc_user");
+      localStorage.removeItem("employee_session");
+    }
     setUser(null);
-    router.push("/login");
+    window.location.href = "/login";
   };
 
   return (

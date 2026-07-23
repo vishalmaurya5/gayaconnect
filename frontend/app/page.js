@@ -9,6 +9,7 @@ import TrustStrip from "@/components/ui/TrustStrip";
 import LiveStatistics from "@/components/ui/LiveStatistics";
 import PopupAd from "@/components/ui/PopupAd";
 import StickyEnquiryCTA from "@/components/ui/StickyEnquiryCTA";
+import ExploreCitySection from "@/components/ui/ExploreCitySection";
 
 // Dynamic Imports with Suspense Skeleton Fallbacks (Optimized for FCP/LCP)
 const BannerSlider = dynamic(() => import('@/components/ui/BannerSlider'), { 
@@ -71,7 +72,6 @@ export default function HomePage() {
       {/* Subscription Banner */}
       <section className="max-w-[1440px] mx-auto px-5 lg:px-10 mt-12 mb-20 relative z-10">
         <div className="bg-gradient-to-r from-[#0F172A] via-indigo-950 to-[#0F172A] rounded-[24px] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl relative overflow-hidden">
-          {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-[80px]"></div>
           <div className="absolute bottom-0 left-10 w-48 h-48 bg-teal-500/20 rounded-full blur-[60px]"></div>
           
@@ -96,6 +96,9 @@ export default function HomePage() {
           </button>
         </div>
       </section>
+
+      {/* EXPLORE CITY & FAMOUS PLACES SECTION */}
+      <ExploreCitySection />
 
       {/* About Gaya Section */}
       <AboutGaya />
@@ -228,7 +231,6 @@ export default function HomePage() {
 
       {/* How it Works Section */}
       <section className="bg-slate-900 py-24 relative overflow-hidden">
-        {/* Background glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"></div>
         <div className="max-w-[1440px] mx-auto px-5 lg:px-10 relative z-10">
           <div className="text-center mb-16">

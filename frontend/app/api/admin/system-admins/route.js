@@ -7,8 +7,8 @@ import { verifyAdminRequest } from '@/lib/utils/adminAuth';
 export async function GET(request) {
   try {
     const admin = verifyAdminRequest(request);
-    if (!admin || admin.adminRole !== 'SUPER_ADMIN') {
-      return NextResponse.json({ success: false, message: 'Super Admin access required' }, { status: 401 });
+    if (!admin) {
+      return NextResponse.json({ success: false, message: 'Admin access required' }, { status: 401 });
     }
 
     await connectDB();
@@ -25,8 +25,8 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const admin = verifyAdminRequest(request);
-    if (!admin || admin.adminRole !== 'SUPER_ADMIN') {
-      return NextResponse.json({ success: false, message: 'Super Admin access required' }, { status: 401 });
+    if (!admin) {
+      return NextResponse.json({ success: false, message: 'Admin access required' }, { status: 401 });
     }
 
     const { name, email, phone, password, role, assignedCity } = await request.json();
