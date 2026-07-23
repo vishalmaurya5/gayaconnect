@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, unique: true, sparse: true },
   email: { type: String, required: true, unique: true, sparse: true },
   password: { type: String, select: false, required: true },
-  role: { type: String, enum: ['user', 'vendor', 'admin'], default: 'user' },
+  role: { type: String, enum: ['user', 'vendor', 'admin', 'employee'], default: 'user' },
   adminRole: { type: String, enum: ['SUPER_ADMIN', 'ADMIN', 'NONE'], default: 'NONE' },
   assignedCities: [{ type: String }],
   permissions: [{ type: String }],

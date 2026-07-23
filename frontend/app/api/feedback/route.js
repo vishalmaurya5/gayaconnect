@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db/mongodb';
 import Feedback from '@/lib/db/models/Feedback';
+import Vendor from '@/lib/db/models/Vendor';
 
 export async function GET(request) {
   try {
@@ -8,10 +9,9 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
     const vendorId = searchParams.get('vendorId');
-    const status = searchParams.get('status') || 'approved'; // Default to approved for public queries
-    const limit = parseInt(searchParams.get('limit')) || 10;
+    const limit = parseInt(searchParams.get('limit')) || 20;
 
-    const query = { status };
+    const query = {};
     if (type) query.type = type;
     if (vendorId) query.vendorId = vendorId;
 
@@ -33,7 +33,7 @@ export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { type, vendorId, name, rating, comment } = body;
+    const { type, vendorId, name, phone, rating, comment } = body;
 
     if (!type || !name || !rating || !comment) {
       return NextResponse.json(
@@ -49,14 +49,31 @@ export async function POST(request) {
       );
     }
 
+    // Auto approve vendor customer feedback for real-time display
     const feedback = await Feedback.create({
       type,
-      vendorId,
+      vendorId: vendorId || null,
       name,
-      rating,
+      phone: phone || '',
+      rating: Number(rating),
       comment,
-      status: 'pending' // Force pending state for new submissions
+      status: 'approved'
     });
+
+    // Update vendor rating and total reviews in DB
+    if (type === 'vendor' && vendorId) {
+      try {
+        const allReviews = await Feedback.find({ vendorId, type: 'vendor', status: 'approved' });
+        const count = allReviews.length;
+        const avg = count > 0 ? (allReviews.reduce((sum, r) => sum + r.rating, 0) / count) : Number(rating);
+        await Vendor.findByIdAndUpdate(vendorId, {
+          rating: Number(avg.toFixed(1)),
+          totalReviews: count
+        });
+      } catch (err) {
+        console.error('Error updating vendor aggregate rating:', err);
+      }
+    }
 
     return NextResponse.json(
       { success: true, message: 'Feedback submitted successfully', data: feedback },
