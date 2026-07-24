@@ -1,9 +1,25 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { FiPhone } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 
 export default function FloatingContactButtons() {
+  const pathname = usePathname();
+
+  // Hide Call & WhatsApp floating buttons on all Admin, Super Admin, Employee & Dashboard routes
+  if (
+    !pathname ||
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/employee') ||
+    pathname.startsWith('/vendor') ||
+    pathname.includes('/admin/') ||
+    pathname.includes('/employee/') ||
+    pathname.includes('/(dashboard)')
+  ) {
+    return null;
+  }
+
   const callPhone = '+918544491413';
   const whatsappPhone = '+919117588242';
   const whatsappUrl = `https://wa.me/${whatsappPhone.replace(/\D/g, '')}?text=${encodeURIComponent('Hi Gaya Seva Team, I need assistance.')}`;

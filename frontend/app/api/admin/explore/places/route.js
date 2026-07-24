@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db/mongodb';
 import ExplorePlace from '@/lib/db/models/ExplorePlace';
-import { verifyAdminRequest } from '@/lib/auth/adminAuth';
+import { verifyAdminRequest } from '@/lib/utils/adminAuth';
 
 export async function GET(request) {
   try {
-    const auth = await verifyAdminRequest(request);
-    if (!auth.authorized) {
+    const auth = verifyAdminRequest(request);
+    if (!auth) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
@@ -20,8 +20,8 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const auth = await verifyAdminRequest(request);
-    if (!auth.authorized) {
+    const auth = verifyAdminRequest(request);
+    if (!auth) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 

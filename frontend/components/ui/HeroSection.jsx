@@ -214,7 +214,7 @@ export default function HeroSection() {
               {/* Premium Image Container */}
               <div className="relative w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl shadow-indigo-900/10 border border-slate-200/50 bg-white z-20">
                 <Image 
-                  src="/images/gaya_seva_hero_banner.png" 
+                  src="/images/gaya_seva_hero_banner_v2.png" 
                   alt="Gaya Seva Professionals" 
                   fill
                   priority
